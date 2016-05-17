@@ -42,17 +42,19 @@ public class AdmClientes {
         servidores[pos] = false; 
     }
     
-    public int numServidores(){
-    
-        int libres = 0;
+    public boolean hayServidor(){
         
-        for(int i = 0; i < servidores.length; i++){
+        int pos = 0;
         
-            if(!servidores[i])
-                libres++;
+        while(pos < servidores.length){
+        
+            if(!servidores[pos])
+                return true;
+            
+            pos++;
         }
         
-        return libres;
+        return false;
     }
     
 }

@@ -23,11 +23,12 @@ public class Simulacion {
     
     void addConexion(){
     
-       if(adm.numServidores()> 0){
+       if(adm.hayServidor()){
        
-           adm.crearConexion(tiempoActual);
+           int numServidor = adm.crearConexion(tiempoActual);
+           Conexion conexion = new Conexion(tiempoActual, timeOutGlobal, numServidor);
+           conexiones.add(conexion);
            
-       
        }
         
     }

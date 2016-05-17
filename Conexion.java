@@ -18,12 +18,13 @@ public class Conexion {
     Random r = new Random();
  
     
-    public Conexion(int tipo,int  tiempoEntrada,int  timeoutGlobal, int numServidor){
-    
-        this.tipo = tipo;
+    public Conexion(int  tiempoEntrada,int  timeoutGlobal, int numServidor){
         this.tiempoEntrada = tiempoEntrada;
         generarTimeout(timeoutGlobal);
+        definirTipo();
     }
+    
+    
     public void definirTipo(){   
         
         float val = r.nextFloat();
