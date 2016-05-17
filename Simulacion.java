@@ -17,7 +17,7 @@ public class Simulacion {
     int timeOutGlobal = 0;
     int tiempoActual = 0;
     
-    List<Conexion> conexiones = new ArrayList<>();//Lista que contendra los eventos
+
     Random r = new Random();
     AdmClientes adm;
     
@@ -25,9 +25,8 @@ public class Simulacion {
     
        if(adm.hayServidor()){
        
-           int numServidor = adm.crearConexion(tiempoActual);
-           Conexion conexion = new Conexion(tiempoActual, timeOutGlobal, numServidor);
-           conexiones.add(conexion);
+          adm.crearConexion(tiempoActual,timeOutGlobal);
+          
            
        }
         

@@ -5,12 +5,16 @@
  */
 package io;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author b26441
  */
 public class AdmClientes {
-    
+   
+    List<Conexion> conexiones = new ArrayList<>();//Lista que contendra los eventos
     boolean[] servidores;
     
     
@@ -20,26 +24,32 @@ public class AdmClientes {
 
     }
     
-    public int crearConexion(int pos){
+    public void crearConexion(int tiempoActual, int timeOutGlobal){
     //Metodo poco ortodoxo con for
         for(int i = 0; i < servidores.length; i++){
         
             if(!servidores[i]){
                  servidores[i] = true;
-                 return i;
+                 Conexion conexion = new Conexion(tiempoActual, timeOutGlobal, i);
+                 conexiones.add(conexion);
+                 break;
             }
         }
-        
-      /* int pos = 0; 
-       while(pos < servidores.length && )
-       */
-        
-        return -1;
         
     }
     
     public void eliminarConexion(int pos){
         servidores[pos] = false; 
+        
+        for(int i = 0; i < conexiones.size(); i++){
+        
+            if(conexiones.get(i).getServidor() == pos){
+            
+                
+            } 
+            
+        }
+        
     }
     
     public boolean hayServidor(){

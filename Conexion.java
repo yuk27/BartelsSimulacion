@@ -18,14 +18,14 @@ public class Conexion {
     Random r = new Random();
  
     
-    public Conexion(int  tiempoEntrada,int  timeoutGlobal, int numServidor){
+    public Conexion(int tiempoEntrada,int  timeoutGlobal, int numServidor){
         this.tiempoEntrada = tiempoEntrada;
         generarTimeout(timeoutGlobal);
-        definirTipo();
+        generarTipo();
     }
     
     
-    public void definirTipo(){   
+    public void generarTipo(){   
         
         float val = r.nextFloat();
         
@@ -62,6 +62,11 @@ public class Conexion {
     public int getTimeout(){
         return timeout;     
     }
+    
+        public int getServidor(){
+        return numServidor;     
+    }
+    
     
         public int getTiempoEntrada(){
         return tiempoEntrada;     
