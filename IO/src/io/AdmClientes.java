@@ -14,24 +14,23 @@ import java.util.List;
  */
 public class AdmClientes {
    
-    List<Conexion> conexiones = new ArrayList<>();//Lista que contendra los eventos
+    List<Conexion> conexiones;
     boolean[] servidores;
     
     
     public AdmClientes(int k){
-    
         servidores = new boolean[k];
-
+        conexiones = new ArrayList<>();
     }
     
     public void crearConexion(int tiempoActual, int timeOutGlobal){
-    //Metodo poco ortodoxo con for
         for(int i = 0; i < servidores.length; i++){
-        
             if(!servidores[i]){
                  servidores[i] = true;
-                 Conexion conexion = new Conexion(tiempoActual, timeOutGlobal, i);
-                 conexiones.add(conexion);
+                 Conexion nuevaConexion = new Conexion(tiempoActual, timeOutGlobal, i);
+                 nuevaConexion.generarTimeout(timeOutGlobal);
+                 nuevaConexion.generarTipo();
+                 conexiones.add(nuevaConexion);
                  break;
             }
         }
@@ -40,31 +39,35 @@ public class AdmClientes {
     
     public void eliminarConexion(int pos){
         servidores[pos] = false; 
-        
         for(int i = 0; i < conexiones.size(); i++){
-        
             if(conexiones.get(i).getServidor() == pos){
-            
-                
-            } 
-            
-        }
-        
+                conexiones.remove(i);
+            }    
+        }   
     }
     
     public boolean hayServidor(){
-        
         int pos = 0;
-        
         while(pos < servidores.length){
-        
             if(!servidores[pos])
                 return true;
-            
             pos++;
-        }
-        
+        }  
         return false;
     }
     
+    public void verificarTimeout(int pos, int reloj){
+            for(int i = 0; i < conexiones.size(); i++){
+            if(conexiones.get(i).getServidor() == pos){
+                if(reloj  > conexiones.get(i).timeout){
+                    conexiones.remove(i);
+                    servidores[pos] = false;
+                }
+            }    
+        } 
+    }
+    
+    public void ponerEnRed(int tiempo){
+        //en espera
+    }    
 }

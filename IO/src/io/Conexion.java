@@ -19,43 +19,31 @@ public class Conexion {
  
     
     public Conexion(int tiempoEntrada,int  timeoutGlobal, int numServidor){
-        this.tiempoEntrada = tiempoEntrada;
-        generarTimeout(timeoutGlobal);
-        generarTipo();
+       this.tiempoEntrada = tiempoEntrada;
+       this.numServidor = numServidor;
     }
     
+    public double generarTiempoArribo(){
+        return (-1/30*(Math.log(1 - r.nextDouble())));
+    }
     
     public void generarTipo(){   
-        
-        float val = r.nextFloat();
-        
+        double val = r.nextDouble();
         if(val < 0.3){
-        
             tipo = 0;
-            
         }
-        
-        else if(val < 0.55){
-            
-            tipo = 1;
-            
+        else if(val < 0.55){    
+            tipo = 1;      
         }
-        
         else if(val < 0.9){
-        
             tipo = 2;
-            
         }
-        
         else{
             tipo = 3;
         }
-   
-        
     }
     
     public void generarTimeout(int  timeoutGlobal){
-    
         timeout = tiempoEntrada + timeoutGlobal; 
     }
     
@@ -66,7 +54,6 @@ public class Conexion {
         public int getServidor(){
         return numServidor;     
     }
-    
     
         public int getTiempoEntrada(){
         return tiempoEntrada;     

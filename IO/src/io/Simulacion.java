@@ -21,12 +21,9 @@ public class Simulacion {
     Random r = new Random();
     AdmClientes adm;
     
-    void addConexion(){
-    
+    void crearConexion(){
        if(adm.hayServidor()){
-       
           adm.crearConexion(tiempoActual,timeOutGlobal);
-          
            
        }
         

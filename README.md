@@ -1,3 +1,0 @@
-# BartelsSimulacion
-
-fdhdfdfh
