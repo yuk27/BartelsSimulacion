@@ -58,5 +58,16 @@ public class Conexion {
         public int getTiempoEntrada(){
         return tiempoEntrada;     
     }
+        
+        public boolean isReadOnly(){
+            return tipo == 0 || tipo == 2;
+        }
     
+        public int getTipo(){
+            return this.tipo;
+        }
+        
+        public int getNumServidor(){
+            return this.numServidor;
+        }
 }
