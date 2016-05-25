@@ -16,28 +16,47 @@ import java.util.Random;
 public class ProcesamientoConsultas {
     int[] servidoresConsultas;
     int[] ejecutorConsultas;
+    double[] tiempoProcesamiento; 
     List<Conexion> consultas;
     List<Conexion> ejecutor;
     Random r = new Random();
     
     public ProcesamientoConsultas(int p, int m){
         servidoresConsultas = new int [p];
+        tiempoProcesamiento = new double [p];
         ejecutorConsultas = new int[m];
         consultas = new ArrayList<>();
         ejecutor = new ArrayList<>();
     }
     
-        public void asignarConsultaAServidor(Conexion c){
+        public double asignarConsultaAServidor(Conexion c, int reloj){
         int i = 0;
         while(i < servidoresConsultas.length){
             if(servidoresConsultas[i] == -1){
                 servidoresConsultas[i] = c.getNumServidor();
-                break;
+                return tiempoProcesamiento[i] = calcularTiempoTotal(c) + reloj;
+             
             }
             i++;
         }
         consultas.add(c);
+        return -1;
     }
+        
+    public int getSiguienteProcesado(){ 
+       
+            double menorTiempo = -1; //se inicializa el valor
+            int siguiente = 0; 
+        for(int i = 0; i < tiempoProcesamiento.length; i++){
+        
+            if(tiempoProcesamiento[i] > menorTiempo || menorTiempo == -1){ //si es el menor tiempo o el primero se toma como el menor
+                menorTiempo = tiempoProcesamiento[i];
+                siguiente = i;
+            }
+        }
+    return siguiente;
+    } 
+        
     
         
     void InicializarVectores(){

@@ -23,8 +23,8 @@ public class Conexion {
        this.numServidor = numServidor;
     }
     
-    public double generarTiempoArribo(){
-        return (-1/30*(Math.log(1 - r.nextDouble())));
+    public static double generarTiempoArribo(double rnd){
+        return (-1/30*(Math.log(1 - rnd)));
     }
     
     public void generarTipo(){   

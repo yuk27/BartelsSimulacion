@@ -15,14 +15,33 @@ public class AdmProcesos {
      boolean servidorOcupado;
      List<Conexion> conexiones;
      Random r = new Random();
+     Conexion enServicio;
      
      public AdmProcesos(){
          servidorOcupado = false;
          conexiones =  new ArrayList<>();
      }
      
-     public void crearHilo(){
-         servidorOcupado = true;
+     public void crearHilo(Conexion c){
+         if(!servidorOcupado){
+            
+             if(conexiones.size() == 0){
+             
+                servidorOcupado = true;
+                enServicio = c;
+             }
+             
+             else{
+             conexiones.add(c);
+             enServicio =conexiones.get(0);
+             conexiones.remove(0);
+             servidorOcupado = true;
+             }
+         
+         }
+         else{
+             conexiones.add(c);
+         }
      }
      
      public void liberarServidor(){
@@ -37,4 +56,14 @@ public class AdmProcesos {
          z -= 6;
          return (1 + (0.01*z));
      }
+     
+     public boolean estaOcupado(){
+     return servidorOcupado;
+     }
+     
+    Conexion SiguienteConexion(){
+     servidorOcupado = false;
+     return enServicio;
+     }
+     
 }

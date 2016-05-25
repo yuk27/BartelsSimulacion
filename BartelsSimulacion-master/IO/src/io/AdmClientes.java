@@ -45,7 +45,28 @@ public class AdmClientes {
             }    
         }   
     }
+   /* 
+    public Conexion getSiguienteConexion(){
     
+        int menorTiempo = -1; //se inicializa el valor
+        Conexion siguiente = null;
+        
+        for(int i = 0; i < conexiones.size(); i++){
+        
+            if(conexiones.get(i).getTiempoEntrada() > menorTiempo || menorTiempo == -1){ //si es el menor tiempo o el primero se toma como el menor
+                siguiente = conexiones.get(i);
+                menorTiempo = conexiones.get(i).getTiempoEntrada();
+            }
+        }
+    return siguiente;
+    } */
+    
+    public Conexion getSiguienteConexion(){
+    return conexiones.get(conexiones.size() - 1);
+    }
+    
+
+   
     public boolean hayServidor(){
         int pos = 0;
         while(pos < servidores.length){
