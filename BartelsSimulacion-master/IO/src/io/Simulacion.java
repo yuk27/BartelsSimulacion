@@ -67,44 +67,45 @@ public class Simulacion {
     void crearConexion(){
        if(admC.hayServidor()){ //si hay servidores desocupados
           admC.crearConexion(tiempoActual,timeOutGlobal); //se crea la conexion y se pone la posicion en ocupado 
-          Evento siguienteCreacionHilo= new Evento();
-          siguienteCreacionHilo.id = 1;
-          siguienteCreacionHilo.tiempo = admP.generarTiempoSalida() + reloj;
-          siguienteCreacionHilo.c = admC.getSiguienteConexion();
-          eventos.add(siguienteCreacionHilo);
+          Evento siguienteCreacionHilo= new Evento();//Se crea el evento de salida
+          siguienteCreacionHilo.id = 1; //se genera si id
+          siguienteCreacionHilo.tiempo = admP.generarTiempoSalida() + reloj; //se guarda si momento de salida
+          siguienteCreacionHilo.c = admC.getSiguienteConexion();//se guarda la conexion que se acaba de hacer
+          eventos.add(siguienteCreacionHilo); //se agraga el evento a la lista de eventos
           
             //CrearHiloConexion(admC.getSiguienteConexion());
        }
        else{
-       conexionesRechazadas++;
+       conexionesRechazadas++; //sino se puede guardar se agrega al contador de rechazadas
        }
        
-        Evento siguienteLlegada = new Evento();
+        Evento siguienteLlegada = new Evento(); //se genera el evento para la siguiente entrada
         siguienteLlegada.id = 0;
-        siguienteLlegada.tiempo = Conexion.generarTiempoArribo(r.nextDouble()) + reloj;
-        eventos.add(siguienteLlegada);
+        siguienteLlegada.tiempo = Conexion.generarTiempoArribo(r.nextDouble()) + reloj; //se guarda su momento de arribo
+        eventos.add(siguienteLlegada);// y se agraga a la lista de eventos ya que no necesita conexion 
     }
     
-    void CrearHiloConexion(Conexion c){   
+    void CrearHiloConexion(Conexion c){  
         
-          admP.crearHilo(c); 
+          admP.crearHilo(c); //se guardar la conexion entrante ya sea en el servidor si no hay cola, o se agraga a la cola
           
-          Conexion siguiente = admP.SiguienteConexion();
-                 if(siguiente.getTimeout() > reloj){
-                        admC.eliminarConexion(c.getNumServidor());
-                  }
-          Evento siguienteCreacionHilo= new Evento();
+          Conexion siguiente = admP.SiguienteConexion(); //Se recupera la conexion que este en el servidor para ser procesada
+               
+          while(siguiente.getTimeout() > reloj){//Recuperamos el siguiente evento hasta que no este en timeout
+             admC.eliminarConexion(c.getNumServidor()); //elimnamos la conexion en timeout
+             siguiente = admP.SiguienteConexion(); //y se pasa la siguiente al servidor
+          }            
+                 
+          Evento siguienteCreacionHilo= new Evento(); //se genera el evento de Procesado de consulta de la siguiente conexion 
           siguienteCreacionHilo.id = 2;
           siguienteCreacionHilo.tiempo = admP.generarTiempoSalida() + reloj;
-          eventos.add(siguienteCreacionHilo);
           siguienteCreacionHilo.c = siguiente;
-         //ProcesarConsultas(siguiente);
+          eventos.add(siguienteCreacionHilo);
         
     }
     
     void ProcesarConsultas(Conexion c){
     
-       //Conexion c =  admP.SiguienteConexion();
        if(c.getTimeout() > reloj){
        admP.liberarServidor();
        admC.eliminarConexion(c.getNumServidor());
@@ -112,9 +113,9 @@ public class Simulacion {
        
        else{
            
-           double procesado = pc.asignarConsultaAServidor(c,reloj);
+           double procesado = pc.asignarConsultaAServidor(c,reloj);//se asigna el servidor y se calcula el tiempo de reloj en donde terminara de procesarse     
            
-         if(procesado != -1){ //se asigna el servidor y se calcula el tiempo de reloj en donde terminara de procesarse     
+         if(procesado != -1){ //De devolver un tiempo -1 significa que el servidor estaba ocupado y se agrago la conexion a la lista de espera
             Evento siguienteConsultaProcesada = new Evento();
             siguienteConsultaProcesada.id = 2;
             siguienteConsultaProcesada.tiempo = procesado;
