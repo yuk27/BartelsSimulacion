@@ -125,19 +125,60 @@ public class Simulacion {
        }  
     }
     
+    void AdministrarConsultas(Conexion c){ 
+    int indice = 0; //variable donde se meterá la conexion que saldrá
+       indice = pc.eliminarConexionServidor(c); //se mete su posicion en servidor
+       
+       if(pc.consultas.size() > 0){ //si hay alguien en cola
+           pc.servidoresConsultas[indice] = pc.consultas.remove(0).numServidor; //metemos el siguiente en cola en servidor y se borra de la lista
+       } 
+    }
+    
     void ProcesarTransaccion(Conexion c){
-       if(c.getTimeout() > reloj){
+        
+       if(c.getTimeout() > reloj){ //si hay timeout elmina
        pc.eliminarConexionServidor(c);
        admP.liberarServidor();
        admC.eliminarConexion(c.getNumServidor());
        }
        
        else{
-       transacciones.asignarConexion(c);
-       }
+           
+       AdministrarConsultas(c); //se elimina del servidor de procesar consultas y se agrega una nueva
+      if(transacciones.asignarConexion(c)){  //se agrega la conexion al servidor de transaciones o a la cola
+          
+        Evento siguienteTransaccion = new Evento(); //se genera el evento
+        siguienteTransaccion.id = 3;
+   
+       if(c.getTipo() == 3){ //si el evento en salir es un ddl
+           siguienteTransaccion.tiempo = transacciones.calcularTiempoTransaccion() + transacciones.mayorTiempoEjecucion;
+        }
+        else{ //si no es dll le calculo el tiempo (p*0.03) y se calcula su tiempo de ejecucion
+           
+            if(c.getTipo() == 2){ //si el evento en salir es un join
+                 siguienteTransaccion.tiempo = transacciones.calcularTiempoTransaccion() + (transacciones.randomWithRange(1,64) *1/10); //se calcula el tiempo del join
+            }
+            else if(c.getTipo() == 0){
+                siguienteTransaccion.tiempo = transacciones.calcularTiempoTransaccion() + 1/10; //se calcula el tiempo del select
+            }
+            else {
+                siguienteTransaccion.tiempo = transacciones.calcularTiempoTransaccion(); //se calcula el tiempo del select
+            }
+           
+            if(siguienteTransaccion.tiempo > transacciones.mayorTiempoEjecucion){
+                transacciones.mayorTiempoEjecucion = siguienteTransaccion.tiempo;
+                }
+             }
+       
+       eventos.add(siguienteTransaccion);
+            }
+        }
+       
        
     }
     
+    
+    //HAY QUE ELIMINAR DEL SERVIDOR DE TRANSACCIONES EL C CON NOS ENTRE
     void EjecutarConsulta(Conexion c, int numBloques){
         
        if(c.getTimeout() > reloj){

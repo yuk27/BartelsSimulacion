@@ -17,9 +17,12 @@ public class Transacciones {
     int[] servidores;
     List<Conexion> conexionesConPrioridad;
     
+    public double mayorTiempoEjecucion;
+    
     public Transacciones(int p){
         servidores = new int[p];
         conexionesConPrioridad = new ArrayList<>();
+        mayorTiempoEjecucion = 0;
         hayDDL = false;
     }
     
@@ -59,24 +62,26 @@ public class Transacciones {
         return tiempoEnDisco;
     }
     
-        double randomWithRange(int min, int max){ 
+       public double randomWithRange(int min, int max){ 
         int range = (max - min) + 1; 
         return (Math.random()*range) + min; 
     }
     
-    public void asignarConexion(Conexion c){
+    public boolean asignarConexion(Conexion c){
         int i = 0; 
         while(i < servidores.length && !hayDDL){
             if(servidores[i] == -1){
                 if(c.getTipo() == 3){
                     hayDDL = true;
                 }
+                
                 servidores[i] = c.getNumServidor();
-                break;
+                return true;
             }
             i++;
         }
         conexionesConPrioridad.add(c);
+        return false;
     }
     
     Conexion getConexionDePrioridad(){
@@ -102,6 +107,10 @@ public class Transacciones {
             if(servidores[i] == c.getNumServidor()){
                 servidores[i] = -1;
             }
+        }
+        
+        if(c.tipo == 3){
+            hayDDL = false;
         }
     }
     

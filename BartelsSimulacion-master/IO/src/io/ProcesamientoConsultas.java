@@ -132,12 +132,15 @@ public class ProcesamientoConsultas {
         return cantidadDeBloques/64;
     }
     
-    public void eliminarConexionServidor(Conexion c){
+    public int eliminarConexionServidor(Conexion c){
         for(int i = 0; i < servidoresConsultas.length; i++){
             if(servidoresConsultas[i] == c.getNumServidor()){
                 servidoresConsultas[i] = -1;
+                return i;
             }
         }
+        
+        return -1;
     }
     
     public void eliminarConexionEjecutor(Conexion c){
