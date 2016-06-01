@@ -50,7 +50,7 @@ public class Simulacion {
     MyComparator comparator = new MyComparator();
     PriorityQueue<Evento> eventos = new PriorityQueue<>(13,comparator);
     
-    int reloj = 0; //ariable que cuente el tiempo actual en el cual nos encontramos dentro del sistema
+    int reloj = 0; //variable que cuenta el tiempo actual en el cual nos encontramos dentro del sistema
     
     int timeOutGlobal = 0;
     int tiempoActual = 0;
@@ -65,43 +65,51 @@ public class Simulacion {
     Transacciones transacciones;
     
     void crearConexion(){
-       if(admC.hayServidor()){ //si hay servidores desocupados
-          admC.crearConexion(tiempoActual,timeOutGlobal); //se crea la conexion y se pone la posicion en ocupado 
-          Evento siguienteCreacionHilo= new Evento();//Se crea el evento de salida
-          siguienteCreacionHilo.id = 1; //se genera si id
-          siguienteCreacionHilo.tiempo = admP.generarTiempoSalida() + reloj; //se guarda si momento de salida
-          siguienteCreacionHilo.c = admC.getSiguienteConexion();//se guarda la conexion que se acaba de hacer
-          eventos.add(siguienteCreacionHilo); //se agraga el evento a la lista de eventos
-          
-            //CrearHiloConexion(admC.getSiguienteConexion());
+       if(admC.hayServidor()){                                              //si hay servidores desocupados
+          admC.crearConexion(tiempoActual,timeOutGlobal); //se crea la conexion y se pone la posicion del servidor en ocupado 
+          Evento siguienteCreacionHilo= new Evento();       //Se crea el evento de salida (entrada al sigueinte modulo)
+          siguienteCreacionHilo.id = 1;                                
+          siguienteCreacionHilo.tiempo = admP.generarTiempoSalida() + reloj;    
+          siguienteCreacionHilo.c = admC.getSiguienteConexion();                    //se guarda la conexion en el evento que se acaba de hacer
+          eventos.add(siguienteCreacionHilo);                    //se agrega el evento a la lista de eventos
        }
        else{
-       conexionesRechazadas++; //sino se puede guardar se agrega al contador de rechazadas
+            conexionesRechazadas++;                             //sino se puede guardar se agrega al contador de rechazadas
        }
        
-        Evento siguienteLlegada = new Evento(); //se genera el evento para la siguiente entrada
+        Evento siguienteLlegada = new Evento();             //se genera el evento para la siguiente entrada de una conexion
         siguienteLlegada.id = 0;
-        siguienteLlegada.tiempo = Conexion.generarTiempoArribo(r.nextDouble()) + reloj; //se guarda su momento de arribo
-        eventos.add(siguienteLlegada);// y se agraga a la lista de eventos ya que no necesita conexion 
+        siguienteLlegada.tiempo = Conexion.generarTiempoArribo(r.nextDouble()) + reloj; 
+        eventos.add(siguienteLlegada);                          // se agrega a la lista de eventos.
     }
     
-    void CrearHiloConexion(Conexion c){  
+    void CrearHiloConexion(Conexion c){  //arreglar este metodo. Si entra una conexion directo al servidor, se le calcular el tiempo, sino se mete  a la cola. Cuando sale es otro evento. 
         
-          admP.crearHilo(c); //se guardar la conexion entrante ya sea en el servidor si no hay cola, o se agraga a la cola
-          
-          Conexion siguiente = admP.SiguienteConexion(); //Se recupera la conexion que este en el servidor para ser procesada
-               
-          while(siguiente.getTimeout() > reloj){//Recuperamos el siguiente evento hasta que no este en timeout
-             admC.eliminarConexion(c.getNumServidor()); //elimnamos la conexion en timeout
-             siguiente = admP.SiguienteConexion(); //y se pasa la siguiente al servidor
-          }            
-                 
-          Evento siguienteCreacionHilo= new Evento(); //se genera el evento de Procesado de consulta de la siguiente conexion 
-          siguienteCreacionHilo.id = 2;
-          siguienteCreacionHilo.tiempo = admP.generarTiempoSalida() + reloj;
-          siguienteCreacionHilo.c = siguiente;
-          eventos.add(siguienteCreacionHilo);
-        
+         if(c.getTimeout() > reloj){                                                //Recuperamos el siguiente evento hasta que no este en timeout
+                admC.eliminarConexion(c.getNumServidor());         //elimnamos la conexion en timeout
+          }  
+         else{
+                admP.crearHilo(c);                                                      //se guarda la conexion entrante ya sea en el servidor si no hay cola, o se agrega a la cola
+                if(admP.getServidor()){
+                        Evento siguienteHilo= new Evento();             //se genera el evento de Procesado de consulta de la siguiente conexion 
+                        siguienteHilo.id = 2;
+                        siguienteHilo.tiempo = admP.generarTiempoSalida() + reloj;
+                        siguienteHilo.c = c;
+                        eventos.add(siguienteHilo); 
+                        admP.SetServidor();
+                }
+         }
+    }
+    
+    void administrarServidorDeCreacionHilo(){
+        admP.administrarServidor();
+        if(admP.servidorOcupado){
+                Evento siguienteHilo= new Evento();             //se genera el evento de Procesado de consulta de la siguiente conexion 
+                siguienteHilo.id = 2;
+                siguienteHilo.tiempo = admP.generarTiempoSalida() + reloj;
+                siguienteHilo.c = admP.SiguienteConexion();
+                eventos.add(siguienteHilo); 
+        }
     }
     
     void ProcesarConsultas(Conexion c){

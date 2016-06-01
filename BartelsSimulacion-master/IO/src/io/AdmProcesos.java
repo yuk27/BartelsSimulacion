@@ -13,6 +13,7 @@ import java.util.Random;
  */
 public class AdmProcesos {
      boolean servidorOcupado;
+     boolean entroAlServidor = false;
      List<Conexion> conexiones;
      Random r = new Random();
      Conexion enServicio;
@@ -24,24 +25,38 @@ public class AdmProcesos {
      
      public void crearHilo(Conexion c){
          if(!servidorOcupado){
-            
              if(conexiones.size() == 0){
-             
                 servidorOcupado = true;
                 enServicio = c;
+                entroAlServidor = true;
              }
-             
              else{
-             conexiones.add(c);
-             enServicio =conexiones.get(0);
-             conexiones.remove(0);
-             servidorOcupado = true;
-             }
-         
+                conexiones.add(c);
+             }  
          }
          else{
              conexiones.add(c);
          }
+     }
+     
+     public void SetServidor(){
+         entroAlServidor = false;
+     }
+     
+     public boolean getServidor(){
+         return entroAlServidor;
+     }
+     
+     public void administrarServidor(){
+                if(conexiones.isEmpty()){
+                    enServicio = null;
+                    servidorOcupado = false;
+                }
+                else{
+                    enServicio =conexiones.get(0);
+                    conexiones.remove(0);
+                    servidorOcupado = true;
+                }
      }
      
      public void liberarServidor(){
@@ -58,7 +73,7 @@ public class AdmProcesos {
      }
      
      public boolean estaOcupado(){
-     return servidorOcupado;
+         return servidorOcupado;
      }
      
     Conexion SiguienteConexion(){
