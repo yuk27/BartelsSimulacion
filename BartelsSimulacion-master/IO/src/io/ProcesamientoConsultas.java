@@ -29,13 +29,12 @@ public class ProcesamientoConsultas {
         ejecutor = new ArrayList<>();
     }
     
-        public double asignarConsultaAServidor(Conexion c, int reloj){
+        public double asignarConsultaAServidor(Conexion c, double reloj){
         int i = 0;
         while(i < servidoresConsultas.length){
             if(servidoresConsultas[i] == -1){
                 servidoresConsultas[i] = c.getNumServidor();
-                return tiempoProcesamiento[i] = calcularTiempoTotal(c) + reloj;
-             
+                return (calcularTiempoTotal(c));
             }
             i++;
         }
@@ -104,28 +103,29 @@ public class ProcesamientoConsultas {
         }
     }
     
-    public void asignarConsultaAEjecutor(Conexion c){
+    public boolean asignarConsultaAEjecutor(Conexion c){
         int i = 0;
         while(i < ejecutorConsultas.length){
             if(ejecutorConsultas[i] == -1){
                 ejecutorConsultas[i] = c.getNumServidor();
-                break;
+                return true;
             }
             i++;
         }
         ejecutor.add(c);
+        return false;
     }
     
     public double calcularTiempoAlgoritmoEjecucion(int cantidadDeBloques, Conexion c){
-        double tiempoDeEjecucion = Math.pow(cantidadDeBloques, 2.0);
+        double tiempoDeEjecucionSegundos = Math.pow(cantidadDeBloques, 2.0) / 1000;
         int tipoConexion = c.getTipo();
         if(tipoConexion == 1){
-            tiempoDeEjecucion += 1;
+            tiempoDeEjecucionSegundos += 1;
         }
         else if(tipoConexion == 3){
-            tiempoDeEjecucion += 0.5;
+            tiempoDeEjecucionSegundos += 0.5;
         }
-        return tiempoDeEjecucion;
+        return tiempoDeEjecucionSegundos;
     }
     
     public double calcularTamanoRespuesta(int cantidadDeBloques){
@@ -133,21 +133,46 @@ public class ProcesamientoConsultas {
     }
     
     public int eliminarConexionServidor(Conexion c){
+        int posLibre = -1;
         for(int i = 0; i < servidoresConsultas.length; i++){
             if(servidoresConsultas[i] == c.getNumServidor()){
                 servidoresConsultas[i] = -1;
-                return i;
+                posLibre = i;
             }
         }
-        
-        return -1;
+        return posLibre;
     }
     
-    public void eliminarConexionEjecutor(Conexion c){
+    public Conexion administrarEjecutor(Conexion c){
+        int posLibre = eliminarConexionEjecutor(c);
+        if(!ejecutor.isEmpty()){
+            ejecutorConsultas[posLibre] = ejecutor.get(0).getNumServidor();
+            return (ejecutor.remove(0));
+        }
+        else{
+            return null;
+        }
+    }
+    
+    public Conexion administrarServidor(Conexion c){             
+        int posLibre = eliminarConexionServidor(c);
+        if(!consultas.isEmpty()){
+            servidoresConsultas[posLibre] = consultas.get(0).getNumServidor();      //asigno la primera conexion de la lista al servidor que acabo de liberar
+            return (consultas.remove(0));    
+        }
+        else{
+            return null;
+        }
+    }
+    
+    public int eliminarConexionEjecutor(Conexion c){
+        int posLibre = -1;
         for(int i = 0; i < ejecutorConsultas.length; i++){
             if(ejecutorConsultas[i] == c.getNumServidor()){
                 ejecutorConsultas[i] = -1;
+                posLibre = 0;
             }
         }
+        return posLibre;
     }
 }

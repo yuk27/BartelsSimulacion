@@ -88,7 +88,7 @@ public class AdmClientes {
         } 
     }
     
-    public void ponerEnRed(int tiempo){
-        //en espera
+    public double ponerEnRed(double tiempo){
+        return tiempo;
     }    
 }

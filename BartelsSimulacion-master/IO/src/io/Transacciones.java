@@ -34,9 +34,7 @@ public class Transacciones {
     }
       
     public double calcularTiempoTransaccion(){
-    
         return servidores.length *0.03;
-    
     }
     
     public double calcularTiempoBloquesDeDisco(Conexion c){
@@ -74,7 +72,6 @@ public class Transacciones {
                 if(c.getTipo() == 3){
                     hayDDL = true;
                 }
-                
                 servidores[i] = c.getNumServidor();
                 return true;
             }
@@ -84,34 +81,45 @@ public class Transacciones {
         return false;
     }
     
-    Conexion getConexionDePrioridad(){
-        
+    Conexion getConexionDePrioridad(){        
         int priorMax = 0;
         int index = 0;
         
-        for(int i = 0; i < conexionesConPrioridad.size(); i++){
-            
+        for(int i = 0; i < conexionesConPrioridad.size(); i++){     
             if(conexionesConPrioridad.get(i).getTipo() > priorMax){
-            
                 priorMax = conexionesConPrioridad.get(i).getTipo();
                 index = i;
             }
-        }
-        
-        return conexionesConPrioridad.get(index);
-        
+        }   
+        return conexionesConPrioridad.get(index);      
     }
     
-    public void eliminarConexion(Conexion c){
-        for(int i = 0; i < servidores.length; i++){
-            if(servidores[i] == c.getNumServidor()){
-                servidores[i] = -1;
-            }
-        }
-        
+    public int eliminarConexion(Conexion c){
+       int posLibre = -1;
         if(c.tipo == 3){
             hayDDL = false;
         }
+        for(int i = 0; i < servidores.length; i++){
+            if(servidores[i] == c.getNumServidor()){
+                servidores[i] = -1;
+                posLibre = i;
+            }
+        }
+        return posLibre;
+    }
+    
+    public Conexion administrarServidorDeTransacciones(Conexion c){
+        int posLibre = eliminarConexion(c);
+        if(!conexionesConPrioridad.isEmpty()){
+            Conexion nuevaConexion = getConexionDePrioridad();
+            servidores[posLibre] = nuevaConexion.numServidor;
+            return nuevaConexion;
+        }
+        return null;
+    }
+    
+    public void setDDL(){
+        hayDDL = true;
     }
     
 }

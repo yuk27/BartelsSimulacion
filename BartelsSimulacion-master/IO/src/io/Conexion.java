@@ -15,6 +15,7 @@ public class Conexion {
     int timeout = 0;
     int numServidor = 0;
     int  tiempoEntrada;
+    int numBloques = 0;
     Random r = new Random();
  
     
