@@ -108,7 +108,7 @@ public class Simulacion {
         }
     }
     
-    void ProcesarConsultas(Conexion c){
+    void procesarConsultas(Conexion c){
         administrarServidorDeCreacionHilo();        //ordena el servidor anterior
         
         if(c.getTimeout() > reloj){
@@ -135,7 +135,7 @@ public class Simulacion {
             }
     }
     
-    void ProcesarTransaccion(Conexion c){       
+    void procesarTransaccion(Conexion c){       
         administrarServidorDeConsultas(c);
         if(c.getTimeout() > reloj){                                  //si hay timeout elimina
             admC.eliminarConexion(c.getNumServidor());
@@ -181,7 +181,7 @@ public class Simulacion {
         }
     }
     
-    void EjecutarConsulta(Conexion c){
+    void ejecutarConsulta(Conexion c){
        administrarServidorDeTransacciones(c);       //acomoda el servidor anterior con la nueva conexion
        if(c.getTimeout() > reloj){
          admC.eliminarConexion(c.getNumServidor());
@@ -218,10 +218,41 @@ public class Simulacion {
         admC.eliminarConexion(c.getNumServidor());
     }
     
-    void IniciarSimulación(int numC){
-       
+    void iniciarSimulación(int numC){       
+        admC = new AdmClientes(10);
+        admP = new AdmProcesos();
+        pc = new ProcesamientoConsultas(10, 10);
+        transacciones = new Transacciones(10);
         
-        
+        correrSimulacion(numC);
     }
     
+    void correrSimulacion(int numC){
+        crearConexion();
+        
+        for(int i = 0; i < numC; i++){
+            Evento siguienteEvento = eventos.poll();
+            reloj = siguienteEvento.tiempo;
+            switch(siguienteEvento.id){
+                case 0:
+                    crearConexion();
+                    break;
+                case 1:
+                    procesarConsultas(siguienteEvento.c);
+                    break;
+                case 2:
+                    procesarTransaccion(siguienteEvento.c);
+                    break;
+                case 3:
+                    ejecutarConsulta(siguienteEvento.c);
+                    break;
+                case 4:
+                    ponerResultadoEnRed(siguienteEvento.c);
+                    break;
+                case 5:
+                    terminarConexion(siguienteEvento.c);
+                    break;  
+            }
+        }
+    }
 }
