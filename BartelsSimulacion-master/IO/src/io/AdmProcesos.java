@@ -59,10 +59,6 @@ public class AdmProcesos {
                 }
      }
      
-     public void liberarServidor(){
-         servidorOcupado = false;
-     }
-     
      public double generarTiempoSalida(){      //distribucion normal
          double z = 0;
          for(int i = 0; i < 12; i++){

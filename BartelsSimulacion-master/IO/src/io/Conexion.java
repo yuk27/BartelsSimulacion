@@ -12,14 +12,14 @@ import java.util.Random;
 public class Conexion {
     
     int tipo = 0; //tipo de instruccion 0 SELECT, 1 UPDATE, 2 JOIN, 3 DLL 
-    int timeout = 0;
+    double timeout = 0;
     int numServidor = 0;
-    int  tiempoEntrada;
+    double  tiempoEntrada;
     int numBloques = 0;
     Random r = new Random();
  
     
-    public Conexion(int tiempoEntrada,int  timeoutGlobal, int numServidor){
+    public Conexion(double tiempoEntrada,int  timeoutGlobal, int numServidor){
        this.tiempoEntrada = tiempoEntrada;
        this.numServidor = numServidor;
     }
@@ -44,11 +44,11 @@ public class Conexion {
         }
     }
     
-    public void generarTimeout(int  timeoutGlobal){
+    public void generarTimeout(double  timeoutGlobal){
         timeout = tiempoEntrada + timeoutGlobal; 
     }
     
-    public int getTimeout(){
+    public double getTimeout(){
         return timeout;     
     }
     
@@ -56,7 +56,7 @@ public class Conexion {
         return numServidor;     
     }
     
-        public int getTiempoEntrada(){
+        public double getTiempoEntrada(){
         return tiempoEntrada;     
     }
         

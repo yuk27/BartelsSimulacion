@@ -23,7 +23,7 @@ public class AdmClientes {
         conexiones = new ArrayList<>();
     }
     
-    public void crearConexion(int tiempoActual, int timeOutGlobal){
+    public void crearConexion(double tiempoActual, int timeOutGlobal){
         for(int i = 0; i < servidores.length; i++){
             if(!servidores[i]){
                  servidores[i] = true;
@@ -62,11 +62,9 @@ public class AdmClientes {
     } */
     
     public Conexion getSiguienteConexion(){
-    return conexiones.get(conexiones.size() - 1);
+        return conexiones.get(conexiones.size() - 1);
     }
     
-
-   
     public boolean hayServidor(){
         int pos = 0;
         while(pos < servidores.length){

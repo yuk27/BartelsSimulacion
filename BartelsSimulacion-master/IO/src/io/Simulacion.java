@@ -26,12 +26,12 @@ public class Simulacion {
         return tiempo;
     }
     /*Tipos de eventos
-    0 - CrearConexion 
-    1 - CrearHiloConexion
-    2 - ProcesarConsultas
-    3 - ProcesarTransaccion
-    4 - EjecutarConsulta
-    5 - TerminarConexion
+    0 - Llega conexion
+    1 - Sale del servidor de creacion de hilos
+    2 - Salir del servidor de consultas
+    3 - Salir del servidor de transacciones
+    4 -Salir del servidor que ejecuta las consultas
+    5 - Termina conexion y sale del sistema 
     */
 
     
@@ -66,12 +66,8 @@ public class Simulacion {
     
     void crearConexion(){
        if(admC.hayServidor()){                                                  //si hay servidores desocupados
-          admC.crearConexion(tiempoActual,timeOutGlobal);    //se crea la conexion y se pone la posicion del servidor en ocupado 
-          Evento siguienteCreacionHilo= new Evento();            //Se crea el evento de salida (entrada al sigueinte modulo)
-          siguienteCreacionHilo.id = 1;                                
-          siguienteCreacionHilo.tiempo = admP.generarTiempoSalida() + reloj;    
-          siguienteCreacionHilo.c = admC.getSiguienteConexion();                    //se guarda la conexion en el evento que se acaba de hacer
-          eventos.add(siguienteCreacionHilo);                    //se agrega el evento a la lista de eventos
+          admC.crearConexion(reloj, timeOutGlobal);    //se crea la conexion y se pone la posicion del servidor en ocupado
+          crearHiloConexion(admC.getSiguienteConexion());
        }
        else{
             conexionesRechazadas++;                             //sino se puede guardar se agrega al contador de rechazadas
@@ -83,30 +79,29 @@ public class Simulacion {
         eventos.add(siguienteLlegada);                          // se agrega a la lista de eventos.
     }
     
-    void CrearHiloConexion(Conexion c){  
-        
-         if(c.getTimeout() > reloj){                                              
-                admC.eliminarConexion(c.getNumServidor());         //elimnamos la conexion en timeout
-                administrarServidorDeCreacionHilo();
-          }  
-         else{
+    void crearHiloConexion(Conexion c){  
                 admP.crearHilo(c);                                                      //se guarda la conexion entrante ya sea en el servidor si no hay cola, o se agrega a la cola
                 if(admP.getServidor()){
+                    if(c.getTimeout() > reloj){                                              
+                     admC.eliminarConexion(c.getNumServidor());         //elimnamos la conexion en timeout
+                     administrarServidorDeCreacionHilo();
+                     }
+                    else{
                         Evento siguienteHilo= new Evento();             //se genera el evento de Procesado de consulta de la siguiente conexion 
-                        siguienteHilo.id = 2;
+                        siguienteHilo.id = 1;
                         siguienteHilo.tiempo = admP.generarTiempoSalida() + reloj;
                         siguienteHilo.c = c;
                         eventos.add(siguienteHilo); 
-                        admP.SetServidor();
+                    }
+                    admP.SetServidor();
                 }
-         }
     }
     
     void administrarServidorDeCreacionHilo(){       //acomoda el servidor de acuerdo a la salida. Si hay conexiones en cola, lo pasa a servicio, sino, libera el servidor
         admP.administrarServidor();
         if(admP.servidorOcupado){
                 Evento siguienteHilo= new Evento();             //se genera el evento de Procesado de consulta de la siguiente conexion 
-                siguienteHilo.id = 2;
+                siguienteHilo.id = 1;
                 siguienteHilo.tiempo = admP.generarTiempoSalida() + reloj;
                 siguienteHilo.c = admP.SiguienteConexion();
                 eventos.add(siguienteHilo); 
@@ -173,7 +168,7 @@ public class Simulacion {
                  siguienteTransaccion.tiempo = transacciones.calcularTiempoTransaccion();  
                  break;
          }
-         if(siguienteTransaccion.tiempo > transacciones.mayorTiempoEjecucion){
+         if(c.getTipo() != 3 && siguienteTransaccion.tiempo > transacciones.mayorTiempoEjecucion){
                 transacciones.mayorTiempoEjecucion = siguienteTransaccion.tiempo;
          }
          eventos.add(siguienteTransaccion);
