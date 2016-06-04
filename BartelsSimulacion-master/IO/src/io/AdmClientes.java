@@ -45,6 +45,7 @@ public class AdmClientes {
             }    
         }   
     }
+    
    /* 
     public Conexion getSiguienteConexion(){
     

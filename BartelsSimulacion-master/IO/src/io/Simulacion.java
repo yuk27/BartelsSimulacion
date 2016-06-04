@@ -33,8 +33,6 @@ public class Simulacion {
     4 -Salir del servidor que ejecuta las consultas
     5 - Termina conexion y sale del sistema 
     */
-
-    
 }
           
 //clase que compara el tiempo de reloj de los eventos para ordenarlos 
@@ -47,8 +45,11 @@ public class Simulacion {
     } 
 }
         
+        //----------------------------------------DECLARACION DE VARIABLES-------------------------------------------------------------------
+        
     MyComparator comparator = new MyComparator();
     PriorityQueue<Evento> eventos = new PriorityQueue<>(13,comparator);
+    Estadisticas estadistica = new Estadisticas();
     
     double reloj = 0;                          //variable que cuenta el tiempo actual en el cual nos encontramos dentro del sistema
     
@@ -61,8 +62,26 @@ public class Simulacion {
     AdmClientes admC;
     AdmProcesos admP;
     ProcesamientoConsultas pc;
-    double TiempoProxHilo;
     Transacciones transacciones;
+    
+    //lista que tiene las estadisticas de cada corrida de la simulacion
+    ArrayList estadisticas = new ArrayList();
+    
+    //vectores que llevan cuenta de los tamanos de la cola generados por cada corrida
+    Vector<Integer> colaClientes = new Vector<>();
+    Vector<Integer> colaProcesos = new Vector<>();
+    Vector<Integer> colaProcesamientoConsutlas = new Vector<>();
+    Vector<Integer> colaTransacciones = new Vector<>();
+    
+    //Vectores que llevan cuenta de los tiempos de cada conexion en los diferentes modulos 
+    Vector<Double> tiempoPromedio = new Vector<>();
+    Vector<Double> tiempoSelect = new Vector<>();    
+    Vector<Double> tiempoUpdate = new Vector<>(); 
+    Vector<Double> tiempoJoin = new Vector<>();
+    Vector<Double> tiempoDDL = new Vector<>();
+    
+    
+    //----------------------------------FIN DE DECLARACION DE VARIABLES---------------------------------------------------------
     
     void crearConexion(){
        if(admC.hayServidor()){                                                  //si hay servidores desocupados
