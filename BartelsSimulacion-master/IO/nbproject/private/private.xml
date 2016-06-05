@@ -20,12 +20,12 @@
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Ulises/Documents/GitHub/BartelsSimulacion/BartelsSimulacion-master/IO/src/io/Simulacion.java</file>
-            <file>file:/C:/Users/Ulises/Documents/GitHub/BartelsSimulacion/BartelsSimulacion-master/IO/src/io/AdmClientes.java</file>
-            <file>file:/C:/Users/Ulises/Documents/GitHub/BartelsSimulacion/BartelsSimulacion-master/IO/src/io/AdmProcesos.java</file>
-            <file>file:/C:/Users/Ulises/Documents/GitHub/BartelsSimulacion/BartelsSimulacion-master/IO/src/io/ProcesamientoConsultas.java</file>
-            <file>file:/C:/Users/Ulises/Documents/GitHub/BartelsSimulacion/BartelsSimulacion-master/IO/src/io/Transacciones.java</file>
-            <file>file:/C:/Users/Ulises/Documents/GitHub/BartelsSimulacion/BartelsSimulacion-master/IO/src/io/Conexion.java</file>
+            <file>file:/C:/Users/JuanCa/Desktop/BartelsArreglado/BartelsSimulacion-master/BartelsSimulacion-master/IO/src/io/ModuloProcesamientoConsultas.java</file>
+            <file>file:/C:/Users/JuanCa/Desktop/BartelsArreglado/BartelsSimulacion-master/BartelsSimulacion-master/IO/src/io/Simulacion.java</file>
+            <file>file:/C:/Users/JuanCa/Desktop/BartelsArreglado/BartelsSimulacion-master/BartelsSimulacion-master/IO/src/io/ModuloAdmClientes.java</file>
+            <file>file:/C:/Users/JuanCa/Desktop/BartelsArreglado/BartelsSimulacion-master/BartelsSimulacion-master/IO/src/io/ModuloAdmProcesos.java</file>
+            <file>file:/C:/Users/JuanCa/Desktop/BartelsArreglado/BartelsSimulacion-master/BartelsSimulacion-master/IO/src/io/ModuloTransacciones.java</file>
+            <file>file:/C:/Users/JuanCa/Desktop/BartelsArreglado/BartelsSimulacion-master/BartelsSimulacion-master/IO/src/io/Menu.java</file>
         </group>
     </open-files>
 </project-private>

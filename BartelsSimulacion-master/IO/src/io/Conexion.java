@@ -1,25 +1,17 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package io;
 import java.util.Random;
-/**
- *
- * @author b26441
- */
+
 public class Conexion {
     
-    int tipo = 0; //tipo de instruccion 0 SELECT, 1 UPDATE, 2 JOIN, 3 DLL 
-    double timeout = 0;
-    int numServidor = 0;
-    double  tiempoEntrada;
-    int numBloques = 0;
-    Random r = new Random();
+    private int tipo = 0; //tipo de instruccion 0 SELECT, 1 UPDATE, 2 JOIN, 3 DLL 
+    private double timeout = 0;
+    private int numServidor = 0;
+    private double  tiempoEntrada;
+    private int numBloques = 0;
+    private Random r = new Random();
  
     
-    public Conexion(double tiempoEntrada,int  timeoutGlobal, int numServidor){
+    public Conexion(double tiempoEntrada, int numServidor){
        this.tiempoEntrada = tiempoEntrada;
        this.numServidor = numServidor;
     }
@@ -71,4 +63,13 @@ public class Conexion {
         public int getNumServidor(){
             return this.numServidor;
         }
+        
+        public int getNumBloques(){
+            return numBloques;
+        }
+        
+        public void setNumBloques(int numBloques){
+            this.numBloques = numBloques;
+        }
+
 }

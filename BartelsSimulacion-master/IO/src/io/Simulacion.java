@@ -1,155 +1,99 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package io;
 import java.util.*;
 import java.util.Random;
-import java.io.IOException;
-/**
- *
- * @author b26441
- */
-
-
 
 public class Simulacion {
     
-    static class Evento{
-
-    double tiempo;
-    int id;
-    Conexion c;
-    
-    public double getTiempo(){
-        return tiempo;
-    }
-    /*Tipos de eventos
-    0 - Llega conexion
-    1 - Sale del servidor de creacion de hilos
-    2 - Salir del servidor de consultas
-    3 - Salir del servidor de transacciones
-    4 -Salir del servidor que ejecuta las consultas
-    5 - Termina conexion y sale del sistema 
-    */
-}
-          
-//clase que compara el tiempo de reloj de los eventos para ordenarlos 
-    //Es usada por el priority queue para ordenar los eventos 
-        static class MyComparator implements Comparator<Evento> { 
- 
-    public int compare(Evento a,Evento b) { 
-        int result = new Double(a.getTiempo()).compareTo(b.getTiempo()); 
-        return result; 
-    } 
-}
-        
         //----------------------------------------DECLARACION DE VARIABLES-------------------------------------------------------------------
         
-    MyComparator comparator = new MyComparator();
-    PriorityQueue<Evento> eventos = new PriorityQueue<>(13,comparator);
+    Comparador comparador = new Comparador();
+    PriorityQueue<Evento> eventos = new PriorityQueue<>(13,comparador);
     Estadisticas estadistica = new Estadisticas();
     
-    double reloj = 0;                          //variable que cuenta el tiempo actual en el cual nos encontramos dentro del sistema
-    
-    int timeOutGlobal = 0;
-    int tiempoActual = 0;
+    private double reloj = 0;                          //variable que cuenta el tiempo actual en el cual nos encontramos dentro del sistema
+    private Menu menu;
+    private int timeOutGlobal = 0;
+    private int tiempoActual = 0;
     
     int conexionesRechazadas = 0;
 
-    Random r = new Random();
-    AdmClientes admC;
-    AdmProcesos admP;
-    ProcesamientoConsultas pc;
-    Transacciones transacciones;
+    private Random r = new Random();
+    private ModuloAdmClientes admC;
+    private ModuloAdmProcesos admP;
+    private ModuloProcesamientoConsultas pc;
+    private ModuloTransacciones transacciones;
     
     //lista que tiene las estadisticas de cada corrida de la simulacion
-    ArrayList estadisticas = new ArrayList();
+    private ArrayList estadisticas = new ArrayList();
     
     //vectores que llevan cuenta de los tamanos de la cola generados por cada corrida
-    Vector<Integer> colaClientes = new Vector<>();
-    Vector<Integer> colaProcesos = new Vector<>();
-    Vector<Integer> colaProcesamientoConsutlas = new Vector<>();
-    Vector<Integer> colaTransacciones = new Vector<>();
+    private Vector<Integer> colaClientes = new Vector<>();
+    private Vector<Integer> colaProcesos = new Vector<>();
+    private Vector<Integer> colaProcesamientoConsutlas = new Vector<>();
+    private Vector<Integer> colaTransacciones = new Vector<>();
     
     //Vectores que llevan cuenta de los tiempos de cada conexion en los diferentes modulos 
-    Vector<Double> tiempoPromedio = new Vector<>();
-    Vector<Double> tiempoSelect = new Vector<>();    
-    Vector<Double> tiempoUpdate = new Vector<>(); 
-    Vector<Double> tiempoJoin = new Vector<>();
-    Vector<Double> tiempoDDL = new Vector<>();
+    private Vector<Double> tiempoPromedio = new Vector<>();
+    private Vector<Double> tiempoSelect = new Vector<>();    
+    private Vector<Double> tiempoUpdate = new Vector<>(); 
+    private Vector<Double> tiempoJoin = new Vector<>();
+    private Vector<Double> tiempoDDL = new Vector<>();
     
     
     //----------------------------------FIN DE DECLARACION DE VARIABLES---------------------------------------------------------
     
-    void crearConexion(){
-       if(admC.hayServidor()){                                                  //si hay servidores desocupados
-          admC.crearConexion(reloj, timeOutGlobal);    //se crea la conexion y se pone la posicion del servidor en ocupado
+    void crearConexion(){                                              
+        if(admC.crearConexion(reloj)){ 
           crearHiloConexion(admC.getSiguienteConexion());
-       }
-       else{
-            conexionesRechazadas++;                             //sino se puede guardar se agrega al contador de rechazadas
-       }
-       
-        Evento siguienteLlegada = new Evento();             //se genera el evento para la siguiente entrada de una conexion
-        siguienteLlegada.id = 0;
-        siguienteLlegada.tiempo = Conexion.generarTiempoArribo(r.nextDouble()) + reloj; 
+          menu.aplicarInterfazClientes(admC.getUsedConexiones());//pruebas de interfaz
+        }
+        else{
+          conexionesRechazadas++;  //sino se puede guardar se agrega al contador de rechazadas
+          menu.aplicarInterfazRechazadas(conexionesRechazadas);
+        }
+        Evento siguienteLlegada = new Evento(Conexion.generarTiempoArribo(r.nextDouble()) + reloj,null,TipoEvento.LLEGA_CONEXION); //se genera el evento para la siguiente entrada de una conexion
         eventos.add(siguienteLlegada);                          // se agrega a la lista de eventos.
-    }
+        }
     
     void crearHiloConexion(Conexion c){  
-                admP.crearHilo(c);                                                      //se guarda la conexion entrante ya sea en el servidor si no hay cola, o se agrega a la cola
-                if(admP.getServidor()){
-                    if(c.getTimeout() > reloj){                                              
-                     admC.eliminarConexion(c.getNumServidor());         //elimnamos la conexion en timeout
-                     administrarServidorDeCreacionHilo();
-                     }
-                    else{
-                        Evento siguienteHilo= new Evento();             //se genera el evento de Procesado de consulta de la siguiente conexion 
-                        siguienteHilo.id = 1;
-                        siguienteHilo.tiempo = admP.generarTiempoSalida() + reloj;
-                        siguienteHilo.c = c;
-                        eventos.add(siguienteHilo); 
-                    }
-                    admP.SetServidor();
-                }
+        admP.crearHilo(c); //se guarda la conexion entrante ya sea en el servidor si no hay cola, o se agrega a la cola
+        if(admP.getServidor()){
+            if(c.getTimeout() > reloj){                                              
+             admC.eliminarConexion(c.getNumServidor());         //elimnamos la conexion en timeout
+             administrarServidorDeCreacionHilo();
+             }
+            else{
+                Evento siguienteHilo= new Evento(admP.generarTiempoSalida() + reloj,c,TipoEvento.SALE_DE_HILO); //se genera el evento de Procesado de consulta de la siguiente conexion 
+                eventos.add(siguienteHilo); 
+            }
+            admP.SetServidor();
+        }
     }
     
-    void administrarServidorDeCreacionHilo(){       //acomoda el servidor de acuerdo a la salida. Si hay conexiones en cola, lo pasa a servicio, sino, libera el servidor
-        admP.administrarServidor();
-        if(admP.servidorOcupado){
-                Evento siguienteHilo= new Evento();             //se genera el evento de Procesado de consulta de la siguiente conexion 
-                siguienteHilo.id = 1;
-                siguienteHilo.tiempo = admP.generarTiempoSalida() + reloj;
-                siguienteHilo.c = admP.SiguienteConexion();
-                eventos.add(siguienteHilo); 
+    void administrarServidorDeCreacionHilo(){ //acomoda el servidor de acuerdo a la salida. Si hay conexiones en cola, lo pasa a servicio, sino, libera el servidor
+        if(admP.administrarServidor()){
+            Evento siguienteHilo= new Evento(admP.generarTiempoSalida() + reloj,admP.SiguienteConexion(),TipoEvento.SALE_DE_HILO);             //se genera el evento de Procesado de consulta de la siguiente conexion 
+            eventos.add(siguienteHilo); 
         }
     }
     
     void procesarConsultas(Conexion c){
         administrarServidorDeCreacionHilo();        //ordena el servidor anterior
-        
         if(c.getTimeout() > reloj){
-                admC.eliminarConexion(c.getNumServidor());
+            admC.eliminarConexion(c.getNumServidor());
        }
        else{           
-                double procesado = pc.asignarConsultaAServidor(c, reloj);             //se asigna el servidor y se calcula el tiempo de reloj en donde terminara de procesarse       
-                if(procesado != -1){                                                                             //De devolver un tiempo -1 significa que el servidor estaba ocupado y se agrego la conexion a la lista de espera
-                    Evento siguienteConsultaProcesada = new Evento();
-                    siguienteConsultaProcesada.id = 2;
-                    siguienteConsultaProcesada.tiempo = procesado;
-                    eventos.add(siguienteConsultaProcesada);
-                }
+        double procesado = pc.asignarConsultaAServidor(c, reloj); //se asigna el servidor y se calcula el tiempo de reloj en donde terminara de procesarse       
+        if(procesado != -1){ //De devolver un tiempo -1 significa que el servidor estaba ocupado y se agrego la conexion a la lista de espera
+            Evento siguienteConsultaProcesada = new Evento(procesado,c,TipoEvento.EJECUTO_CONSULTA);
+        }
        }  
     }
     
     void administrarServidorDeConsultas(Conexion c){             //ordena el servidor de consultas con respecto a la conexion que sale. 
             Conexion nuevaConexion = pc.administrarServidor(c);
             if(nuevaConexion != null){
-                Evento siguienteConsultaProcesada = new Evento();
-                siguienteConsultaProcesada.id = 2;
-                siguienteConsultaProcesada.tiempo = pc.calcularTiempoTotal(nuevaConexion);
+                Evento siguienteConsultaProcesada = new Evento(pc.calcularTiempoTotal(nuevaConexion),c,TipoEvento.EJECUTO_CONSULTA);
                 eventos.add(siguienteConsultaProcesada);
             }
     }
@@ -161,34 +105,37 @@ public class Simulacion {
        }
        else{
             if(transacciones.asignarConexion(c)){                        //se agrega la conexion al servidor de transaciones o a la cola
-                  calcularTiempoTransaccion(c);
+             calcularTiempoTransaccion(c);
            }
         }     
     }
     
     void calcularTiempoTransaccion(Conexion c){
-         Evento siguienteTransaccion = new Evento();         //se genera el evento
-         siguienteTransaccion.id = 3;
-
+        
+        double tiempo;
+         
          switch(c.getTipo()){
              case 0:        //SELECT
-                 siguienteTransaccion.tiempo = transacciones.calcularTiempoTransaccion() + 1/10;
-                 c.numBloques = 1;
+                 tiempo = transacciones.calcularTiempoTransaccion() + 1/10;
+                 c.setNumBloques(1);
                  break;
              case 2:        //JOIN
-                 c.numBloques = (int)transacciones.randomWithRange(1, 64);
-                 siguienteTransaccion.tiempo = transacciones.calcularTiempoTransaccion() + (c.numBloques * 1/10);     //se calcula el tiempo del join
+                 c.setNumBloques((int)transacciones.randomWithRange(1, 64));
+                 tiempo = transacciones.calcularTiempoTransaccion() + (c.getNumBloques() * 1/10); //se calcula el tiempo del join
                  break;
              case 3:        //DDL
-                 siguienteTransaccion.tiempo = transacciones.calcularTiempoTransaccion() + transacciones.mayorTiempoEjecucion;
+                 tiempo = transacciones.calcularTiempoTransaccion() + transacciones.getMayorTiempoEjecucion();
                  transacciones.setDDL();
                  break;
              default:       //UPDATE
-                 siguienteTransaccion.tiempo = transacciones.calcularTiempoTransaccion();  
+                 tiempo = transacciones.calcularTiempoTransaccion();  
                  break;
          }
-         if(c.getTipo() != 3 && siguienteTransaccion.tiempo > transacciones.mayorTiempoEjecucion){
-                transacciones.mayorTiempoEjecucion = siguienteTransaccion.tiempo;
+         
+         Evento siguienteTransaccion = new Evento(tiempo,c,TipoEvento.SALE_DE_TRANSACCIONES);
+         
+         if(c.getTipo() != 3 && siguienteTransaccion.getTiempo() > transacciones.getMayorTiempoEjecucion()){
+            transacciones.setMayorTiempoEjecucion(siguienteTransaccion.getTiempo());
          }
          eventos.add(siguienteTransaccion);
     }
@@ -196,7 +143,7 @@ public class Simulacion {
     void administrarServidorDeTransacciones(Conexion c){            //ordena el servidor de transacciones con las coenxiones en cola
         Conexion nuevaConexion = transacciones.administrarServidorDeTransacciones(c);
         if(nuevaConexion != null){
-                calcularTiempoTransaccion(nuevaConexion);
+            calcularTiempoTransaccion(nuevaConexion);
         }
     }
     
@@ -207,10 +154,8 @@ public class Simulacion {
        }
        else{
             if(pc.asignarConsultaAEjecutor(c)){         
-                    Evento siguienteEjecucion = new Evento();
-                    siguienteEjecucion.id = 4;
-                    siguienteEjecucion.tiempo = pc.calcularTiempoAlgoritmoEjecucion(c.numBloques, c);
-                    eventos.add(siguienteEjecucion);
+                Evento siguienteEjecucion = new Evento(pc.calcularTiempoAlgoritmoEjecucion(c.getNumBloques(),c),c,TipoEvento.EJECUTO_CONSULTA);
+                eventos.add(siguienteEjecucion);
             }
        }    
     }
@@ -218,18 +163,14 @@ public class Simulacion {
     void administrarEjecutor(Conexion c){
         Conexion nuevaConexion = pc.administrarEjecutor(c);
         if(nuevaConexion != null){
-                Evento siguienteConsultaProcesada = new Evento();
-                siguienteConsultaProcesada.id = 4;
-                siguienteConsultaProcesada.tiempo = pc.calcularTiempoAlgoritmoEjecucion(c.numBloques, c);
+                Evento siguienteConsultaProcesada = new Evento(pc.calcularTiempoAlgoritmoEjecucion(c.getNumBloques(), c),c,TipoEvento.EJECUTO_CONSULTA);
                 eventos.add(siguienteConsultaProcesada);
         }
     }
     
     void ponerResultadoEnRed(Conexion c){
         administrarEjecutor(c);
-        Evento siguienteSalidaDelSistema = new Evento();
-        siguienteSalidaDelSistema.id = 5;
-        siguienteSalidaDelSistema.tiempo =  admC.ponerEnRed(pc.calcularTamanoRespuesta(c.numBloques));
+        Evento siguienteSalidaDelSistema = new Evento(admC.ponerEnRed(pc.calcularTamanoRespuesta(c.getNumBloques())),c,TipoEvento.TERMINO_CONEXION);
         eventos.add(siguienteSalidaDelSistema);
     }
     
@@ -237,40 +178,42 @@ public class Simulacion {
         admC.eliminarConexion(c.getNumServidor());
     }
     
-    void iniciarSimulación(int numC){       
-        admC = new AdmClientes(10);
-        admP = new AdmProcesos();
-        pc = new ProcesamientoConsultas(10, 10);
-        transacciones = new Transacciones(10);
-        
-        correrSimulacion(numC);
+    void iniciarSimulación(int numC, double tiempoMax,int k,int n, int p, int m,double t,Menu menu){       
+        admC = new ModuloAdmClientes(k,timeOutGlobal);
+        admP = new ModuloAdmProcesos();
+        pc = new ModuloProcesamientoConsultas(n,m);
+        transacciones = new ModuloTransacciones(p);
+        this.menu = menu;
+        correrSimulacion(numC,tiempoMax);
     }
     
-    void correrSimulacion(int numC){
+    void correrSimulacion(int numC, double tiempoMax){
+        System.out.println("simulando");
         crearConexion();
-        
         for(int i = 0; i < numC; i++){
-            Evento siguienteEvento = eventos.poll();
-            reloj = siguienteEvento.tiempo;
-            switch(siguienteEvento.id){
-                case 0:
-                    crearConexion();
-                    break;
-                case 1:
-                    procesarConsultas(siguienteEvento.c);
-                    break;
-                case 2:
-                    procesarTransaccion(siguienteEvento.c);
-                    break;
-                case 3:
-                    ejecutarConsulta(siguienteEvento.c);
-                    break;
-                case 4:
-                    ponerResultadoEnRed(siguienteEvento.c);
-                    break;
-                case 5:
-                    terminarConexion(siguienteEvento.c);
-                    break;  
+            while(reloj < tiempoMax){
+                Evento siguienteEvento = eventos.poll();
+                reloj = siguienteEvento.getTiempo();
+                switch(siguienteEvento.getTipo()){
+                    case LLEGA_CONEXION:
+                        crearConexion();
+                        break;
+                    case SALE_DE_HILO:
+                        procesarConsultas(siguienteEvento.getConexion());
+                        break;
+                    case PROCESO_CONSULTA:
+                        procesarTransaccion(siguienteEvento.getConexion());
+                        break;
+                    case SALE_DE_TRANSACCIONES:
+                        ejecutarConsulta(siguienteEvento.getConexion());
+                        break;
+                    case EJECUTO_CONSULTA:
+                        ponerResultadoEnRed(siguienteEvento.getConexion());
+                        break;
+                    case TERMINO_CONEXION:
+                        terminarConexion(siguienteEvento.getConexion());
+                        break;  
+                }
             }
         }
     }
