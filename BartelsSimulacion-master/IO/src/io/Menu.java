@@ -59,6 +59,7 @@ public class Menu extends javax.swing.JFrame {
 
         if(nc > 0 && tm > 0 && k > 0 && n > 0 && p> 0 && m > 0 && t > 0){
           System.out.println("correcto");
+          LimpiarLabels();
           lento = lentoInput.isSelected();
           s = new Simulacion();
           s.iniciarSimulación(nc, tm, k, n, p, m, t, this);
@@ -67,6 +68,18 @@ public class Menu extends javax.swing.JFrame {
           System.out.println("incorrecto");
         }
 
+    }
+    
+    private void LimpiarLabels(){
+    nLabel.setText("0");
+    pLabel.setText("0");
+    mLabel.setText("0");
+    kLabel.setText("0");
+    rechazadasLabel.setText("0");
+    colaHiloLabel.setText("0");
+    colaProcesadorLabel.setText("0");
+    colaTransaccionesLabel.setText("0");
+    cierreLabel.setText("0");
     }
     
     public void generarImagenes(){
@@ -125,11 +138,12 @@ public class Menu extends javax.swing.JFrame {
     }
     
     void retrasar(){
-        try {
+      /*  try {
             Thread.sleep(1000);                 //1000 milliseconds is one second.
         } catch(InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
+      */
     }
     
     void limpiarFlechas(){
@@ -138,20 +152,21 @@ public class Menu extends javax.swing.JFrame {
         }
     }
     
-    void aplicarInterfazRechazadas(int val){
-        flechas[0].setVisible(true);
+    void aplicarInterfazRechazadas(int val, double reloj){
         if(lento){
             limpiarFlechas();
-            //retrasar();
+            retrasar();
         }
-        flechas[0].setVisible(false);
+        flechas[0].setVisible(true);
+        //flechas[0].setVisible(false);
         rechazadasLabel.setText(Integer.toString(val));
+        relojLabel.setText(Double.toString(reloj));
     }
     
-    void aplicarInterfazClientes(int val){
+    void aplicarInterfazClientes(int val, double reloj){
         if(lento){
             limpiarFlechas();
-            //retrasar();
+            retrasar();
         }
         kLabel.setText(Integer.toString(val));
         if(val > 0){
@@ -161,25 +176,197 @@ public class Menu extends javax.swing.JFrame {
         else{
             paneles[0].setVisible(false);
         }
+        relojLabel.setText(Double.toString(reloj));
     }
     
-    void hilo(boolean ocupado){
+    void aplicarInterfazNuevoHilo(boolean ocupado, double reloj){
         if(lento){
             limpiarFlechas();
-            //retrasar();
+            retrasar();
         }
         if(ocupado){
-            nLabel.setText("ocupado");
+            hiloLabel.setText("ocupado");
             paneles[1].setVisible(true);
         }
         else{
-            nLabel.setText("limpio");
+            hiloLabel.setText("limpio");
             paneles[1].setVisible(false);
         }
         
         //flechas[1].setVisible(true);
+        relojLabel.setText(Double.toString(reloj));
+    }
+    
+    void aplicarInterfazColaHilo(int val, double reloj){
+        if(lento){
+            limpiarFlechas();
+            retrasar();
+        }
+        
+        if(val > 0){
+            paneles[2].setVisible(true);
+            if(val > Integer.parseInt(colaHiloLabel.getText())){
+            flechas[2].setVisible(true);
+            }
+            else{
+            flechas[3].setVisible(true);
+            }
+        }
+        else{
+            paneles[2].setVisible(false);
+            flechas[3].setVisible(true);
+        }
+        
+        colaHiloLabel.setText(Integer.toString(val));
+        relojLabel.setText(Double.toString(reloj));
+    }
+       
+    void aplicarInterfazProcesarConsulta(double reloj){
+        if(lento){
+            limpiarFlechas();
+            retrasar();
+        }
+        int val = Integer.parseInt(nLabel.getText()) + 1;
+        nLabel.setText(Integer.toString(val));
+        
+        if(val > 0){
+            paneles[3].setVisible(true);
+            
+        }
+        else{
+            paneles[3].setVisible(false);
+        }
+        flechas[4].setVisible(true);
+        relojLabel.setText(Double.toString(reloj));
+    }
+    
+    void aplicarInterfazColaProcesador(int val, double reloj){
+        if(lento){
+            limpiarFlechas();
+            retrasar();
+        }
+        
+        if(val > 0){
+            paneles[4].setVisible(true);
+            if(val > Integer.parseInt(colaProcesadorLabel.getText())){
+            flechas[5].setVisible(true);
+            }
+            else{
+            flechas[6].setVisible(true);
+            }
+        }
+        else{
+            paneles[4].setVisible(false);
+            flechas[6].setVisible(true);
+        }
+        
+        colaProcesadorLabel.setText(Integer.toString(val));
+        relojLabel.setText(Double.toString(reloj));
+    }
+   
+    
+    void aplicarInterfazProcesarTransacciones(int val, double reloj){
+        if(lento){
+            limpiarFlechas();
+            retrasar();
+        }
+        pLabel.setText(Integer.toString(val));
+        
+        if(val > 0){
+            paneles[5].setVisible(true);
+            
+        }
+        else{
+            paneles[5].setVisible(false);
+        }
+        flechas[6].setVisible(true);
+        relojLabel.setText(Double.toString(reloj));
     }
 
+    void aplicarInterfazColaTransacciones(int val, double reloj){
+        if(lento){
+            limpiarFlechas();
+            retrasar();
+        }
+        
+        if(val > 0){
+            paneles[6].setVisible(true);
+            if(val > Integer.parseInt(colaTransaccionesLabel.getText())){
+            flechas[7].setVisible(true);
+            }
+            else{
+            flechas[8].setVisible(true);
+            }
+        }
+        else{
+            paneles[6].setVisible(false);
+            flechas[8].setVisible(true);
+        }
+        
+        colaTransaccionesLabel.setText(Integer.toString(val));
+        relojLabel.setText(Double.toString(reloj));
+    }
+    
+    void aplicarInterfazProcesarEjecutor(int val, double reloj){
+        if(lento){
+            limpiarFlechas();
+            retrasar();
+        }
+        mLabel.setText(Integer.toString(val));
+        
+        if(val > 0){
+            paneles[7].setVisible(true);
+            
+        }
+        else{
+            paneles[7].setVisible(false);
+        }
+        flechas[8].setVisible(true);
+        relojLabel.setText(Double.toString(reloj));
+    }
+    
+    void aplicarInterfazColaEjecutor(int val, double reloj){
+        if(lento){
+            limpiarFlechas();
+            retrasar();
+        }
+        
+        if(val > 0){
+            paneles[8].setVisible(true);
+            if(val > Integer.parseInt(colaEjecutorLabel.getText())){
+            flechas[11].setVisible(true);
+            }
+            else{
+            flechas[12].setVisible(true);
+            }
+        }
+        else{
+            paneles[8].setVisible(false);
+            flechas[12].setVisible(true);
+        }
+        
+        colaEjecutorLabel.setText(Integer.toString(val));
+        relojLabel.setText(Double.toString(reloj));
+    }
+        
+        void aplicarInterfazProcesarCierreConexion(int val, double reloj){
+        if(lento){
+            limpiarFlechas();
+            retrasar();
+        }
+       cierreLabel.setText(Integer.toString(val));
+        
+        if(val > 0){
+            paneles[9].setVisible(true);
+            
+        }
+        else{
+            paneles[9].setVisible(false);
+        }
+        flechas[13].setVisible(true);
+        relojLabel.setText(Double.toString(reloj));
+    }
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -210,13 +397,15 @@ public class Menu extends javax.swing.JFrame {
         hiloLabel = new javax.swing.JLabel();
         nLabel = new javax.swing.JLabel();
         mLabel = new javax.swing.JLabel();
-        jLabel15 = new javax.swing.JLabel();
+        cierreLabel = new javax.swing.JLabel();
         rechazadasLabel = new javax.swing.JLabel();
         pLabel = new javax.swing.JLabel();
         colaHiloLabel = new javax.swing.JLabel();
-        rechazadasLabel2 = new javax.swing.JLabel();
-        rechazadasLabel3 = new javax.swing.JLabel();
-        rechazadasLabel4 = new javax.swing.JLabel();
+        colaProcesadorLabel = new javax.swing.JLabel();
+        colaEjecutorLabel = new javax.swing.JLabel();
+        colaTransaccionesLabel = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
+        relojLabel = new javax.swing.JLabel();
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -330,7 +519,7 @@ public class Menu extends javax.swing.JFrame {
             }
         });
 
-        ncInput.setText("10");
+        ncInput.setText("2");
         ncInput.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 ncInputActionPerformed(evt);
@@ -343,7 +532,12 @@ public class Menu extends javax.swing.JFrame {
         jLabel3.setFont(new java.awt.Font("Tahoma", 0, 13)); // NOI18N
         jLabel3.setText("Tiempo Max Corrida");
 
-        tmInput.setText("10");
+        tmInput.setText("0.2");
+        tmInput.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tmInputActionPerformed(evt);
+            }
+        });
 
         jLabel10.setFont(new java.awt.Font("Tahoma", 0, 13)); // NOI18N
         jLabel10.setText("Timeout(t)");
@@ -368,7 +562,7 @@ public class Menu extends javax.swing.JFrame {
 
         hiloLabel.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         hiloLabel.setText("Libre");
-        hiloLabel.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+        hiloLabel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
         nLabel.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         nLabel.setText("0");
@@ -378,9 +572,9 @@ public class Menu extends javax.swing.JFrame {
         mLabel.setText("0");
         mLabel.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
 
-        jLabel15.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel15.setText("0");
-        jLabel15.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+        cierreLabel.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        cierreLabel.setText("0");
+        cierreLabel.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
 
         rechazadasLabel.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         rechazadasLabel.setText("0");
@@ -394,17 +588,17 @@ public class Menu extends javax.swing.JFrame {
         colaHiloLabel.setText("0");
         colaHiloLabel.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
 
-        rechazadasLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        rechazadasLabel2.setText("0");
-        rechazadasLabel2.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+        colaProcesadorLabel.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        colaProcesadorLabel.setText("0");
+        colaProcesadorLabel.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
 
-        rechazadasLabel3.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        rechazadasLabel3.setText("0");
-        rechazadasLabel3.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+        colaEjecutorLabel.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        colaEjecutorLabel.setText("0");
+        colaEjecutorLabel.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
 
-        rechazadasLabel4.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        rechazadasLabel4.setText("0");
-        rechazadasLabel4.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+        colaTransaccionesLabel.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        colaTransaccionesLabel.setText("0");
+        colaTransaccionesLabel.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
 
         javax.swing.GroupLayout ImagenesLayout = new javax.swing.GroupLayout(Imagenes);
         Imagenes.setLayout(ImagenesLayout);
@@ -418,27 +612,26 @@ public class Menu extends javax.swing.JFrame {
                         .addGap(130, 130, 130))
                     .addGroup(ImagenesLayout.createSequentialGroup()
                         .addGap(59, 59, 59)
-                        .addComponent(jLabel15, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(cierreLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(129, 129, 129)
                         .addGroup(ImagenesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(mLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(nLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(pLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addComponent(pLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(hiloLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 104, Short.MAX_VALUE)))
                 .addGroup(ImagenesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(ImagenesLayout.createSequentialGroup()
                         .addComponent(rechazadasLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(36, 36, 36))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, ImagenesLayout.createSequentialGroup()
                         .addGroup(ImagenesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(rechazadasLabel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(rechazadasLabel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(rechazadasLabel4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(colaProcesadorLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(colaEjecutorLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(colaTransaccionesLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addContainerGap())))
             .addGroup(ImagenesLayout.createSequentialGroup()
-                .addGap(237, 237, 237)
-                .addComponent(hiloLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 95, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(colaHiloLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(62, 62, 62))
         );
@@ -464,19 +657,24 @@ public class Menu extends javax.swing.JFrame {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, ImagenesLayout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(ImagenesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(rechazadasLabel2)
-                            .addComponent(jLabel15))
+                            .addComponent(colaProcesadorLabel)
+                            .addComponent(cierreLabel))
                         .addGap(55, 55, 55)))
                 .addGroup(ImagenesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(mLabel)
                     .addGroup(ImagenesLayout.createSequentialGroup()
                         .addGap(10, 10, 10)
-                        .addComponent(rechazadasLabel3)))
+                        .addComponent(colaEjecutorLabel)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 118, Short.MAX_VALUE)
                 .addGroup(ImagenesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(pLabel)
-                    .addComponent(rechazadasLabel4)))
+                    .addComponent(colaTransaccionesLabel)))
         );
+
+        jLabel11.setText("Tiempo de reloj:");
+
+        relojLabel.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        relojLabel.setText("0");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -500,7 +698,7 @@ public class Menu extends javax.swing.JFrame {
                                 .addComponent(tmInput, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(32, 32, 32)
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 82, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 87, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addComponent(lentoInput)
@@ -517,13 +715,16 @@ public class Menu extends javax.swing.JFrame {
                                 .addGap(333, 333, 333)
                                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(layout.createSequentialGroup()
-                                .addGap(6, 6, 6)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(Imagenes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGap(351, 351, 351)
-                                        .addComponent(EmprezarBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                        .addGap(0, 261, Short.MAX_VALUE)))
+                                .addGap(357, 357, 357)
+                                .addComponent(EmprezarBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(133, 133, 133)
+                        .addComponent(Imagenes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel11)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(relojLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -552,8 +753,16 @@ public class Menu extends javax.swing.JFrame {
                             .addComponent(jLabel6))))
                 .addGap(6, 6, 6)
                 .addComponent(EmprezarBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 8, Short.MAX_VALUE)
-                .addComponent(Imagenes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 8, Short.MAX_VALUE)
+                        .addComponent(Imagenes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(47, 47, 47)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel11)
+                            .addComponent(relojLabel))
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
 
         pack();
@@ -581,6 +790,10 @@ public class Menu extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_nInputActionPerformed
 
+    private void tmInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tmInputActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tmInputActionPerformed
+
     public static void main(String args[]) {
         
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -596,11 +809,15 @@ public class Menu extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton EmprezarBtn;
     private javax.swing.JPanel Imagenes;
+    private javax.swing.JLabel cierreLabel;
+    private javax.swing.JLabel colaEjecutorLabel;
     private javax.swing.JLabel colaHiloLabel;
+    private javax.swing.JLabel colaProcesadorLabel;
+    private javax.swing.JLabel colaTransaccionesLabel;
     private javax.swing.JLabel hiloLabel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
-    private javax.swing.JLabel jLabel15;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -622,9 +839,7 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JTextField pInput;
     private javax.swing.JLabel pLabel;
     private javax.swing.JLabel rechazadasLabel;
-    private javax.swing.JLabel rechazadasLabel2;
-    private javax.swing.JLabel rechazadasLabel3;
-    private javax.swing.JLabel rechazadasLabel4;
+    private javax.swing.JLabel relojLabel;
     private javax.swing.JTextField tInput;
     private javax.swing.JTextField tmInput;
     // End of variables declaration//GEN-END:variables
