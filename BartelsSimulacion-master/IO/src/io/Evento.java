@@ -4,11 +4,11 @@ public class Evento {
 
     private double tiempo;
     private TipoEvento tipo;
-    private Conexion c;
+    private Conexion conexion;
     
     public Evento(double tiempo, Conexion c, TipoEvento tipo){
     this.tiempo = tiempo;
-    this.c = c;
+    this.conexion = c;
     this.tipo = tipo;
     }
     
@@ -21,16 +21,6 @@ public class Evento {
     }
     
     public Conexion getConexion(){
-        return c;
+        return conexion;
     }
-    
-    
-    /*Tipos de eventos
-    0 - Llega conexion
-    1 - Sale del servidor de creacion de hilos
-    2 - Salir del servidor de consultas
-    3 - Salir del servidor de transacciones
-    4 -Salir del servidor que ejecuta las consultas
-    5 - Termina conexion y sale del sistema 
-    */
 }

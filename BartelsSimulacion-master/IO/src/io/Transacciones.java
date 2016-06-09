@@ -96,7 +96,7 @@ public class Transacciones {
     
     public int eliminarConexion(Conexion c){
        int posLibre = -1;
-        if(c.tipo == 3){
+        if(c.getTipo() == 3){
             hayDDL = false;
         }
         for(int i = 0; i < servidores.length; i++){
@@ -112,7 +112,7 @@ public class Transacciones {
         int posLibre = eliminarConexion(c);
         if(!conexionesConPrioridad.isEmpty()){
             Conexion nuevaConexion = getConexionDePrioridad();
-            servidores[posLibre] = nuevaConexion.numServidor;
+            servidores[posLibre] = nuevaConexion.getNumServidor();
             return nuevaConexion;
         }
         return null;

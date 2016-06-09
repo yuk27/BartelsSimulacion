@@ -79,7 +79,7 @@ public class AdmClientes {
     public void verificarTimeout(int pos, int reloj){
             for(int i = 0; i < conexiones.size(); i++){
             if(conexiones.get(i).getServidor() == pos){
-                if(reloj  > conexiones.get(i).timeout){
+                if(reloj  > conexiones.get(i).getTimeout()){
                     conexiones.remove(i);
                     servidores[pos] = false;
                 }

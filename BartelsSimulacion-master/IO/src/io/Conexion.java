@@ -11,13 +11,14 @@ public class Conexion {
     private Random r = new Random();
  
     
-    public Conexion(double tiempoEntrada, int numServidor){
+    public Conexion(double tiempoEntrada,double timeout, int numServidor){
+       this.timeout = timeout;
        this.tiempoEntrada = tiempoEntrada;
        this.numServidor = numServidor;
     }
     
     public static double generarTiempoArribo(double rnd){
-        return (-1/30*(Math.log(1 - rnd)));
+        return -1/30d *((Math.log(1 - rnd)));
     }
     
     public void generarTipo(){   
@@ -44,32 +45,32 @@ public class Conexion {
         return timeout;     
     }
     
-        public int getServidor(){
+    public int getServidor(){
         return numServidor;     
     }
     
-        public double getTiempoEntrada(){
+    public double getTiempoEntrada(){
         return tiempoEntrada;     
     }
         
-        public boolean isReadOnly(){
-            return tipo == 0 || tipo == 2;
-        }
+    public boolean isReadOnly(){
+        return tipo == 0 || tipo == 2;
+    }
     
-        public int getTipo(){
-            return this.tipo;
-        }
-        
-        public int getNumServidor(){
-            return this.numServidor;
-        }
-        
-        public int getNumBloques(){
-            return numBloques;
-        }
-        
-        public void setNumBloques(int numBloques){
-            this.numBloques = numBloques;
-        }
+    public int getTipo(){
+        return this.tipo;
+    }
+
+    public int getNumServidor(){
+        return this.numServidor;
+    }
+
+    public int getNumBloques(){
+        return numBloques;
+    }
+
+    public void setNumBloques(int numBloques){
+        this.numBloques = numBloques;
+    }
 
 }
