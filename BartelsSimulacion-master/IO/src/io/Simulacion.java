@@ -3,15 +3,20 @@ import java.util.*;
 import java.util.Random;
 
 public class Simulacion {
-
-    private Comparador comparador = new Comparador();
-    public PriorityQueue<Evento> eventos = new PriorityQueue<>(13,comparador);
+    
+        //----------------------------------------DECLARACION DE VARIABLES-------------------------------------------------------------------
+        
+    Comparador comparador = new Comparador();
+    PriorityQueue<Evento> eventos = new PriorityQueue<>(13,comparador);
     Estadisticas estadistica = new Estadisticas();
     
-    private double reloj = 0; //variable que cuenta el tiempo actual en el cual nos encontramos dentro del sistema
+    private double reloj = 0;                          //variable que cuenta el tiempo actual en el cual nos encontramos dentro del sistema
     private Menu menu;
     private int timeOutGlobal = 0;
-    private int conexionesRechazadas = 0;
+    private int tiempoActual = 0;
+    
+    int conexionesRechazadas = 0;
+
     private Random r = new Random();
     private ModuloAdmClientes admC;
     private ModuloAdmProcesos admP;
@@ -33,116 +38,183 @@ public class Simulacion {
     private Vector<Double> tiempoUpdate = new Vector<>(); 
     private Vector<Double> tiempoJoin = new Vector<>();
     private Vector<Double> tiempoDDL = new Vector<>();
-
-    private void crearConexion(){
-          
+    
+    
+    //----------------------------------FIN DE DECLARACION DE VARIABLES---------------------------------------------------------
+    
+    void crearConexion(){                                              
         if(admC.crearConexion(reloj)){ 
           crearHiloConexion(admC.getSiguienteConexion());
-          menu.aplicarInterfazClientes(admC.getUsedConexiones(),reloj);//pruebas de interfaz
+          menu.aplicarInterfazClientes(admC.getUsedConexiones());//pruebas de interfaz
         }
         else{
           conexionesRechazadas++;  //sino se puede guardar se agrega al contador de rechazadas
-          menu.aplicarInterfazRechazadas(conexionesRechazadas,reloj);
+          menu.aplicarInterfazRechazadas(conexionesRechazadas);
         }
-        admC.crearArribo(reloj,r.nextDouble(),eventos);
+        Evento siguienteLlegada = new Evento(Conexion.generarTiempoArribo(r.nextDouble()) + reloj,null,TipoEvento.LLEGA_CONEXION); //se genera el evento para la siguiente entrada de una conexion
+        eventos.add(siguienteLlegada);                          // se agrega a la lista de eventos.
         }
- 
-    private void crearHiloConexion(Conexion c){  
-        admP.crearHilo(c,reloj); //se guarda la conexion entrante ya sea en el servidor si no hay cola, o se agrega a la cola
+    
+    void crearHiloConexion(Conexion c){  
+        admP.crearHilo(c); //se guarda la conexion entrante ya sea en el servidor si no hay cola, o se agrega a la cola
         if(admP.getServidor()){
             if(c.getTimeout() > reloj){                                              
-                admC.eliminarConexion(c.getNumServidor(),reloj);         //elimnamos la conexion en timeout
-                admP.procesarSalida(reloj,eventos);   
+             admC.eliminarConexion(c.getNumServidor());         //elimnamos la conexion en timeout
+             administrarServidorDeCreacionHilo();
              }
             else{
-                admP.siguienteHilo(c,reloj,eventos);
+                Evento siguienteHilo= new Evento(admP.generarTiempoSalida() + reloj,c,TipoEvento.SALE_DE_HILO); //se genera el evento de Procesado de consulta de la siguiente conexion 
+                eventos.add(siguienteHilo); 
             }
-            admP.setServidor();
+            admP.SetServidor();
         }
     }
     
-    private void procesarConsultas(Conexion c){
-        admP.procesarSalida(reloj,eventos);    //ordena el servidor anterior
+    void administrarServidorDeCreacionHilo(){ //acomoda el servidor de acuerdo a la salida. Si hay conexiones en cola, lo pasa a servicio, sino, libera el servidor
+        if(admP.administrarServidor()){
+            Evento siguienteHilo= new Evento(admP.generarTiempoSalida() + reloj,admP.SiguienteConexion(),TipoEvento.SALE_DE_HILO);             //se genera el evento de Procesado de consulta de la siguiente conexion 
+            eventos.add(siguienteHilo); 
+        }
+    }
+    
+    void procesarConsultas(Conexion c){
+        administrarServidorDeCreacionHilo();        //ordena el servidor anterior
         if(c.getTimeout() > reloj){
-            admC.eliminarConexion(c.getNumServidor(),reloj);
+            admC.eliminarConexion(c.getNumServidor());
        }
        else{           
-        pc.asignarConsultaAServidor(c, reloj,eventos); //se asigna el servidor y se calcula el tiempo de reloj en donde terminara de procesarse       
+        double procesado = pc.asignarConsultaAServidor(c, reloj); //se asigna el servidor y se calcula el tiempo de reloj en donde terminara de procesarse       
+        if(procesado != -1){ //De devolver un tiempo -1 significa que el servidor estaba ocupado y se agrego la conexion a la lista de espera
+            Evento siguienteConsultaProcesada = new Evento(procesado,c,TipoEvento.EJECUTO_CONSULTA);
+        }
        }  
     }
-
     
-    private void procesarTransaccion(Conexion c){       
-        pc.procesarSalida(c,eventos);   //ordena el servidor de consultas con respecto a la conexion que sale. 
-        if(c.getTimeout() > reloj){     //si hay timeout elimina
-            admC.eliminarConexion(c.getNumServidor(),reloj);
+    void administrarServidorDeConsultas(Conexion c){             //ordena el servidor de consultas con respecto a la conexion que sale. 
+            Conexion nuevaConexion = pc.administrarServidor(c);
+            if(nuevaConexion != null){
+                Evento siguienteConsultaProcesada = new Evento(pc.calcularTiempoTotal(nuevaConexion),c,TipoEvento.EJECUTO_CONSULTA);
+                eventos.add(siguienteConsultaProcesada);
+            }
+    }
+    
+    void procesarTransaccion(Conexion c){       
+        administrarServidorDeConsultas(c);
+        if(c.getTimeout() > reloj){                                  //si hay timeout elimina
+            admC.eliminarConexion(c.getNumServidor());
        }
        else{
-            transacciones.asignarConexion(c,eventos,reloj);//se agrega la conexion al servidor de transaciones o a la cola
+            if(transacciones.asignarConexion(c)){                        //se agrega la conexion al servidor de transaciones o a la cola
+             calcularTiempoTransaccion(c);
+           }
         }     
     }
-   
-    private void ejecutarConsulta(Conexion c){
-       transacciones.administrarServidorDeTransacciones(c,eventos);       //acomoda el servidor anterior con la nueva conexion
+    
+    void calcularTiempoTransaccion(Conexion c){
+        
+        double tiempo;
+         
+         switch(c.getTipo()){
+             case 0:        //SELECT
+                 tiempo = transacciones.calcularTiempoTransaccion() + 1/10;
+                 c.setNumBloques(1);
+                 break;
+             case 2:        //JOIN
+                 c.setNumBloques((int)transacciones.randomWithRange(1, 64));
+                 tiempo = transacciones.calcularTiempoTransaccion() + (c.getNumBloques() * 1/10); //se calcula el tiempo del join
+                 break;
+             case 3:        //DDL
+                 tiempo = transacciones.calcularTiempoTransaccion() + transacciones.getMayorTiempoEjecucion();
+                 transacciones.setDDL();
+                 break;
+             default:       //UPDATE
+                 tiempo = transacciones.calcularTiempoTransaccion();  
+                 break;
+         }
+         
+         Evento siguienteTransaccion = new Evento(tiempo,c,TipoEvento.SALE_DE_TRANSACCIONES);
+         
+         if(c.getTipo() != 3 && siguienteTransaccion.getTiempo() > transacciones.getMayorTiempoEjecucion()){
+            transacciones.setMayorTiempoEjecucion(siguienteTransaccion.getTiempo());
+         }
+         eventos.add(siguienteTransaccion);
+    }
+    
+    void administrarServidorDeTransacciones(Conexion c){            //ordena el servidor de transacciones con las coenxiones en cola
+        Conexion nuevaConexion = transacciones.administrarServidorDeTransacciones(c);
+        if(nuevaConexion != null){
+            calcularTiempoTransaccion(nuevaConexion);
+        }
+    }
+    
+    void ejecutarConsulta(Conexion c){
+       administrarServidorDeTransacciones(c);       //acomoda el servidor anterior con la nueva conexion
        if(c.getTimeout() > reloj){
-            admC.eliminarConexion(c.getNumServidor(),reloj);
+         admC.eliminarConexion(c.getNumServidor());
        }
        else{
-            pc.asignarConsultaAEjecutor(c,eventos);
+            if(pc.asignarConsultaAEjecutor(c)){         
+                Evento siguienteEjecucion = new Evento(pc.calcularTiempoAlgoritmoEjecucion(c.getNumBloques(),c),c,TipoEvento.EJECUTO_CONSULTA);
+                eventos.add(siguienteEjecucion);
+            }
        }    
     }
     
-    private void ponerResultadoEnRed(Conexion c){
-        pc.administrarEjecutor(c,eventos);
-        admC.sacarDelSistema(c,pc.calcularTamanoRespuesta(c.getNumBloques()),eventos);
+    void administrarEjecutor(Conexion c){
+        Conexion nuevaConexion = pc.administrarEjecutor(c);
+        if(nuevaConexion != null){
+                Evento siguienteConsultaProcesada = new Evento(pc.calcularTiempoAlgoritmoEjecucion(c.getNumBloques(), c),c,TipoEvento.EJECUTO_CONSULTA);
+                eventos.add(siguienteConsultaProcesada);
+        }
     }
     
-    private void terminarConexion(Conexion c){
-        admC.eliminarConexion(c.getNumServidor(),reloj);
+    void ponerResultadoEnRed(Conexion c){
+        administrarEjecutor(c);
+        Evento siguienteSalidaDelSistema = new Evento(admC.ponerEnRed(pc.calcularTamanoRespuesta(c.getNumBloques())),c,TipoEvento.TERMINO_CONEXION);
+        eventos.add(siguienteSalidaDelSistema);
     }
     
-    void iniciarSimulación(int numC, double tiempoMax,int k,int n, int p, int m,double t,Menu menu){    
-        System.out.println(numC+"-"+tiempoMax+" - "+k+ " - " + n+ " - " + p+" - "+m +" - " +t);
-        admC = new ModuloAdmClientes(k,timeOutGlobal,menu);
-        admP = new ModuloAdmProcesos(menu);
-        pc = new ModuloProcesamientoConsultas(n,m,menu);
-        transacciones = new ModuloTransacciones(p,menu);
+    void terminarConexion(Conexion c){
+        admC.eliminarConexion(c.getNumServidor());
+    }
+    
+    void iniciarSimulación(int numC, double tiempoMax,int k,int n, int p, int m,double t,Menu menu){       
+        admC = new ModuloAdmClientes(k,timeOutGlobal);
+        admP = new ModuloAdmProcesos();
+        pc = new ModuloProcesamientoConsultas(n,m);
+        transacciones = new ModuloTransacciones(p);
         this.menu = menu;
-        this.correrSimulacion(numC,tiempoMax);
+        correrSimulacion(numC,tiempoMax);
     }
     
-    private void correrSimulacion(int numC, double tiempoMax){
-        this.crearConexion();
+    void correrSimulacion(int numC, double tiempoMax){
+        System.out.println("simulando");
+        crearConexion();
         for(int i = 0; i < numC; i++){
             while(reloj < tiempoMax){
                 Evento siguienteEvento = eventos.poll();
                 reloj = siguienteEvento.getTiempo();
-                System.out.println(reloj);
                 switch(siguienteEvento.getTipo()){
                     case LLEGA_CONEXION:
-                        this.crearConexion();
+                        crearConexion();
                         break;
                     case SALE_DE_HILO:
-                        this.procesarConsultas(siguienteEvento.getConexion());
+                        procesarConsultas(siguienteEvento.getConexion());
                         break;
                     case PROCESO_CONSULTA:
-                        this.procesarTransaccion(siguienteEvento.getConexion());
+                        procesarTransaccion(siguienteEvento.getConexion());
                         break;
                     case SALE_DE_TRANSACCIONES:
-                        this.ejecutarConsulta(siguienteEvento.getConexion());
+                        ejecutarConsulta(siguienteEvento.getConexion());
                         break;
                     case EJECUTO_CONSULTA:
-                        this.ponerResultadoEnRed(siguienteEvento.getConexion());
+                        ponerResultadoEnRed(siguienteEvento.getConexion());
                         break;
                     case TERMINO_CONEXION:
-                        this.terminarConexion(siguienteEvento.getConexion());
+                        terminarConexion(siguienteEvento.getConexion());
                         break;  
                 }
             }
-            
-            System.out.println("Termino: " + i);
         }
-        
-        System.out.println("Termino todo");
     }
 }

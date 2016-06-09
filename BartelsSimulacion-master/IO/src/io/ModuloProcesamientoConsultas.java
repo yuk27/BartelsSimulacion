@@ -2,11 +2,9 @@ package io;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.PriorityQueue;
 import java.util.Random;
 
 public class ModuloProcesamientoConsultas {
-    private Menu menu;
     private int[] servidoresConsultas;
     private int[] ejecutorConsultas;
     private double[] tiempoProcesamiento; 
@@ -14,30 +12,25 @@ public class ModuloProcesamientoConsultas {
     private List<Conexion> ejecutor;
     private Random r = new Random();
     
-    public ModuloProcesamientoConsultas(int p, int m, Menu menu){
+    public ModuloProcesamientoConsultas(int p, int m){
         servidoresConsultas = new int [p];
         tiempoProcesamiento = new double [p];
         ejecutorConsultas = new int[m];
         consultas = new ArrayList<>();
         ejecutor = new ArrayList<>();
-        this.menu = menu;
     }
     
-        public void asignarConsultaAServidor(Conexion c, double reloj,PriorityQueue<Evento> eventos){
+        public double asignarConsultaAServidor(Conexion c, double reloj){
         int i = 0;
         while(i < servidoresConsultas.length){
             if(servidoresConsultas[i] == -1){
                 servidoresConsultas[i] = c.getNumServidor();
-                //return (calcularTiempoTotal(c));
-                menu.aplicarInterfazProcesarConsulta(reloj);
-                Evento siguienteConsultaProcesada = new Evento(calcularTiempoTotal(c),c,TipoEvento.EJECUTO_CONSULTA);
-                eventos.add(siguienteConsultaProcesada);
-                return;
+                return (calcularTiempoTotal(c));
             }
             i++;
         }
         consultas.add(c);
-        menu.aplicarInterfazColaProcesador(consultas.size(), reloj);
+        return -1;
     }
         
     public int getSiguienteProcesado(){ 
@@ -101,18 +94,17 @@ public class ModuloProcesamientoConsultas {
         }
     }
     
-    public void asignarConsultaAEjecutor(Conexion c,PriorityQueue<Evento> eventos){
+    public boolean asignarConsultaAEjecutor(Conexion c){
         int i = 0;
         while(i < ejecutorConsultas.length){
             if(ejecutorConsultas[i] == -1){
                 ejecutorConsultas[i] = c.getNumServidor();
-                Evento siguienteEjecucion = new Evento(calcularTiempoAlgoritmoEjecucion(c.getNumBloques(),c),c,TipoEvento.EJECUTO_CONSULTA);
-                eventos.add(siguienteEjecucion);
-                return;
+                return true;
             }
             i++;
         }
         ejecutor.add(c);
+        return false;
     }
     
     public double calcularTiempoAlgoritmoEjecucion(int cantidadDeBloques, Conexion c){
@@ -142,21 +134,25 @@ public class ModuloProcesamientoConsultas {
         return posLibre;
     }
     
-    public void administrarEjecutor(Conexion c,PriorityQueue<Evento> eventos){
+    public Conexion administrarEjecutor(Conexion c){
         int posLibre = eliminarConexionEjecutor(c);
         if(!ejecutor.isEmpty()){
             ejecutorConsultas[posLibre] = ejecutor.get(0).getNumServidor();
-            Evento siguienteConsultaProcesada = new Evento(calcularTiempoAlgoritmoEjecucion(c.getNumBloques(), c),c,TipoEvento.EJECUTO_CONSULTA);
-            eventos.add(siguienteConsultaProcesada);
+            return (ejecutor.remove(0));
+        }
+        else{
+            return null;
         }
     }
     
-    public void procesarSalida(Conexion c,PriorityQueue<Evento> eventos){             
+    public Conexion administrarServidor(Conexion c){             
         int posLibre = eliminarConexionServidor(c);
         if(!consultas.isEmpty()){
-            servidoresConsultas[posLibre] = consultas.get(0).getNumServidor(); //asigno la primera conexion de la lista al servidor que acabo de liberar  
-            Evento siguienteConsultaProcesada = new Evento(calcularTiempoTotal(consultas.remove(0)),c,TipoEvento.EJECUTO_CONSULTA);
-            eventos.add(siguienteConsultaProcesada);
+            servidoresConsultas[posLibre] = consultas.get(0).getNumServidor();      //asigno la primera conexion de la lista al servidor que acabo de liberar
+            return (consultas.remove(0));    
+        }
+        else{
+            return null;
         }
     }
     
@@ -170,6 +166,4 @@ public class ModuloProcesamientoConsultas {
         }
         return posLibre;
     }
-    
-    
 }

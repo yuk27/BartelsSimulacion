@@ -2,19 +2,17 @@ package io;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.PriorityQueue;
 
 public class ModuloAdmClientes {
-    Menu menu;
+   
     private List<Conexion> conexiones;
     private boolean[] servidores;
     private double timeOutGlobal;
     
-    public ModuloAdmClientes(int k, double timeOutGlobal,Menu menu){
+    public ModuloAdmClientes(int k, double timeOutGlobal){
         servidores = new boolean[k];
         conexiones = new ArrayList<>();
         this.timeOutGlobal = timeOutGlobal;
-        this.menu = menu;
     }
     
     public boolean crearConexion(double tiempoActual){
@@ -34,12 +32,11 @@ public class ModuloAdmClientes {
        return false;
     }
     
-    public void eliminarConexion(int pos,double reloj){
+    public void eliminarConexion(int pos){
         servidores[pos] = false; 
         for(int i = 0; i < conexiones.size(); i++){
             if(conexiones.get(i).getServidor() == pos){
                 conexiones.remove(i);
-                menu.aplicarInterfazClientes(conexiones.size(),reloj);
             }    
         }   
     }
@@ -59,29 +56,23 @@ public class ModuloAdmClientes {
     }
     
     public void verificarTimeout(int pos, int reloj){
-        for(int i = 0; i < conexiones.size(); i++){
-            if(conexiones.get(i).getServidor() == pos){
-                if(reloj  > conexiones.get(i).getTimeout()){
-                    conexiones.remove(i);
-                    servidores[pos] = false;
-                }
-            }    
+            for(int i = 0; i < conexiones.size(); i++){
+                if(conexiones.get(i).getServidor() == pos){
+                    if(reloj  > conexiones.get(i).getTimeout()){
+                        conexiones.remove(i);
+                        servidores[pos] = false;
+                    }
+                }    
         } 
     }
-      
+    
+    public double ponerEnRed(double tiempo){
+        return tiempo;
+    }
+    
+            
     public int getUsedConexiones(){
         return conexiones.size();
-    }
-    
-    public void sacarDelSistema(Conexion c,double tamanoRespuesta,PriorityQueue<Evento> eventos){
-        Evento siguienteSalidaDelSistema = new Evento(tamanoRespuesta,c,TipoEvento.TERMINO_CONEXION);
-        eventos.add(siguienteSalidaDelSistema);
-    }
-    
-    public void crearArribo(double reloj,double r,PriorityQueue<Evento> eventos){
-        double tiempoArribo = Conexion.generarTiempoArribo(r);
-        Evento siguienteLlegada = new Evento(tiempoArribo + reloj,null,TipoEvento.LLEGA_CONEXION); //se genera el evento para la siguiente entrada de una conexion
-        eventos.add(siguienteLlegada);// se agrega a la lista de eventos.
     }
     
 }

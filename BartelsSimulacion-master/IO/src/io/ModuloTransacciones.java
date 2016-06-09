@@ -2,17 +2,15 @@ package io;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.PriorityQueue;
 
 public class ModuloTransacciones {
-    private Menu menu;
     private boolean hayDDL;
     private int[] servidores;
     private List<Conexion> conexionesConPrioridad;
     
     private double mayorTiempoEjecucion;
     
-    public ModuloTransacciones(int p,Menu menu){
+    public ModuloTransacciones(int p){
         servidores = new int[p];
         conexionesConPrioridad = new ArrayList<>();
         mayorTiempoEjecucion = 0;
@@ -42,7 +40,7 @@ public class ModuloTransacciones {
                     break;
                 
                 case 2:
-                   tiempoEnDisco =  randomConRango(0,64); 
+                   tiempoEnDisco =  randomWithRange(0,64); 
                     break;
                    
                  default:
@@ -53,12 +51,12 @@ public class ModuloTransacciones {
         return tiempoEnDisco;
     }
     
-       public double randomConRango(int min, int max){ 
+       public double randomWithRange(int min, int max){ 
         int range = (max - min) + 1; 
         return (Math.random()*range) + min; 
     }
     
-    public boolean asignarConexion(Conexion c,PriorityQueue<Evento> eventos,double reloj){
+    public boolean asignarConexion(Conexion c){
         int i = 0; 
         while(i < servidores.length && !hayDDL){
             if(servidores[i] == -1){
@@ -66,13 +64,11 @@ public class ModuloTransacciones {
                     hayDDL = true;
                 }
                 servidores[i] = c.getNumServidor();
-                calcularTiempoTransaccion(c,eventos);
                 return true;
             }
             i++;
         }
         conexionesConPrioridad.add(c);
-        menu.aplicarInterfazColaTransacciones(conexionesConPrioridad.size(), reloj);
         return false;
     }
     
@@ -89,36 +85,6 @@ public class ModuloTransacciones {
         return conexionesConPrioridad.get(index);      
     }
     
-        private void calcularTiempoTransaccion(Conexion c,PriorityQueue<Evento> eventos){
-        
-        double tiempo;
-         
-         switch(c.getTipo()){
-             case 0:        //SELECT
-                 tiempo = calcularTiempoTransaccion() + 1/10;
-                 c.setNumBloques(1);
-                 break;
-             case 2:        //JOIN
-                 c.setNumBloques((int)randomConRango(1, 64));
-                 tiempo = calcularTiempoTransaccion() + (c.getNumBloques() * 1/10); //se calcula el tiempo del join
-                 break;
-             case 3:        //DDL
-                 tiempo = calcularTiempoTransaccion() + getMayorTiempoEjecucion();
-                 setDDL();
-                 break;
-             default:       //UPDATE
-                 tiempo = calcularTiempoTransaccion();  
-                 break;
-         }
-         
-         Evento siguienteTransaccion = new Evento(tiempo,c,TipoEvento.SALE_DE_TRANSACCIONES);
-         
-         if(c.getTipo() != 3 && siguienteTransaccion.getTiempo() > getMayorTiempoEjecucion()){
-           setMayorTiempoEjecucion(siguienteTransaccion.getTiempo());
-         }
-         eventos.add(siguienteTransaccion);
-    }
-    
     public int eliminarConexion(Conexion c){
        int posLibre = -1;
         if(c.getTipo() == 3){
@@ -133,13 +99,14 @@ public class ModuloTransacciones {
         return posLibre;
     }
     
-    public void administrarServidorDeTransacciones(Conexion c,PriorityQueue<Evento> eventos){
+    public Conexion administrarServidorDeTransacciones(Conexion c){
         int posLibre = eliminarConexion(c);
         if(!conexionesConPrioridad.isEmpty()){
             Conexion nuevaConexion = getConexionDePrioridad();
             servidores[posLibre] = nuevaConexion.getNumServidor();
-            calcularTiempoTransaccion(c,eventos);
+            return nuevaConexion;
         }
+        return null;
     }
     
     public void setDDL(){
