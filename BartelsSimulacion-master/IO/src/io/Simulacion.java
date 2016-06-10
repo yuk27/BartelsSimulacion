@@ -35,7 +35,7 @@ public class Simulacion {
     private Vector<Double> tiempoDDL = new Vector<>();
 
     private void crearConexion(){
-          
+          System.out.println("crear conexion");
         if(admC.crearConexion(reloj)){ 
           crearHiloConexion(admC.getSiguienteConexion());
           menu.aplicarInterfazClientes(admC.getUsedConexiones(),reloj);//pruebas de interfaz
@@ -48,6 +48,7 @@ public class Simulacion {
         }
  
     private void crearHiloConexion(Conexion c){  
+        System.out.println("crear hilo");
         admP.crearHilo(c,reloj); //se guarda la conexion entrante ya sea en el servidor si no hay cola, o se agrega a la cola
         if(admP.getServidor()){
             if(c.getTimeout() > reloj){                                              
@@ -83,7 +84,7 @@ public class Simulacion {
     }
    
     private void ejecutarConsulta(Conexion c){
-       transacciones.administrarServidorDeTransacciones(c,eventos);       //acomoda el servidor anterior con la nueva conexion
+       transacciones.administrarServidorDeTransacciones(c,eventos, reloj);       //acomoda el servidor anterior con la nueva conexion
        if(c.getTimeout() > reloj){
             admC.eliminarConexion(c.getNumServidor(),reloj);
        }
@@ -106,6 +107,7 @@ public class Simulacion {
         admC = new ModuloAdmClientes(k,timeOutGlobal,menu);
         admP = new ModuloAdmProcesos(menu);
         pc = new ModuloProcesamientoConsultas(n,m,menu);
+        pc.InicializarVectores();
         transacciones = new ModuloTransacciones(p,menu);
         this.menu = menu;
         this.correrSimulacion(numC,tiempoMax);
@@ -118,6 +120,7 @@ public class Simulacion {
                 Evento siguienteEvento = eventos.poll();
                 reloj = siguienteEvento.getTiempo();
                 System.out.println(reloj);
+                System.out.println("evento de tipo: " + siguienteEvento.getTipo());
                 switch(siguienteEvento.getTipo()){
                     case LLEGA_CONEXION:
                         this.crearConexion();

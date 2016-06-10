@@ -66,7 +66,7 @@ public class ModuloTransacciones {
                     hayDDL = true;
                 }
                 servidores[i] = c.getNumServidor();
-                calcularTiempoTransaccion(c,eventos);
+                calcularTiempoTransaccion(c,eventos, reloj);
                 return true;
             }
             i++;
@@ -89,25 +89,25 @@ public class ModuloTransacciones {
         return conexionesConPrioridad.get(index);      
     }
     
-        private void calcularTiempoTransaccion(Conexion c,PriorityQueue<Evento> eventos){
+        private void calcularTiempoTransaccion(Conexion c,PriorityQueue<Evento> eventos, double reloj){
         
         double tiempo;
          
          switch(c.getTipo()){
              case 0:        //SELECT
-                 tiempo = calcularTiempoTransaccion() + 1/10;
+                 tiempo = calcularTiempoTransaccion() + 1/10 + reloj;
                  c.setNumBloques(1);
                  break;
              case 2:        //JOIN
                  c.setNumBloques((int)randomConRango(1, 64));
-                 tiempo = calcularTiempoTransaccion() + (c.getNumBloques() * 1/10); //se calcula el tiempo del join
+                 tiempo = calcularTiempoTransaccion() + (c.getNumBloques() * 1/10) + reloj; //se calcula el tiempo del join
                  break;
              case 3:        //DDL
                  tiempo = calcularTiempoTransaccion() + getMayorTiempoEjecucion();
                  setDDL();
                  break;
              default:       //UPDATE
-                 tiempo = calcularTiempoTransaccion();  
+                 tiempo = calcularTiempoTransaccion() + reloj;  
                  break;
          }
          
@@ -133,12 +133,12 @@ public class ModuloTransacciones {
         return posLibre;
     }
     
-    public void administrarServidorDeTransacciones(Conexion c,PriorityQueue<Evento> eventos){
+    public void administrarServidorDeTransacciones(Conexion c,PriorityQueue<Evento> eventos, double reloj){
         int posLibre = eliminarConexion(c);
         if(!conexionesConPrioridad.isEmpty()){
             Conexion nuevaConexion = getConexionDePrioridad();
             servidores[posLibre] = nuevaConexion.getNumServidor();
-            calcularTiempoTransaccion(c,eventos);
+            calcularTiempoTransaccion(c,eventos, reloj);
         }
     }
     

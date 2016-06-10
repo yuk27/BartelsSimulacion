@@ -24,14 +24,16 @@ public class ModuloProcesamientoConsultas {
     }
     
         public void asignarConsultaAServidor(Conexion c, double reloj,PriorityQueue<Evento> eventos){
+            System.out.println("asiganr consulta");
         int i = 0;
         while(i < servidoresConsultas.length){
             if(servidoresConsultas[i] == -1){
                 servidoresConsultas[i] = c.getNumServidor();
                 //return (calcularTiempoTotal(c));
                 menu.aplicarInterfazProcesarConsulta(reloj);
-                Evento siguienteConsultaProcesada = new Evento(calcularTiempoTotal(c),c,TipoEvento.EJECUTO_CONSULTA);
+                Evento siguienteConsultaProcesada = new Evento(calcularTiempoTotal(c),c,TipoEvento.PROCESO_CONSULTA);
                 eventos.add(siguienteConsultaProcesada);
+                System.out.println("evento de consulta");
                 return;
             }
             i++;
@@ -155,7 +157,7 @@ public class ModuloProcesamientoConsultas {
         int posLibre = eliminarConexionServidor(c);
         if(!consultas.isEmpty()){
             servidoresConsultas[posLibre] = consultas.get(0).getNumServidor(); //asigno la primera conexion de la lista al servidor que acabo de liberar  
-            Evento siguienteConsultaProcesada = new Evento(calcularTiempoTotal(consultas.remove(0)),c,TipoEvento.EJECUTO_CONSULTA);
+            Evento siguienteConsultaProcesada = new Evento(calcularTiempoTotal(consultas.remove(0)),c,TipoEvento.PROCESO_CONSULTA);
             eventos.add(siguienteConsultaProcesada);
         }
     }
