@@ -17,10 +17,10 @@ public class ModuloTransacciones {
         conexionesConPrioridad = new ArrayList<>();
         mayorTiempoEjecucion = 0;
         hayDDL = false;
+        this.menu = menu;
     }
     
-    void InicializarVector(){
-    
+    public void inicializarVector(){
         for(int i = 0; i < servidores.length; i++){
             servidores[i] = -1; 
         }
@@ -30,32 +30,9 @@ public class ModuloTransacciones {
         return servidores.length *0.03;
     }
     
-    public double calcularTiempoBloquesDeDisco(Conexion c){
-    
-        double tiempoEnDisco = 0;
-        
-        switch (c.getTipo()){
-                
-                case 0: 
-                    
-                    tiempoEnDisco =  1/10;
-                    break;
-                
-                case 2:
-                   tiempoEnDisco =  randomConRango(0,64); 
-                    break;
-                   
-                 default:
-                     tiempoEnDisco = 0;
-                     break;
-        }
-        
-        return tiempoEnDisco;
-    }
-    
        public double randomConRango(int min, int max){ 
-        int range = (max - min) + 1; 
-        return (Math.random()*range) + min; 
+            int range = (max - min) + 1; 
+            return (Math.random()*range) + min; 
     }
     
     public boolean asignarConexion(Conexion c,PriorityQueue<Evento> eventos,double reloj){
@@ -76,7 +53,7 @@ public class ModuloTransacciones {
         return false;
     }
     
-    Conexion getConexionDePrioridad(){        
+    private Conexion getConexionDePrioridad(){        
         int priorMax = 0;
         int index = 0;
         
@@ -89,34 +66,33 @@ public class ModuloTransacciones {
         return conexionesConPrioridad.get(index);      
     }
     
-        private void calcularTiempoTransaccion(Conexion c,PriorityQueue<Evento> eventos, double reloj){
-        
-        double tiempo;
-         
-         switch(c.getTipo()){
-             case 0:        //SELECT
-                 tiempo = calcularTiempoTransaccion() + 1/10 + reloj;
-                 c.setNumBloques(1);
-                 break;
-             case 2:        //JOIN
-                 c.setNumBloques((int)randomConRango(1, 64));
-                 tiempo = calcularTiempoTransaccion() + (c.getNumBloques() * 1/10) + reloj; //se calcula el tiempo del join
-                 break;
-             case 3:        //DDL
-                 tiempo = calcularTiempoTransaccion() + getMayorTiempoEjecucion();
-                 setDDL();
-                 break;
-             default:       //UPDATE
-                 tiempo = calcularTiempoTransaccion() + reloj;  
-                 break;
-         }
-         
-         Evento siguienteTransaccion = new Evento(tiempo,c,TipoEvento.SALE_DE_TRANSACCIONES);
-         
-         if(c.getTipo() != 3 && siguienteTransaccion.getTiempo() > getMayorTiempoEjecucion()){
-           setMayorTiempoEjecucion(siguienteTransaccion.getTiempo());
-         }
-         eventos.add(siguienteTransaccion);
+        private void calcularTiempoTransaccion(Conexion c,PriorityQueue<Evento> eventos, double reloj){        
+                double tiempo;
+
+                 switch(c.getTipo()){
+                     case 0:        //SELECT
+                         tiempo = calcularTiempoTransaccion() + 1/10 + reloj;
+                         c.setNumBloques(1);
+                         break;
+                     case 2:        //JOIN
+                         c.setNumBloques((int)randomConRango(1, 64));
+                         tiempo = calcularTiempoTransaccion() + (c.getNumBloques() * 1/10) + reloj; //se calcula el tiempo del join
+                         break;
+                     case 3:        //DDL
+                         tiempo = calcularTiempoTransaccion() + getMayorTiempoEjecucion();
+                         setDDL();
+                         break;
+                     default:       //UPDATE
+                         tiempo = calcularTiempoTransaccion() + reloj;  
+                         break;
+                 }
+
+                Evento siguienteTransaccion = new Evento(tiempo,c,TipoEvento.SALE_DE_TRANSACCIONES);
+
+                if(c.getTipo() != 3 && siguienteTransaccion.getTiempo() > getMayorTiempoEjecucion()){
+                  setMayorTiempoEjecucion(siguienteTransaccion.getTiempo());
+                }
+                eventos.add(siguienteTransaccion);
     }
     
     public int eliminarConexion(Conexion c){
@@ -133,12 +109,12 @@ public class ModuloTransacciones {
         return posLibre;
     }
     
-    public void administrarServidorDeTransacciones(Conexion c,PriorityQueue<Evento> eventos, double reloj){
+    public void procesarSalida(Conexion c,PriorityQueue<Evento> eventos, double reloj){
         int posLibre = eliminarConexion(c);
         if(!conexionesConPrioridad.isEmpty()){
             Conexion nuevaConexion = getConexionDePrioridad();
             servidores[posLibre] = nuevaConexion.getNumServidor();
-            calcularTiempoTransaccion(c,eventos, reloj);
+            calcularTiempoTransaccion(nuevaConexion, eventos, reloj);
         }
     }
     

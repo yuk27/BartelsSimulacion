@@ -24,50 +24,41 @@ public class ModuloProcesamientoConsultas {
     }
     
         public void asignarConsultaAServidor(Conexion c, double reloj,PriorityQueue<Evento> eventos){
-            System.out.println("asiganr consulta");
-        int i = 0;
-        while(i < servidoresConsultas.length){
-            if(servidoresConsultas[i] == -1){
-                servidoresConsultas[i] = c.getNumServidor();
-                //return (calcularTiempoTotal(c));
-                menu.aplicarInterfazProcesarConsulta(reloj);
-                Evento siguienteConsultaProcesada = new Evento(calcularTiempoTotal(c),c,TipoEvento.PROCESO_CONSULTA);
-                eventos.add(siguienteConsultaProcesada);
-                System.out.println("evento de consulta");
-                return;
-            }
-            i++;
-        }
-        consultas.add(c);
-        menu.aplicarInterfazColaProcesador(consultas.size(), reloj);
+                int i = 0;
+                while(i < servidoresConsultas.length){
+                    if(servidoresConsultas[i] == -1){
+                        servidoresConsultas[i] = c.getNumServidor();
+                        menu.aplicarInterfazProcesarConsulta(reloj);
+                        Evento siguienteConsultaProcesada = new Evento(calcularTiempoTotal(c) + reloj, c, TipoEvento.PROCESO_CONSULTA);
+                        eventos.add(siguienteConsultaProcesada);
+                        return;
+                    }
+                    i++;
+                }
+                consultas.add(c);
+                menu.aplicarInterfazColaProcesador(consultas.size(), reloj);
     }
         
     public int getSiguienteProcesado(){ 
-       
             double menorTiempo = -1; //se inicializa el valor
             int siguiente = 0; 
-        for(int i = 0; i < tiempoProcesamiento.length; i++){
-        
-            if(tiempoProcesamiento[i] > menorTiempo || menorTiempo == -1){ //si es el menor tiempo o el primero se toma como el menor
-                menorTiempo = tiempoProcesamiento[i];
-                siguiente = i;
+            for(int i = 0; i < tiempoProcesamiento.length; i++){
+                if(tiempoProcesamiento[i] > menorTiempo || menorTiempo == -1){ //si es el menor tiempo o el primero se toma como el menor
+                    menorTiempo = tiempoProcesamiento[i];
+                    siguiente = i;
+                }
             }
-        }
-    return siguiente;
+            return siguiente;
     } 
         
-    
         
-    void InicializarVectores(){
-    
+    public void inicializarVectores(){    
         for(int i = 0; i < servidoresConsultas.length; i++){
             servidoresConsultas[i] = -1; 
         }
-        
         for(int i = 0; i < ejecutorConsultas.length; i++){
             ejecutorConsultas[i] = -1; 
-        }
-    
+        }   
     }
         
     public double calcularTiempoTotal(Conexion c){
@@ -103,12 +94,12 @@ public class ModuloProcesamientoConsultas {
         }
     }
     
-    public void asignarConsultaAEjecutor(Conexion c,PriorityQueue<Evento> eventos){
+    public void asignarConsultaAEjecutor(Conexion c,PriorityQueue<Evento> eventos, double reloj){
         int i = 0;
         while(i < ejecutorConsultas.length){
             if(ejecutorConsultas[i] == -1){
                 ejecutorConsultas[i] = c.getNumServidor();
-                Evento siguienteEjecucion = new Evento(calcularTiempoAlgoritmoEjecucion(c.getNumBloques(),c),c,TipoEvento.EJECUTO_CONSULTA);
+                Evento siguienteEjecucion = new Evento(calcularTiempoAlgoritmoEjecucion(c.getNumBloques(), c) + reloj, c, TipoEvento.EJECUTO_CONSULTA);
                 eventos.add(siguienteEjecucion);
                 return;
             }
@@ -144,20 +135,20 @@ public class ModuloProcesamientoConsultas {
         return posLibre;
     }
     
-    public void administrarEjecutor(Conexion c,PriorityQueue<Evento> eventos){
+    public void procesarSalidaEjecutor(Conexion c,PriorityQueue<Evento> eventos, double reloj){
         int posLibre = eliminarConexionEjecutor(c);
         if(!ejecutor.isEmpty()){
             ejecutorConsultas[posLibre] = ejecutor.get(0).getNumServidor();
-            Evento siguienteConsultaProcesada = new Evento(calcularTiempoAlgoritmoEjecucion(c.getNumBloques(), c),c,TipoEvento.EJECUTO_CONSULTA);
+            Evento siguienteConsultaProcesada = new Evento(calcularTiempoAlgoritmoEjecucion(ejecutor.get(0).getNumBloques(), ejecutor.get(0)) + reloj, ejecutor.remove(0), TipoEvento.EJECUTO_CONSULTA);
             eventos.add(siguienteConsultaProcesada);
         }
     }
     
-    public void procesarSalida(Conexion c,PriorityQueue<Evento> eventos){             
+    public void procesarSalidaConsulta(Conexion c,PriorityQueue<Evento> eventos, double reloj){             
         int posLibre = eliminarConexionServidor(c);
         if(!consultas.isEmpty()){
             servidoresConsultas[posLibre] = consultas.get(0).getNumServidor(); //asigno la primera conexion de la lista al servidor que acabo de liberar  
-            Evento siguienteConsultaProcesada = new Evento(calcularTiempoTotal(consultas.remove(0)),c,TipoEvento.PROCESO_CONSULTA);
+            Evento siguienteConsultaProcesada = new Evento(calcularTiempoTotal(consultas.get(0)) + reloj, consultas.remove(0), TipoEvento.PROCESO_CONSULTA);
             eventos.add(siguienteConsultaProcesada);
         }
     }

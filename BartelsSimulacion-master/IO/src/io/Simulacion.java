@@ -35,7 +35,6 @@ public class Simulacion {
     private Vector<Double> tiempoDDL = new Vector<>();
 
     private void crearConexion(){
-          System.out.println("crear conexion");
         if(admC.crearConexion(reloj)){ 
           crearHiloConexion(admC.getSiguienteConexion());
           menu.aplicarInterfazClientes(admC.getUsedConexiones(),reloj);//pruebas de interfaz
@@ -48,7 +47,6 @@ public class Simulacion {
         }
  
     private void crearHiloConexion(Conexion c){  
-        System.out.println("crear hilo");
         admP.crearHilo(c,reloj); //se guarda la conexion entrante ya sea en el servidor si no hay cola, o se agrega a la cola
         if(admP.getServidor()){
             if(c.getTimeout() > reloj){                                              
@@ -74,7 +72,7 @@ public class Simulacion {
 
     
     private void procesarTransaccion(Conexion c){       
-        pc.procesarSalida(c,eventos);   //ordena el servidor de consultas con respecto a la conexion que sale. 
+        pc.procesarSalidaConsulta(c,eventos, reloj);   //ordena el servidor de consultas con respecto a la conexion que sale. 
         if(c.getTimeout() > reloj){     //si hay timeout elimina
             admC.eliminarConexion(c.getNumServidor(),reloj);
        }
@@ -84,18 +82,18 @@ public class Simulacion {
     }
    
     private void ejecutarConsulta(Conexion c){
-       transacciones.administrarServidorDeTransacciones(c,eventos, reloj);       //acomoda el servidor anterior con la nueva conexion
+       transacciones.procesarSalida(c,eventos, reloj);       //acomoda el servidor anterior con la nueva conexion
        if(c.getTimeout() > reloj){
             admC.eliminarConexion(c.getNumServidor(),reloj);
        }
        else{
-            pc.asignarConsultaAEjecutor(c,eventos);
+            pc.asignarConsultaAEjecutor(c,eventos, reloj);
        }    
     }
     
     private void ponerResultadoEnRed(Conexion c){
-        pc.administrarEjecutor(c,eventos);
-        admC.sacarDelSistema(c,pc.calcularTamanoRespuesta(c.getNumBloques()),eventos);
+        pc.procesarSalidaEjecutor(c,eventos, reloj);
+        admC.sacarDelSistema(c,pc.calcularTamanoRespuesta(c.getNumBloques()) + reloj, eventos);
     }
     
     private void terminarConexion(Conexion c){
@@ -107,8 +105,9 @@ public class Simulacion {
         admC = new ModuloAdmClientes(k,timeOutGlobal,menu);
         admP = new ModuloAdmProcesos(menu);
         pc = new ModuloProcesamientoConsultas(n,m,menu);
-        pc.InicializarVectores();
+        pc.inicializarVectores();
         transacciones = new ModuloTransacciones(p,menu);
+        transacciones.inicializarVector();
         this.menu = menu;
         this.correrSimulacion(numC,tiempoMax);
     }

@@ -7,9 +7,9 @@ public class Evento {
     private Conexion conexion;
     
     public Evento(double tiempo, Conexion c, TipoEvento tipo){
-    this.tiempo = tiempo;
-    this.conexion = c;
-    this.tipo = tipo;
+        this.tiempo = tiempo;
+        this.conexion = c;
+        this.tipo = tipo;
     }
     
     public double getTiempo(){

@@ -74,7 +74,7 @@ public class ModuloAdmClientes {
     }
     
     public void sacarDelSistema(Conexion c,double tamanoRespuesta,PriorityQueue<Evento> eventos){
-        Evento siguienteSalidaDelSistema = new Evento(tamanoRespuesta,c,TipoEvento.TERMINO_CONEXION);
+        Evento siguienteSalidaDelSistema = new Evento(tamanoRespuesta, c, TipoEvento.TERMINO_CONEXION);
         eventos.add(siguienteSalidaDelSistema);
     }
     

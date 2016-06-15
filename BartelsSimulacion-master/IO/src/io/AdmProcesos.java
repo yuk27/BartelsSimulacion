@@ -25,7 +25,7 @@ public class AdmProcesos {
      
      public void crearHilo(Conexion c){
          if(!servidorOcupado){
-             if(conexiones.size() == 0){
+             if(conexiones.isEmpty()){
                 servidorOcupado = true;
                 enServicio = c;
                 entroAlServidor = true;
@@ -39,7 +39,7 @@ public class AdmProcesos {
          }
      }
      
-     public void SetServidor(){
+     public void setServidor(){
          entroAlServidor = false;
      }
      
@@ -72,9 +72,9 @@ public class AdmProcesos {
          return servidorOcupado;
      }
      
-    Conexion SiguienteConexion(){
-     servidorOcupado = false;
-     return enServicio;
+    public Conexion siguienteConexion(){
+        servidorOcupado = false;
+        return enServicio;
      }
      
 }
