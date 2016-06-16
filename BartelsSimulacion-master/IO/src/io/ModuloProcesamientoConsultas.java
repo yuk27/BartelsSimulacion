@@ -164,5 +164,20 @@ public class ModuloProcesamientoConsultas {
         return posLibre;
     }
     
-    
+    public void eliminarConexion(Conexion c){
+        this.eliminarConexionServidor(c);
+        for(int i = 0; i < consultas.size(); i++){
+             if(consultas.get(i) == c){
+                 consultas.remove(i);
+                 break;
+             }
+         }
+        this.eliminarConexionEjecutor(c);
+        for(int i = 0; i < ejecutor.size(); i++){
+             if(ejecutor.get(i) == c){
+                 ejecutor.remove(i);
+                 return;
+             }
+        }
+    }
 }

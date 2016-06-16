@@ -17,7 +17,6 @@ public class AdmClientes {
     List<Conexion> conexiones;
     boolean[] servidores;
     
-    
     public AdmClientes(int k){
         servidores = new boolean[k];
         conexiones = new ArrayList<>();

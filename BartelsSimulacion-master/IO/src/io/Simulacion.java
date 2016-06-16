@@ -47,7 +47,7 @@ public class Simulacion {
         }
  
     private void crearHiloConexion(Conexion c){  
-        admP.crearHilo(c,reloj); //se guarda la conexion entrante ya sea en el servidor si no hay cola, o se agrega a la cola
+        admP.crearHilo(c,reloj, eventos); //se guarda la conexion entrante ya sea en el servidor si no hay cola, o se agrega a la cola
         if(admP.getServidor()){
             if(c.getTimeout() > reloj){                                              
                 admC.eliminarConexion(c.getNumServidor(),reloj);         //elimnamos la conexion en timeout
@@ -100,7 +100,14 @@ public class Simulacion {
         admC.eliminarConexion(c.getNumServidor(),reloj);
     }
     
-    void iniciarSimulación(int numC, double tiempoMax,int k,int n, int p, int m,double t,Menu menu){    
+    private void procesarTimeout(Conexion c){
+        admC.eliminarConexion(c.getNumServidor() , reloj);
+        admP.eliminarConexion(c);
+        pc.eliminarConexion(c);
+        transacciones.eliminarConexionTimeout(c);
+    }
+    
+    public void iniciarSimulación(int numC, double tiempoMax,int k,int n, int p, int m,double t,Menu menu){    
         System.out.println(numC+"-"+tiempoMax+" - "+k+ " - " + n+ " - " + p+" - "+m +" - " +t);
         admC = new ModuloAdmClientes(k,timeOutGlobal,menu);
         admP = new ModuloAdmProcesos(menu);
@@ -138,7 +145,10 @@ public class Simulacion {
                         break;
                     case TERMINO_CONEXION:
                         this.terminarConexion(siguienteEvento.getConexion());
-                        break;  
+                        break;
+                    case TIMEOUT:
+                        this.procesarTimeout(siguienteEvento.getConexion());
+                        break;
                 }
             }
             

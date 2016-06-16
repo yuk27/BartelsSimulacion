@@ -18,20 +18,35 @@ public class ModuloAdmProcesos {
          this.menu = menu;
      }
      
-     public void crearHilo(Conexion c,double reloj){
+     public void eliminarConexion(Conexion c){
+         for(int i = 0; i < conexiones.size(); i++){
+             if(conexiones.get(i) == c){
+                 conexiones.remove(i);
+                 return;
+             }
+         }
+     }
+     
+     public void crearHilo(Conexion c,double reloj, PriorityQueue<Evento> eventos){
          if(!servidorOcupado){
              if(conexiones.isEmpty()){
                 servidorOcupado = true;
                 enServicio = c;
                 entroAlServidor = true;
+                Evento siguienteTimeout = new Evento(c.getTimeout() ,c,TipoEvento.TIMEOUT);
+                eventos.add(siguienteTimeout);
                 menu.aplicarInterfazNuevoHilo(servidorOcupado,reloj);
              }
              else{
                 conexiones.add(c);
+                Evento siguienteTimeout = new Evento(c.getTimeout() ,c,TipoEvento.TIMEOUT); 
+                eventos.add(siguienteTimeout);
              }  
          }
          else{
-             conexiones.add(c);
+                conexiones.add(c);
+                Evento siguienteTimeout = new Evento(c.getTimeout() ,c,TipoEvento.TIMEOUT); 
+                eventos.add(siguienteTimeout);
          }
          menu.aplicarInterfazColaHilo(conexiones.size(), reloj);
      }

@@ -118,6 +118,16 @@ public class ModuloTransacciones {
         }
     }
     
+    public void eliminarConexionTimeout(Conexion c){
+        this.eliminarConexion(c);
+        for(int i = 0; i < conexionesConPrioridad.size(); i++){
+             if(conexionesConPrioridad.get(i) == c){
+                 conexionesConPrioridad.remove(i);
+                 return;
+             }
+        }
+    }
+    
     public void setDDL(){
         hayDDL = true;
     }

@@ -57,7 +57,8 @@ public class ModuloAdmClientes {
         }  
         return false;
     }
-    
+   
+    /*
     public void verificarTimeout(int pos, int reloj){
         for(int i = 0; i < conexiones.size(); i++){
             if(conexiones.get(i).getServidor() == pos){
@@ -67,7 +68,7 @@ public class ModuloAdmClientes {
                 }
             }    
         } 
-    }
+    }*/
       
     public int getUsedConexiones(){
         return conexiones.size();
@@ -83,5 +84,7 @@ public class ModuloAdmClientes {
         Evento siguienteLlegada = new Evento(tiempoArribo + reloj,null,TipoEvento.LLEGA_CONEXION); //se genera el evento para la siguiente entrada de una conexion
         eventos.add(siguienteLlegada);// se agrega a la lista de eventos.
     }
+    
+
     
 }
