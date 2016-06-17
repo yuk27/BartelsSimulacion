@@ -77,7 +77,7 @@ public class Menu extends javax.swing.JFrame {
           s = new Simulacion();
           s.iniciarSimulación(nc, tm, k, n, p, m, t, this);
           if(lento){
-            displayTimer = new Timer(1000, listener); //empezar interfaz
+            displayTimer = new Timer(100, listener); //empezar interfaz
             displayTimer.start(); 
           }
         }

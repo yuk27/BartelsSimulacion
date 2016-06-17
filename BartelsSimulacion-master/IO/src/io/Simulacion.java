@@ -10,7 +10,7 @@ public class Simulacion {
     
     private double reloj = 0; //variable que cuenta el tiempo actual en el cual nos encontramos dentro del sistema
     private Menu menu;
-    private int timeOutGlobal = 0;
+    private double timeOutGlobal = 0;
     private int conexionesRechazadas = 0;
     private Random r = new Random();
     private ModuloAdmClientes admC;
@@ -109,6 +109,7 @@ public class Simulacion {
     
     public void iniciarSimulación(int numC, double tiempoMax,int k,int n, int p, int m,double t,Menu menu){    
         System.out.println(numC+"-"+tiempoMax+" - "+k+ " - " + n+ " - " + p+" - "+m +" - " +t);
+        this.timeOutGlobal = t;
         admC = new ModuloAdmClientes(k,timeOutGlobal,menu);
         admP = new ModuloAdmProcesos(menu);
         pc = new ModuloProcesamientoConsultas(n,m,menu);

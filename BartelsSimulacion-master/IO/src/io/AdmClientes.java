@@ -22,7 +22,7 @@ public class AdmClientes {
         conexiones = new ArrayList<>();
     }
     
-    public void crearConexion(double tiempoActual, int timeOutGlobal){
+    public void crearConexion(double tiempoActual, double timeOutGlobal){
         for(int i = 0; i < servidores.length; i++){
             if(!servidores[i]){
                  servidores[i] = true;

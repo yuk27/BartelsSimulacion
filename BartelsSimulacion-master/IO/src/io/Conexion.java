@@ -12,6 +12,9 @@ public class Conexion {
  
     
     public Conexion(double tiempoEntrada,double timeout, int numServidor){
+        
+       System.out.println("timeout: " + timeout);
+        
        this.timeout = timeout;
        this.tiempoEntrada = tiempoEntrada;
        this.numServidor = numServidor;
