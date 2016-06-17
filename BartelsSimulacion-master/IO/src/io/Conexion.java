@@ -11,13 +11,12 @@ public class Conexion {
     private Random r = new Random();
  
     
-    public Conexion(double tiempoEntrada,double timeout, int numServidor){
+    public Conexion(double tiempoEntrada,double timeoutGlobal, int numServidor){
         
-       System.out.println("timeout: " + timeout);
-        
-       this.timeout = timeout;
        this.tiempoEntrada = tiempoEntrada;
        this.numServidor = numServidor;
+       generarTimeout(timeoutGlobal);
+       System.out.println("timeout: " + timeout);
     }
     
     public static double generarTiempoArribo(double rnd){
@@ -41,7 +40,7 @@ public class Conexion {
     }
     
     public void generarTimeout(double  timeoutGlobal){
-        timeout = tiempoEntrada + timeoutGlobal; 
+       this.timeout = tiempoEntrada + timeoutGlobal; 
     }
     
     public double getTimeout(){
