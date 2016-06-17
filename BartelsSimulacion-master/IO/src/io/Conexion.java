@@ -16,7 +16,6 @@ public class Conexion {
        this.tiempoEntrada = tiempoEntrada;
        this.numServidor = numServidor;
        generarTimeout(timeoutGlobal);
-       System.out.println("timeout: " + timeout);
     }
     
     public static double generarTiempoArribo(double rnd){

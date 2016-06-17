@@ -41,16 +41,34 @@ public class ModuloTransacciones {
             if(servidores[i] == -1){
                 if(c.getTipo() == 3){
                     hayDDL = true;
+                menu.aplicarInterfazProcesarTransacciones(getOcupados(),reloj);
                 }
                 servidores[i] = c.getNumServidor();
                 calcularTiempoTransaccion(c,eventos, reloj);
+                menu.aplicarInterfazProcesarTransacciones(getOcupados(),reloj);
                 return true;
             }
             i++;
         }
+        
         conexionesConPrioridad.add(c);
+        menu.aplicarInterfazProcesarTransacciones(getOcupados(),reloj);
         menu.aplicarInterfazColaTransacciones(conexionesConPrioridad.size(), reloj);
         return false;
+    }
+    
+        public int getOcupados(){
+    
+        int aux = 0;
+        
+        for(int i = 0; i < servidores.length; i++){
+        
+             if(servidores[i] != -1){
+                 aux++;
+             }
+        
+        }
+        return aux;  
     }
     
     private Conexion getConexionDePrioridad(){        

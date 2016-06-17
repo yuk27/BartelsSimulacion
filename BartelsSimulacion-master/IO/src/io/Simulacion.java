@@ -12,6 +12,7 @@ public class Simulacion {
     private Menu menu;
     private double timeOutGlobal = 0;
     private int conexionesRechazadas = 0;
+    private int conexionesTerminadas = 0;
     private Random r = new Random();
     private ModuloAdmClientes admC;
     private ModuloAdmProcesos admP;
@@ -47,9 +48,11 @@ public class Simulacion {
         }
  
     private void crearHiloConexion(Conexion c){  
+        
         admP.crearHilo(c,reloj, eventos); //se guarda la conexion entrante ya sea en el servidor si no hay cola, o se agrega a la cola
         if(admP.getServidor()){
-            if(c.getTimeout() > reloj){                                              
+            if(c.getTimeout() < reloj){
+                
                 admC.eliminarConexion(c.getNumServidor(),reloj);         //elimnamos la conexion en timeout
                 admP.procesarSalida(reloj,eventos);   
              }
@@ -62,7 +65,7 @@ public class Simulacion {
     
     private void procesarConsultas(Conexion c){
         admP.procesarSalida(reloj,eventos);    //ordena el servidor anterior
-        if(c.getTimeout() > reloj){
+        if(c.getTimeout() < reloj){
             admC.eliminarConexion(c.getNumServidor(),reloj);
        }
        else{           
@@ -73,7 +76,7 @@ public class Simulacion {
     
     private void procesarTransaccion(Conexion c){       
         pc.procesarSalidaConsulta(c,eventos, reloj);   //ordena el servidor de consultas con respecto a la conexion que sale. 
-        if(c.getTimeout() > reloj){     //si hay timeout elimina
+        if(c.getTimeout() < reloj){     //si hay timeout elimina
             admC.eliminarConexion(c.getNumServidor(),reloj);
        }
        else{
@@ -83,7 +86,7 @@ public class Simulacion {
    
     private void ejecutarConsulta(Conexion c){
        transacciones.procesarSalida(c,eventos, reloj);       //acomoda el servidor anterior con la nueva conexion
-       if(c.getTimeout() > reloj){
+       if(c.getTimeout() < reloj){
             admC.eliminarConexion(c.getNumServidor(),reloj);
        }
        else{
@@ -98,6 +101,8 @@ public class Simulacion {
     
     private void terminarConexion(Conexion c){
         admC.eliminarConexion(c.getNumServidor(),reloj);
+        conexionesTerminadas++;
+        menu.aplicarInterfazProcesarCierreConexion(conexionesTerminadas,reloj);
     }
     
     private void procesarTimeout(Conexion c){

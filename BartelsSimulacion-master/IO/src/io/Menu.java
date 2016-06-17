@@ -77,9 +77,11 @@ public class Menu extends javax.swing.JFrame {
           s = new Simulacion();
           s.iniciarSimulación(nc, tm, k, n, p, m, t, this);
           if(lento){
-            displayTimer = new Timer(100, listener); //empezar interfaz
+            displayTimer = new Timer(100, listener); //empezar interfaz //TIEMPO DE ESPERA
             displayTimer.start(); 
           }
+          
+          
         }
         else{
           System.out.println("incorrecto");
@@ -187,6 +189,8 @@ public class Menu extends javax.swing.JFrame {
         cambiosInterfaz.add(c);
     }
     
+    
+    
     void limpiarFlechas(){
         for (BackgroundPanel flecha : flechas) {
             flecha.setVisible(false);
@@ -197,27 +201,12 @@ public class Menu extends javax.swing.JFrame {
         if(lento){
             retrasar(rechazadasLabel,null,flechas[0],val,reloj);
         }
-        /*flechas[0].setVisible(true);
-        //flechas[0].setVisible(false);
-        rechazadasLabel.setText(Integer.toString(val));
-        relojLabel.setText(Double.toString(reloj));
-*/
     }
     
     void aplicarInterfazClientes(int val, double reloj){
         if(lento){
             retrasar(kLabel,paneles[0],flechas[1],val,reloj);
         }
-        /*kLabel.setText(Integer.toString(val));
-        if(val > 0){
-            paneles[0].setVisible(true);
-            flechas[1].setVisible(true);
-        }
-        else{
-            paneles[0].setVisible(false);
-        }
-        relojLabel.setText(Double.toString(reloj));
-        */
     }
     
     void aplicarInterfazNuevoHilo(boolean ocupado, double reloj){
@@ -242,9 +231,6 @@ public class Menu extends javax.swing.JFrame {
             hiloLabel.setText("limpio");
             paneles[1].setVisible(false);
         }
-        
-        //flechas[1].setVisible(true);
-        //relojLabel.setText(Double.toString(reloj));
     }
     
     void aplicarInterfazColaHilo(int val, double reloj){
@@ -258,42 +244,12 @@ public class Menu extends javax.swing.JFrame {
             }
            
         }
-        
-        /*if(val > 0){
-            paneles[2].setVisible(true);
-            if(val > Integer.parseInt(colaHiloLabel.getText())){
-            flechas[2].setVisible(true);
-            }
-            else{
-            flechas[3].setVisible(true);
-            }
-        }
-        else{
-            paneles[2].setVisible(false);
-            flechas[3].setVisible(true);
-        }
-        
-        colaHiloLabel.setText(Integer.toString(val));
-        relojLabel.setText(Double.toString(reloj));*/
     }
        
-    void aplicarInterfazProcesarConsulta(double reloj){
-        
-        int val = Integer.parseInt(nLabel.getText()) + 1;//aumentamos en 1 si ya existe algo en el servidor, para saber cuantos estan ocupados
-        //nLabel.setText(Integer.toString(val));
+    void aplicarInterfazProcesarConsulta(double reloj,int val){
         if(lento){
             retrasar(nLabel,paneles[3],flechas[4],val,reloj);
         } 
-       /* if(val > 0){
-            paneles[3].setVisible(true);
-            
-        }
-        else{
-            paneles[3].setVisible(false);
-        }
-        flechas[4].setVisible(true);
-        relojLabel.setText(Double.toString(reloj));
-*/
     }
     
     void aplicarInterfazColaProcesador(int val, double reloj){
@@ -306,23 +262,6 @@ public class Menu extends javax.swing.JFrame {
             }
            
         }
-      /*  if(val > 0){
-            paneles[4].setVisible(true);
-            if(val > Integer.parseInt(colaProcesadorLabel.getText())){
-            flechas[5].setVisible(true);
-            }
-            else{
-            flechas[6].setVisible(true);
-            }
-        }
-        else{
-            paneles[4].setVisible(false);
-            flechas[6].setVisible(true);
-        }
-        
-        colaProcesadorLabel.setText(Integer.toString(val));
-        relojLabel.setText(Double.toString(reloj));
-*/
     }
    
     
@@ -330,19 +269,6 @@ public class Menu extends javax.swing.JFrame {
         if(lento){
             retrasar(pLabel,paneles[5],flechas[6],val,reloj);
         }
-       
-        /*pLabel.setText(Integer.toString(val));
-        
-        if(val > 0){
-            paneles[5].setVisible(true);
-            
-        }
-        else{
-            paneles[5].setVisible(false);
-        }
-        flechas[6].setVisible(true);
-        relojLabel.setText(Double.toString(reloj));
-*/
     }
 
     void aplicarInterfazColaTransacciones(int val, double reloj){
@@ -356,23 +282,6 @@ public class Menu extends javax.swing.JFrame {
             }
            
         }
-       /* if(val > 0){
-            paneles[6].setVisible(true);
-            if(val > Integer.parseInt(colaTransaccionesLabel.getText())){
-            flechas[7].setVisible(true);
-            }
-            else{
-            flechas[8].setVisible(true);
-            }
-        }
-        else{
-            paneles[6].setVisible(false);
-            flechas[8].setVisible(true);
-        }
-        
-        colaTransaccionesLabel.setText(Integer.toString(val));
-        relojLabel.setText(Double.toString(reloj));
-        */
     }
     
     void aplicarInterfazProcesarEjecutor(int val, double reloj){
@@ -380,17 +289,6 @@ public class Menu extends javax.swing.JFrame {
             retrasar(mLabel,paneles[7],flechas[8],val,reloj);
         }
         mLabel.setText(Integer.toString(val));
-       /* 
-        if(val > 0){
-            paneles[7].setVisible(true);
-            
-        }
-        else{
-            paneles[7].setVisible(false);
-        }
-        flechas[8].setVisible(true);
-        relojLabel.setText(Double.toString(reloj));
-*/  
     }
     
     void aplicarInterfazColaEjecutor(int val, double reloj){
@@ -403,42 +301,12 @@ public class Menu extends javax.swing.JFrame {
                 retrasar(colaEjecutorLabel,paneles[8],flechas[12],val,reloj); 
             }
         }
-        /*
-        if(val > 0){
-            paneles[8].setVisible(true);
-            if(val > Integer.parseInt(colaEjecutorLabel.getText())){
-            flechas[11].setVisible(true);
-            }
-            else{
-            flechas[12].setVisible(true);
-            }
-        }
-        else{
-            paneles[8].setVisible(false);
-            flechas[12].setVisible(true);
-        }
-        
-        colaEjecutorLabel.setText(Integer.toString(val));
-        relojLabel.setText(Double.toString(reloj));
-        */
     }
         
         void aplicarInterfazProcesarCierreConexion(int val, double reloj){
         if(lento){
             retrasar(cierreLabel,paneles[9],flechas[13],val,reloj);
         }
-       /*cierreLabel.setText(Integer.toString(val));
-        
-        if(val > 0){
-            paneles[9].setVisible(true);
-            
-        }
-        else{
-            paneles[9].setVisible(false);
-        }
-        flechas[13].setVisible(true);
-        relojLabel.setText(Double.toString(reloj));
-        */
     }
     
     @SuppressWarnings("unchecked")

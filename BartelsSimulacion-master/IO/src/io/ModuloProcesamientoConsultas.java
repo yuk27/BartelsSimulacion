@@ -28,14 +28,14 @@ public class ModuloProcesamientoConsultas {
                 while(i < servidoresConsultas.length){
                     if(servidoresConsultas[i] == -1){
                         servidoresConsultas[i] = c.getNumServidor();
-                        menu.aplicarInterfazProcesarConsulta(reloj);
+                        menu.aplicarInterfazProcesarConsulta(reloj,getOcupados());
                         Evento siguienteConsultaProcesada = new Evento(calcularTiempoTotal(c) + reloj, c, TipoEvento.PROCESO_CONSULTA);
                         eventos.add(siguienteConsultaProcesada);
                         return;
                     }
                     i++;
                 }
-                consultas.add(c);
+                consultas.add(c);    
                 menu.aplicarInterfazColaProcesador(consultas.size(), reloj);
     }
         
@@ -50,8 +50,35 @@ public class ModuloProcesamientoConsultas {
             }
             return siguiente;
     } 
+   
+    public int getOcupados(){
+    
+        int aux = 0;
         
+        for(int i = 0; i < servidoresConsultas.length; i++){
         
+             if(servidoresConsultas[i] != -1){
+                 aux++;
+             }
+        
+        }
+        return aux;  
+    }
+        
+        public int getOcupadosEjecutor(){
+    
+        int aux = 0;
+        
+        for(int i = 0; i < ejecutorConsultas.length; i++){
+        
+             if(ejecutorConsultas[i] != -1){
+                 aux++;
+             }
+        
+        }
+        return aux;  
+    }
+    
     public void inicializarVectores(){    
         for(int i = 0; i < servidoresConsultas.length; i++){
             servidoresConsultas[i] = -1; 
@@ -101,11 +128,14 @@ public class ModuloProcesamientoConsultas {
                 ejecutorConsultas[i] = c.getNumServidor();
                 Evento siguienteEjecucion = new Evento(calcularTiempoAlgoritmoEjecucion(c.getNumBloques(), c) + reloj, c, TipoEvento.EJECUTO_CONSULTA);
                 eventos.add(siguienteEjecucion);
+                System.out.println("EJECUTANDO---------------------------------------------------------------------------------------------------------------------------------");
+                menu.aplicarInterfazProcesarConsulta(reloj,getOcupadosEjecutor());
                 return;
             }
             i++;
         }
         ejecutor.add(c);
+        menu.aplicarInterfazColaEjecutor(ejecutor.size(), reloj);
     }
     
     public double calcularTiempoAlgoritmoEjecucion(int cantidadDeBloques, Conexion c){
