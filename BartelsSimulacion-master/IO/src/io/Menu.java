@@ -77,14 +77,15 @@ public class Menu extends javax.swing.JFrame {
           s = new Simulacion();
           s.iniciarSimulación(nc, tm, k, n, p, m, t, this);
           if(lento){
-            displayTimer = new Timer(100, listener); //empezar interfaz //TIEMPO DE ESPERA
+            displayTimer = new Timer(1, listener); //empezar interfaz //TIEMPO DE ESPERA
             displayTimer.start(); 
           }
-          
-          
         }
         else{
           System.out.println("incorrecto");
+          EmprezarBtn.setText("Simular");
+          EmprezarBtn.setBackground(Color.lightGray);
+          simulando = false;
         }
 
     }
@@ -99,6 +100,7 @@ public class Menu extends javax.swing.JFrame {
     colaProcesadorLabel.setText("0");
     colaTransaccionesLabel.setText("0");
     cierreLabel.setText("0");
+    borradasTimeoutLabel.setText("0");
     }
     
     public void generarImagenes(){
@@ -179,12 +181,21 @@ public class Menu extends javax.swing.JFrame {
         simulando = false;
     }
     
+    public boolean isLento(){
+        return lento;
+    }
+    
     void retrasar(JLabel label,BackgroundPanel panel,BackgroundPanel flecha, int val, double relojP){
         CambioInterfaz c =  new CambioInterfaz(label,panel,flecha,val,relojP);
         cambiosInterfaz.add(c);
     }
     
     void retrasar(JLabel label,BackgroundPanel panel,BackgroundPanel flecha, double val, double relojP){
+        CambioInterfaz c =  new CambioInterfaz(label,panel,flecha,val,relojP);
+        cambiosInterfaz.add(c);
+    }
+    
+    void retrasar(JLabel label,BackgroundPanel panel,BackgroundPanel flecha, String val, double relojP){
         CambioInterfaz c =  new CambioInterfaz(label,panel,flecha,val,relojP);
         cambiosInterfaz.add(c);
     }
@@ -211,25 +222,14 @@ public class Menu extends javax.swing.JFrame {
     
     void aplicarInterfazNuevoHilo(boolean ocupado, double reloj){
         
-        String estado;
-        
-        if(ocupado){
-            hiloLabel.setText("ocupado");
-        }
-        else{
-            hiloLabel.setText("limpio");
-        }
         
         if(lento){
-            retrasar(hiloLabel,paneles[1],null, -2, reloj);
-        }
-        if(ocupado){
-            hiloLabel.setText("ocupado");
-            paneles[1].setVisible(true);
-        }
-        else{
-            hiloLabel.setText("limpio");
-            paneles[1].setVisible(false);
+            if(ocupado){
+                retrasar(hiloLabel,paneles[1],null,"ocupado", reloj);
+            }
+            else{
+                retrasar(hiloLabel,paneles[1],null,"limpio", reloj);
+            }
         }
     }
     
@@ -246,7 +246,7 @@ public class Menu extends javax.swing.JFrame {
         }
     }
        
-    void aplicarInterfazProcesarConsulta(double reloj,int val){
+    void aplicarInterfazProcesarConsulta(int val,double reloj){
         if(lento){
             retrasar(nLabel,paneles[3],flechas[4],val,reloj);
         } 
@@ -288,7 +288,6 @@ public class Menu extends javax.swing.JFrame {
         if(lento){
             retrasar(mLabel,paneles[7],flechas[8],val,reloj);
         }
-        mLabel.setText(Integer.toString(val));
     }
     
     void aplicarInterfazColaEjecutor(int val, double reloj){
@@ -308,6 +307,37 @@ public class Menu extends javax.swing.JFrame {
             retrasar(cierreLabel,paneles[9],flechas[13],val,reloj);
         }
     }
+        
+        void aplicarInterfazBorradasTimeOut(int val,double reloj){
+            if(lento){
+                retrasar(borradasTimeoutLabel,null,null,val,reloj);
+            }
+        }
+        
+        void ModoRapido(int k, int rechazadas, boolean hilo, int colaHilo, int n, int colaProcesador, int p, int colaTransacciones, int m, int colaEjecutor, int cierre, double reloj, int borradas){
+        
+            kLabel.setText(Integer.toString(k));
+            rechazadasLabel.setText(Integer.toString(rechazadas));
+            if(hilo){
+                hiloLabel.setText("limpio");
+            }
+            else{
+                hiloLabel.setText("ocupado");
+            }
+            colaHiloLabel.setText(Integer.toString(colaHilo));
+            nLabel.setText(Integer.toString(n));
+            colaProcesadorLabel.setText(Integer.toString(colaProcesador));
+            colaTransaccionesLabel.setText(Integer.toString(colaTransacciones));
+            mLabel.setText(Integer.toString(m));
+            colaEjecutorLabel.setText(Integer.toString(colaEjecutor));
+            cierreLabel.setText(Integer.toString(cierre));
+            relojLabel.setText(Double.toString(reloj));
+            borradasTimeoutLabel.setText(Integer.toString(borradas));
+           
+            EmprezarBtn.setText("Simular");
+            EmprezarBtn.setBackground(Color.lightGray);
+            simulando = false;
+        }
     
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -348,6 +378,8 @@ public class Menu extends javax.swing.JFrame {
         colaTransaccionesLabel = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
         relojLabel = new javax.swing.JLabel();
+        jLabel12 = new javax.swing.JLabel();
+        borradasTimeoutLabel = new javax.swing.JLabel();
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -474,7 +506,7 @@ public class Menu extends javax.swing.JFrame {
         jLabel3.setFont(new java.awt.Font("Tahoma", 0, 13)); // NOI18N
         jLabel3.setText("Tiempo Max Corrida");
 
-        tmInput.setText("0.2");
+        tmInput.setText("60");
         tmInput.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 tmInputActionPerformed(evt);
@@ -618,6 +650,11 @@ public class Menu extends javax.swing.JFrame {
         relojLabel.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         relojLabel.setText("0");
 
+        jLabel12.setText("Conexiones borradas por timeout:");
+
+        borradasTimeoutLabel.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        borradasTimeoutLabel.setText("0");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -640,7 +677,7 @@ public class Menu extends javax.swing.JFrame {
                                 .addComponent(tmInput, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(32, 32, 32)
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 87, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addComponent(lentoInput)
@@ -658,10 +695,22 @@ public class Menu extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addGap(116, 116, 116)
                         .addComponent(Imagenes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(35, 35, 35)
-                        .addComponent(jLabel11)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(relojLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(18, 18, 18)
+                                .addComponent(jLabel12)
+                                .addGap(0, 66, Short.MAX_VALUE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(borradasTimeoutLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGap(35, 35, 35)
+                                        .addComponent(jLabel11)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(relojLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                .addGap(54, 54, 54)))))
                 .addContainerGap())
             .addGroup(layout.createSequentialGroup()
                 .addGap(333, 333, 333)
@@ -703,6 +752,10 @@ public class Menu extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel11)
                             .addComponent(relojLabel))
+                        .addGap(88, 88, 88)
+                        .addComponent(jLabel12)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(borradasTimeoutLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))))
         );
 
@@ -753,6 +806,7 @@ public class Menu extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton EmprezarBtn;
     private javax.swing.JPanel Imagenes;
+    private javax.swing.JLabel borradasTimeoutLabel;
     private javax.swing.JLabel cierreLabel;
     private javax.swing.JLabel colaEjecutorLabel;
     private javax.swing.JLabel colaHiloLabel;
@@ -762,6 +816,7 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;

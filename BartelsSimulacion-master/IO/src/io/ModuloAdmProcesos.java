@@ -36,14 +36,12 @@ public class ModuloAdmProcesos {
                 entroAlServidor = true;
                 Evento siguienteTimeout = new Evento(c.getTimeout() ,c,TipoEvento.TIMEOUT);
                 eventos.add(siguienteTimeout);         
-                menu.aplicarInterfazNuevoHilo(true,reloj);
              }
              else{
                 
                 conexiones.add(c);
                 Evento siguienteTimeout = new Evento(c.getTimeout() ,c,TipoEvento.TIMEOUT); 
                 eventos.add(siguienteTimeout);
-                menu.aplicarInterfazNuevoHilo(true,reloj);
              }  
          }
          else{
@@ -72,12 +70,17 @@ public class ModuloAdmProcesos {
                     enServicio = conexiones.get(0);
                     conexiones.remove(0);
                     servidorOcupado = true;
-                    menu.aplicarInterfazColaHilo(conexiones.size(),reloj);
+                    
                     Evento siguienteHilo= new Evento(generarTiempoSalida() + reloj, siguienteConexion(), TipoEvento.SALE_DE_HILO);             //se genera el evento de Procesado de consulta de la siguiente conexion 
                     eventos.add(siguienteHilo); 
                 }
+        menu.aplicarInterfazColaHilo(conexiones.size(),reloj);
         menu.aplicarInterfazNuevoHilo(servidorOcupado,reloj);
         return servidorOcupado;
+     }
+     
+     public int getConexionesNum(){
+         return conexiones.size();
      }
      
      public double generarTiempoSalida(){      //distribucion normal
@@ -101,6 +104,8 @@ public class ModuloAdmProcesos {
     public void siguienteHilo(Conexion c,double reloj,PriorityQueue<Evento> eventos){
         Evento siguienteHilo= new Evento(generarTiempoSalida() + reloj,c,TipoEvento.SALE_DE_HILO); //se genera el evento de Procesado de consulta de la siguiente conexion 
         eventos.add(siguienteHilo); 
+        menu.aplicarInterfazNuevoHilo(true,reloj);
+        menu.aplicarInterfazColaHilo(conexiones.size(),reloj);
         System.out.println("evento anadido de salida de hilo");
     }
     

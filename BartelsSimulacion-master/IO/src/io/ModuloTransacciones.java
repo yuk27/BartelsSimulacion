@@ -70,6 +70,10 @@ public class ModuloTransacciones {
         }
         return aux;  
     }
+        
+    public int getConexionNum(){
+       return conexionesConPrioridad.size();
+    }
     
     private Conexion getConexionDePrioridad(){        
         int priorMax = 0;
@@ -129,11 +133,15 @@ public class ModuloTransacciones {
     
     public void procesarSalida(Conexion c,PriorityQueue<Evento> eventos, double reloj){
         int posLibre = eliminarConexion(c);
-        if(!conexionesConPrioridad.isEmpty()){
-            Conexion nuevaConexion = getConexionDePrioridad();
-            servidores[posLibre] = nuevaConexion.getNumServidor();
-            calcularTiempoTransaccion(nuevaConexion, eventos, reloj);
+        if(posLibre != -1){
+            if(!conexionesConPrioridad.isEmpty()){
+                Conexion nuevaConexion = getConexionDePrioridad();
+                servidores[posLibre] = nuevaConexion.getNumServidor();
+                calcularTiempoTransaccion(nuevaConexion, eventos, reloj);
+            }
         }
+        menu.aplicarInterfazProcesarTransacciones(getOcupados(),reloj);
+        menu.aplicarInterfazColaTransacciones(conexionesConPrioridad.size(), reloj);
     }
     
     public void eliminarConexionTimeout(Conexion c){

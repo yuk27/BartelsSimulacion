@@ -28,18 +28,20 @@ public class ModuloProcesamientoConsultas {
                 while(i < servidoresConsultas.length){
                     if(servidoresConsultas[i] == -1){
                         servidoresConsultas[i] = c.getNumServidor();
-                        menu.aplicarInterfazProcesarConsulta(reloj,getOcupados());
                         Evento siguienteConsultaProcesada = new Evento(calcularTiempoTotal(c) + reloj, c, TipoEvento.PROCESO_CONSULTA);
                         eventos.add(siguienteConsultaProcesada);
+                        menu.aplicarInterfazProcesarConsulta(getOcupados(),reloj);
+                        menu.aplicarInterfazColaProcesador(consultas.size(), reloj);
                         return;
                     }
                     i++;
                 }
-                consultas.add(c);    
+                consultas.add(c);  
+                menu.aplicarInterfazProcesarConsulta(getOcupados(),reloj);
                 menu.aplicarInterfazColaProcesador(consultas.size(), reloj);
     }
         
-    public int getSiguienteProcesado(){ 
+    public int getSiguienteProcesado(double reloj){ 
             double menorTiempo = -1; //se inicializa el valor
             int siguiente = 0; 
             for(int i = 0; i < tiempoProcesamiento.length; i++){
@@ -48,6 +50,8 @@ public class ModuloProcesamientoConsultas {
                     siguiente = i;
                 }
             }
+            menu.aplicarInterfazProcesarConsulta(getOcupados(),reloj);
+            menu.aplicarInterfazColaProcesador(consultas.size(), reloj);
             return siguiente;
     } 
    
@@ -64,6 +68,10 @@ public class ModuloProcesamientoConsultas {
         }
         return aux;  
     }
+    
+    public int getConsultasNum(){
+        return consultas.size();
+    }
         
         public int getOcupadosEjecutor(){
     
@@ -77,6 +85,10 @@ public class ModuloProcesamientoConsultas {
         
         }
         return aux;  
+    }
+        
+    public int getEjecutorNum(){
+        return ejecutor.size();
     }
     
     public void inicializarVectores(){    
@@ -123,18 +135,19 @@ public class ModuloProcesamientoConsultas {
     
     public void asignarConsultaAEjecutor(Conexion c,PriorityQueue<Evento> eventos, double reloj){
         int i = 0;
+        
         while(i < ejecutorConsultas.length){
             if(ejecutorConsultas[i] == -1){
                 ejecutorConsultas[i] = c.getNumServidor();
                 Evento siguienteEjecucion = new Evento(calcularTiempoAlgoritmoEjecucion(c.getNumBloques(), c) + reloj, c, TipoEvento.EJECUTO_CONSULTA);
                 eventos.add(siguienteEjecucion);
-                System.out.println("EJECUTANDO---------------------------------------------------------------------------------------------------------------------------------");
-                menu.aplicarInterfazProcesarConsulta(reloj,getOcupadosEjecutor());
+                menu.aplicarInterfazProcesarEjecutor(getOcupadosEjecutor(),reloj);
                 return;
             }
             i++;
         }
         ejecutor.add(c);
+        menu.aplicarInterfazProcesarEjecutor(getOcupadosEjecutor(),reloj);
         menu.aplicarInterfazColaEjecutor(ejecutor.size(), reloj);
     }
     
@@ -172,15 +185,25 @@ public class ModuloProcesamientoConsultas {
             Evento siguienteConsultaProcesada = new Evento(calcularTiempoAlgoritmoEjecucion(ejecutor.get(0).getNumBloques(), ejecutor.get(0)) + reloj, ejecutor.remove(0), TipoEvento.EJECUTO_CONSULTA);
             eventos.add(siguienteConsultaProcesada);
         }
+        
+        menu.aplicarInterfazProcesarEjecutor(getOcupadosEjecutor(),reloj);
+        menu.aplicarInterfazColaEjecutor(ejecutor.size(), reloj);
+        
     }
     
     public void procesarSalidaConsulta(Conexion c,PriorityQueue<Evento> eventos, double reloj){             
+        
         int posLibre = eliminarConexionServidor(c);
-        if(!consultas.isEmpty()){
-            servidoresConsultas[posLibre] = consultas.get(0).getNumServidor(); //asigno la primera conexion de la lista al servidor que acabo de liberar  
-            Evento siguienteConsultaProcesada = new Evento(calcularTiempoTotal(consultas.get(0)) + reloj, consultas.remove(0), TipoEvento.PROCESO_CONSULTA);
-            eventos.add(siguienteConsultaProcesada);
+        if(posLibre != -1){
+            if(!consultas.isEmpty()){
+                servidoresConsultas[posLibre] = consultas.get(0).getNumServidor(); //asigno la primera conexion de la lista al servidor que acabo de liberar  
+                Evento siguienteConsultaProcesada = new Evento(calcularTiempoTotal(consultas.get(0)) + reloj, consultas.remove(0), TipoEvento.PROCESO_CONSULTA);
+                eventos.add(siguienteConsultaProcesada);
+            }
         }
+        menu.aplicarInterfazProcesarConsulta(getOcupadosEjecutor(), reloj);
+        menu.aplicarInterfazColaProcesador(ejecutor.size(), reloj);
+        
     }
     
     public int eliminarConexionEjecutor(Conexion c){
@@ -210,4 +233,6 @@ public class ModuloProcesamientoConsultas {
              }
         }
     }
+    
+    
 }

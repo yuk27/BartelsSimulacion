@@ -34,6 +34,19 @@ public class ModuloAdmClientes {
        return false;
     }
     
+    public int getOcupados(){
+        int aux = 0;
+        
+        for(int i = 0; i < servidores.length; i++){ 
+            if(servidores[i]){
+                aux++; 
+            }
+        }
+        
+        return aux;
+    }
+    
+    
     public void eliminarConexion(int pos,double reloj){
         servidores[pos] = false; 
         for(int i = 0; i < conexiones.size(); i++){

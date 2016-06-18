@@ -18,6 +18,7 @@ public class CambioInterfaz {
     BackgroundPanel panel = null;
     int val = -1;
     double valD = -0.1;
+    String valS = "";
     double reloj = 0;
     
     
@@ -40,6 +41,17 @@ public class CambioInterfaz {
         if(panel != null) this.panel.setVisible(false);
         if(flecha != null)this.flecha.setVisible(false);
         this.valD = vald;
+        this.reloj = reloj;
+    }
+    
+    public CambioInterfaz(JLabel label,BackgroundPanel panel, BackgroundPanel flecha, String vals, double reloj){
+        this.label = label;
+        this.panel = panel;
+        this.flecha = flecha;
+        if(label != null) this.label.setVisible(false);
+        if(panel != null) this.panel.setVisible(false);
+        if(flecha != null)this.flecha.setVisible(false);
+        this.valS = vals;
         this.reloj = reloj;
     }
 
@@ -73,7 +85,20 @@ public class CambioInterfaz {
                         }
                     }
                     else{
-                        label.setText(Double.toString(valD));
+                        if(valS.equals("")){    
+                            label.setText(Double.toString(valD));
+                        }
+                        else{
+                            if(valS.equals("ocupado")){
+                                panel.setVisible(true);
+                                
+                            }
+                            else{
+                                panel.setVisible(false); 
+                            }
+                            label.setText(valS);
+                        }
+                        
                     }
             }
         

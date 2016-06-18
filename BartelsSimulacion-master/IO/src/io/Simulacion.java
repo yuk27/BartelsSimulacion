@@ -13,6 +13,7 @@ public class Simulacion {
     private double timeOutGlobal = 0;
     private int conexionesRechazadas = 0;
     private int conexionesTerminadas = 0;
+    private int conexionesBorradasTimeOut = 0;
     private Random r = new Random();
     private ModuloAdmClientes admC;
     private ModuloAdmProcesos admP;
@@ -110,6 +111,8 @@ public class Simulacion {
         admP.eliminarConexion(c);
         pc.eliminarConexion(c);
         transacciones.eliminarConexionTimeout(c);
+        conexionesBorradasTimeOut++;
+        menu.aplicarInterfazBorradasTimeOut(conexionesBorradasTimeOut,reloj);
     }
     
     public void iniciarSimulación(int numC, double tiempoMax,int k,int n, int p, int m,double t,Menu menu){    
@@ -160,7 +163,11 @@ public class Simulacion {
             
             System.out.println("Termino: " + i);
         }
+        if(!menu.isLento()){
         
+            menu.ModoRapido(admC.getOcupados(), conexionesRechazadas, admP.getServidor(), admP.getConexionesNum(),pc.getOcupados(),pc.getConsultasNum(), transacciones.getOcupados(), transacciones.getConexionNum(), pc.getOcupadosEjecutor(), pc.getEjecutorNum(), conexionesTerminadas, reloj, conexionesBorradasTimeOut);
+        
+        }
         System.out.println("Termino todo");
     }
 }
