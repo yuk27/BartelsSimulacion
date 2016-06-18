@@ -2,16 +2,19 @@ package io;
 import java.util.*;
 import java.util.Random;
 
+/**
+ * Clase principal encargada de controlar el ciclo de ejecución de la simulación, 
+ * crear los eventos y llamar a los distintos modulos.
+ */
 public class Simulacion {
 
-    private Comparador comparador = new Comparador();
-    public PriorityQueue<Evento> eventos = new PriorityQueue<>(13,comparador);
-    //Estadisticas estadistica = new Estadisticas();
+    private Comparador comparador = new Comparador(); //comparador utilizado para ordenar los eventos por tiempos de reloj 
+    public PriorityQueue<Evento> eventos = new PriorityQueue<>(13,comparador); //lista de eventos
     
     private double reloj = 0; //variable que cuenta el tiempo actual en el cual nos encontramos dentro del sistema
     private Menu menu;
-    private double timeOutGlobal = 0;
-    private int conexionesRechazadas = 0;
+    private double timeOutGlobal = 0; //variable que contiene el tiempo que durará desde ser creado un evento hasta ser eliminado por timeout
+    private int conexionesRechazadas = 0; 
     private int conexionesTerminadas = 0;
     private int conexionesBorradasTimeOut = 0;
     private Random r = new Random();
@@ -27,36 +30,59 @@ public class Simulacion {
     private Vector<Double> tiempoPromedio = new Vector<>();
 
     
+    /**
+    * Método encargado de llamar a la creación de  crear la conexión inicial a la base de datos 
+    * y redireccionar la conexion a coneciones rechazadas si el servidor esta lleno, 
+    * o a el hilo de procesamiento de otra forma. 
+    */
     private void crearConexion(){
-        if(admC.crearConexion(reloj)){ 
-            crearHiloConexion(admC.getSiguienteConexion());
-            menu.aplicarInterfazClientes(admC.getUsedConexiones(),reloj);//pruebas de interfaz
+        if(admC.crearConexion(reloj)){ //si la conexión pudo ser agregada al servidor 
+          crearHiloConexion(admC.getSiguienteConexion()); //crea un hilo de conexión
+          menu.aplicarInterfazClientes(admC.getUsedConexiones(),reloj);//refrezca el panel de conexiones en la interfaz
         }
         else{
-             conexionesRechazadas++;  //sino se puede guardar se agrega al contador de rechazadas
-            menu.aplicarInterfazRechazadas(conexionesRechazadas,reloj);
+          conexionesRechazadas++;  //sino se puede guardar se agrega al contador de rechazadas
+          menu.aplicarInterfazRechazadas(conexionesRechazadas,reloj); //refrezca el panel de rechazadas
         }
-            admC.crearArribo(reloj,r.nextDouble(),eventos);
+        admC.crearArribo(reloj,r.nextDouble(),eventos); //se genera la proxima entrada al sistema.
         }
  
-    private void crearHiloConexion(Conexion c){  
-        
-        admP.crearHilo(c,reloj, eventos); //se guarda la conexion entrante ya sea en el servidor si no hay cola, o se agrega a la cola
+    /**
+    * Método encargado de llamar a la creación de la conexión con hilo de procesamiento, y
+    * llama al metodo que genera el evento de entrada al modulo de procesos o 
+    * definir si la conexión esta en timout y elimnarla de ser necesario. 
+    * @param c conexión perteneciente al evento siendo ejecutado
+    */
+    
+    private void crearHiloConexion(Conexion c){      
+        admP.crearHilo(c,reloj, eventos); //se pone la conexion entrante ya sea en el servidor si no hay cola, o se agrega a la cola
         if(admP.getServidor()){
             if(c.getTimeout() < reloj){
                 admC.eliminarConexion(c.getNumServidor(),reloj);         //elimnamos la conexion en timeout
                 admP.procesarSalida(reloj,eventos);   
+           
+            if(c.getTimeout() < reloj){ //si la conexión esta en tiemout
+                
+                admC.eliminarConexion(c.getNumServidor(),reloj); //eliminamos la conexion en timeout
+                admP.procesarSalida(reloj,eventos); //y si hay conexiones en cola se trae la siguiente para ser procesada  
              }
             else{
-                admP.siguienteHilo(c,reloj,eventos);
+                admP.siguienteHilo(c,reloj,eventos); //se genera el evento salida del procesamiento del hilo y paso al servidor de procesos.
             }
-            admP.setServidor();
-        }
+            admP.setServidor();  //se limpia el servidor 
+            }
+       }
     }
     
-    private void procesarConsultas(Conexion c){
-        admP.procesarSalida(reloj,eventos);    //ordena el servidor anterior
-        if(c.getTimeout() < reloj){
+    /**
+    * Método encargado de llamar a la creación de la conexión con el modulo de prosesamiento de consulta y
+    * llama al metodo que genera el evento de entrada al modulo de procesos o 
+    * definir si la conexión esta en timeout y elimnarla de ser necesario. 
+    * @param c conexión perteneciente al evento siendo ejecutado
+    */
+    private void procesarConsultas(Conexion c){ 
+        admP.procesarSalida(reloj,eventos); //ordena el servidor del hilo de procesamiento con respecto a la conexion que sale. 
+        if(c.getTimeout() < reloj){ 
             admC.eliminarConexion(c.getNumServidor(),reloj);
        }
        else{           
@@ -64,9 +90,14 @@ public class Simulacion {
        }  
     }
 
-    
+    /**
+    * Método encargado de crear la conexión con el modulo de transacciones y de
+    * llamar al metodo que genera el evento que lo devuelve al modulo de procesos y lo ejecuta ,o en otro caso 
+    * definir si la conexión esta en timeout y eliminarla de ser necesario.
+    * @param c conexión perteneciente al evento siendo ejecutado
+    */
     private void procesarTransaccion(Conexion c){       
-        pc.procesarSalidaConsulta(c,eventos, reloj);   //ordena el servidor de consultas con respecto a la conexion que sale. 
+        pc.procesarSalidaConsulta(c,eventos, reloj); //ordena el servidor de consultas con respecto a la conexion que sale. 
         if(c.getTimeout() < reloj){     //si hay timeout elimina
             admC.eliminarConexion(c.getNumServidor(),reloj);
        }
@@ -75,8 +106,14 @@ public class Simulacion {
         }     
     }
    
+    /**
+    * Método encargado de ejecutar la consulta en el modulo de procesamiento y de
+    * llamar al metodo que genera el evento que lo devuelve al modulo de procesos y lo ejecuta ,o en otro caso 
+    * definir si la conexión esta en timeout y eliminarla de ser necesario. 
+    * @param c conexión perteneciente al evento siendo ejecutado
+    */
     private void ejecutarConsulta(Conexion c){
-       transacciones.procesarSalida(c,eventos, reloj);       //acomoda el servidor anterior con la nueva conexion
+       transacciones.procesarSalida(c,eventos, reloj); //acomoda el servidor de transacciones con la nueva conexion
        if(c.getTimeout() < reloj){
             admC.eliminarConexion(c.getNumServidor(),reloj);
        }
@@ -85,20 +122,38 @@ public class Simulacion {
        }    
     }
     
+    /**
+    * Método encargado de llamar a la salida de la ejecución terminada del modulo de procesamiento 
+    * y de llamar a la creación del sisguiente evento de salida
+    * @param c conexión perteneciente al evento siendo ejecutado
+    */
     private void ponerResultadoEnRed(Conexion c){
         pc.procesarSalidaEjecutor(c,eventos, reloj);
         admC.sacarDelSistema(c,pc.calcularTamanoRespuesta(c.getNumBloques()) + reloj, eventos);
     }
     
+    
+    /**
+    * Método encargado de eliminar la conexión del servidor de administración de clientes
+    * y aumentar el contador de conexiones terminadas.
+    * @param c conexión perteneciente al evento siendo ejecutado
+    */
     private void terminarConexion(Conexion c){
         admC.eliminarConexion(c.getNumServidor(),reloj);
         this.conexionesTerminadas++;
         this.tiempoPromedio.add(reloj - c.getTiempoEntrada());
         menu.aplicarInterfazProcesarCierreConexion(conexionesTerminadas,reloj);
+        conexionesTerminadas++;
+        menu.aplicarInterfazProcesarCierreConexion(conexionesTerminadas,reloj); //se actualiza el panel de terminadas de la interfaz
     }
     
+    /**
+    * Método encargado de eliminar las conexiones que su timeout se cumplio,
+    * elminandolo primero de todos los modulos y aumentando el contador de conexiones borradas por timeout
+    * @param c conexión perteneciente al evento siendo ejecutado
+    */
     private void procesarTimeout(Conexion c){
-        admC.eliminarConexion(c.getNumServidor() , reloj);
+        admC.eliminarConexion(c.getNumServidor() , reloj); 
         admP.eliminarConexion(c);
         pc.eliminarConexion(c);
         transacciones.eliminarConexionTimeout(c);
@@ -119,6 +174,20 @@ public class Simulacion {
     //calcula tiempos promedios
         //estadistica.calcularPromedioDouble();
     }
+  
+    /**
+     * Contructor de la clase, encargado de inicializar todos los modulos,
+     * colocar los valores enviados de la interfaz en las variables de la clase correspondiente,
+     * y ejecutar la simulación
+     * @param numC número de corridas que se hará en la simulación
+     * @param tiempoMax tiempo max que puede durar cada corrida
+     * @param k conexiones maximas en el modulo de administración de clientes.
+     * @param n conexiones maximas en el hilo de procesamiento.
+     * @param p conexiones maximas en el servidor de procesamiento de consultas.
+     * @param m conexiones maximas en el servidor de ejecución de consultas.
+     * @param t conexiones maximas en el servidor de transacciones.
+     * @param menu referencia al objeto de interfaz 
+     */
     
     public void iniciarSimulación(int numC, double tiempoMax,int k,int n, int p, int m,double t,Menu menu){    
         System.out.println(numC+"-"+tiempoMax+" - "+k+ " - " + n+ " - " + p+" - "+m +" - " +t);
@@ -134,15 +203,25 @@ public class Simulacion {
         this.correrSimulacion(numC,tiempoMax);
     }
     
+    
+    /**
+    * Método encargado de controlar la lógica de la simulación, 
+    * recorriendo cada evento en la lista de eventos y llamando a los metodos encargados de su ejecución,
+    * haciendo esto para el número de corridas elegidas por el usuario con el tiempo maximo para cada una.
+    * @param numC número de corridas que se hará en la simulación
+    * @param tiempoMax tiempo max que puede durar cada corrida
+    */
     private void correrSimulacion(int numC, double tiempoMax){
-        this.crearConexion();
-        for(int i = 0; i < numC; i++){
-            while(reloj < tiempoMax){
-                Evento siguienteEvento = eventos.poll();
-                reloj = siguienteEvento.getTiempo();
+        this.crearConexion(); //se genera la primera conexión para empezar la simulación
+        
+        for(int i = 0; i < numC; i++){ //se corre la simulación el número de veces indicadas por el usuario
+            while(reloj < tiempoMax){ //mientras el tiempo de reloj sea menor al tiempo maximo de corrida
+                
+                Evento siguienteEvento = eventos.poll(); //se saca el siguiente evento
+                reloj = siguienteEvento.getTiempo(); //se toma el tiempo de reloj actual
                 System.out.println(reloj);
                 System.out.println("evento de tipo: " + siguienteEvento.getTipo());
-                switch(siguienteEvento.getTipo()){
+                switch(siguienteEvento.getTipo()){ //se elige el tipo de evento el cual se esta tratando
                     case LLEGA_CONEXION:
                         this.crearConexion();
                         break;
@@ -171,7 +250,7 @@ public class Simulacion {
             
             System.out.println("Termino: " + i);
         }
-        if(!menu.isLento()){
+        if(!menu.isLento()){ //si la simulación esta funcionando en modo rapido, se llama el método que refresca la interfaz
         
             menu.ModoRapido(admC.getOcupados(), conexionesRechazadas, admP.getServidor(), admP.getConexionesNum(),pc.getOcupados(),pc.getConsultasNum(), transacciones.getOcupados(), transacciones.getConexionNum(), pc.getOcupadosEjecutor(), pc.getEjecutorNum(), conexionesTerminadas, reloj, conexionesBorradasTimeOut);
         
