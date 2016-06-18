@@ -10,78 +10,86 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JLabel;
 import javax.swing.Timer;
-//import javax.swing.SwingUtilities;
 
+/**
+ * Clase encargada de administrar el menu visual utilizado para la comunicación del usuario con el sistema.
+ */
 public class Menu extends javax.swing.JFrame {
-    boolean lento = true; 
+    boolean lento = true; //variable flag para saber si la simulación debe ir rapido o lento
     Simulacion s;
-    BackgroundPanel[] paneles; 
-    BackgroundPanel[] flechas; 
-    private List<CambioInterfaz> cambiosInterfaz = new ArrayList<>();
-    CambioInterfaz actual;
-    Timer displayTimer;
-    boolean simulando = false;
+    PanelFondo[] paneles; 
+    PanelFondo[] flechas; 
+    private List<CambioInterfaz> cambiosInterfaz = new ArrayList<>(); //lista que guardará todos los cambios de interfaz, a medida que se vayan generando para luego ejecutarlos
+    CambioInterfaz actual; //variable auxiliar para guardar el cambio de interfaz sucediendo en un momento dado
+    Timer displayTimer; //timer que hace la funcion del delay en la corrida lenta
+    boolean simulando = false; //flag para saber cuando el sistema esta corriendo y no correrlo dos veces simultaneas
     
-    
+    /**
+     * Constructor inicia los componentes.
+     */
     public Menu() {
         initComponents(); 
     }
 
+    /**
+     * Método encargado de cargar las entradas de los inputs a variables, para su uso en la simulación del sistema.
+     */
     public void getEntradas(){ //toma cada input de entrada, revisa que sea un integer mayor a -1, si cumple se simula el simula
         
-        int nc,k,n,p,m;
-        double tm,t;
+        int nc,k,n,p,m; //variables para número de corridas, y tanaños de servidores k,,n,p,m.
+        double tm,t; // variables para tiempo maximo de corrida y timeout.
         
         try {
             nc = Integer.parseInt(ncInput.getText());
         } catch (NumberFormatException nfe) {
-            nc = -1; // or null if that is your preference
+            nc = -1; 
         }
         try {
             
             tm = Double.parseDouble(tmInput.getText());
         } catch (NumberFormatException nfe) {
-            tm = -1; // or null if that is your preference
+            tm = -1; 
         }
         try {
             k = Integer.parseInt(kInput.getText());
         } catch (NumberFormatException nfe) {
-            k = -1; // or null if that is your preference
+            k = -1; 
         } 
         try {
             n = Integer.parseInt(nInput.getText());
         } catch (NumberFormatException nfe) {
-            n = -1; // or null if that is your preference
+            n = -1; 
         }
         try {
             p = Integer.parseInt(pInput.getText());
         } catch (NumberFormatException nfe) {
-            p = -1; // or null if that is your preference
+            p = -1; 
         }
         try {
             m = Integer.parseInt(mInput.getText());
         } catch (NumberFormatException nfe) {
-            m = -1; // or null if that is your preference
+            m = -1; 
         }
         try {
             t = Double.parseDouble(tInput.getText());
         } catch (NumberFormatException nfe) {
-            t = -1; // or null if that is your preference
+            t = -1; 
         }
 
-        if(nc > 0 && tm > 0 && k > 0 && n > 0 && p> 0 && m > 0 && t > 0){
+        if(nc > 0 && tm > 0 && k > 0 && n > 0 && p> 0 && m > 0 && t > 0){ //si se encotraron valores correctos
           System.out.println("correcto");
-          simulando = true;
-          LimpiarLabels();
-          lento = lentoInput.isSelected();
+          simulando = true; 
+          LimpiarLabels(); //limpia los labes antes de empezar a correr.
+          lento = lentoInput.isSelected(); //ve si el sistema esta simulando en modo lento
           s = new Simulacion();
           s.iniciarSimulación(nc, tm, k, n, p, m, t, this);
-          if(lento){
-            displayTimer = new Timer(1, listener); //empezar interfaz //TIEMPO DE ESPERA
+          
+          if(lento){ //si esta en modo lento genera el hilo de interfaz y el tiempo de espera.
+            displayTimer = new Timer(1, listener);
             displayTimer.start(); 
           }
         }
-        else{
+        else{ //si entraron datos erroneos se vuelve a poner la interfaz lista para ser reutilizada.
           System.out.println("incorrecto");
           EmprezarBtn.setText("Simular");
           EmprezarBtn.setBackground(Color.lightGray);
@@ -90,63 +98,69 @@ public class Menu extends javax.swing.JFrame {
 
     }
     
+    /**
+     * Método encargado de limpiar la pantalla antes de empezar la simulación.
+     */
     private void LimpiarLabels(){
-    nLabel.setText("0");
-    pLabel.setText("0");
-    mLabel.setText("0");
-    kLabel.setText("0");
-    rechazadasLabel.setText("0");
-    colaHiloLabel.setText("0");
-    colaProcesadorLabel.setText("0");
-    colaTransaccionesLabel.setText("0");
-    cierreLabel.setText("0");
-    borradasTimeoutLabel.setText("0");
+        nLabel.setText("0");
+        pLabel.setText("0");
+        mLabel.setText("0");
+        kLabel.setText("0");
+        rechazadasLabel.setText("0");
+        colaHiloLabel.setText("0");
+        colaProcesadorLabel.setText("0");
+        colaTransaccionesLabel.setText("0");
+        cierreLabel.setText("0");
+        borradasTimeoutLabel.setText("0");
     }
     
+    /**
+     * Método encargado de cargar las imagenes del sistema en arrays de tanto paneles como flechas
+     */
     public void generarImagenes(){
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         pack();
         setSize(800,825);
-        paneles = new BackgroundPanel[11];
-        flechas = new BackgroundPanel[14];
+        paneles = new PanelFondo[11];
+        flechas = new PanelFondo[14];
 
-        flechas[0] = new BackgroundPanel("flechaBasura.png");
-        flechas[1] = new BackgroundPanel("flechaHilo.png");
-        flechas[2] = new BackgroundPanel("InColaHilo.png");
-        flechas[3] = new BackgroundPanel("OutColaHilo.png");
-        flechas[4] = new BackgroundPanel("flechaProcesador.png");
-        flechas[5] = new BackgroundPanel("InColaProcesador.png");
-        flechas[6] = new BackgroundPanel("OutColaProcesador.png");
-        flechas[7] = new BackgroundPanel("flechaTransaccion.png");
-        flechas[8] = new BackgroundPanel("InColaTransaccion.png");
-        flechas[9] = new BackgroundPanel("OutColaTransaccion.png");
-        flechas[10] = new BackgroundPanel("flechaEjecutor.png");
-        flechas[11] = new BackgroundPanel("InColaEjecutor.png");
-        flechas[12] = new BackgroundPanel("OutColaEjecutor.png");
-        flechas[13] = new BackgroundPanel("flechaSalida.png");
+        flechas[0] = new PanelFondo("flechaBasura.png");
+        flechas[1] = new PanelFondo("flechaHilo.png");
+        flechas[2] = new PanelFondo("InColaHilo.png");
+        flechas[3] = new PanelFondo("OutColaHilo.png");
+        flechas[4] = new PanelFondo("flechaProcesador.png");
+        flechas[5] = new PanelFondo("InColaProcesador.png");
+        flechas[6] = new PanelFondo("OutColaProcesador.png");
+        flechas[7] = new PanelFondo("flechaTransacción.png");
+        flechas[8] = new PanelFondo("InColaTransacción.png");
+        flechas[9] = new PanelFondo("OutColaTransacción.png");
+        flechas[10] = new PanelFondo("flechaEjecutor.png");
+        flechas[11] = new PanelFondo("InColaEjecutor.png");
+        flechas[12] = new PanelFondo("OutColaEjecutor.png");
+        flechas[13] = new PanelFondo("flechaSalida.png");
 
-        paneles[0] = new BackgroundPanel("clientes.png");
-        paneles[1] = new BackgroundPanel("Hilo.png");
-        paneles[2] = new BackgroundPanel("colaHilo.png");
-        paneles[3] = new BackgroundPanel("Procesador.png");
-        paneles[4] = new BackgroundPanel("colaServidor.png");
-        paneles[5] = new BackgroundPanel("transacciones.png");
-        paneles[6] = new BackgroundPanel("colaTransaccion.png");
-        paneles[7] = new BackgroundPanel("Ejecutor.png");
-        paneles[8] = new BackgroundPanel("colaEjecutor.png");
-        paneles[9] = new BackgroundPanel("salida.png");
-        paneles[10] = new BackgroundPanel("fondo.png");
+        paneles[0] = new PanelFondo("clientes.png");
+        paneles[1] = new PanelFondo("Hilo.png");
+        paneles[2] = new PanelFondo("colaHilo.png");
+        paneles[3] = new PanelFondo("Procesador.png");
+        paneles[4] = new PanelFondo("colaServidor.png");
+        paneles[5] = new PanelFondo("transacciónes.png");
+        paneles[6] = new PanelFondo("colaTransacción.png");
+        paneles[7] = new PanelFondo("Ejecutor.png");
+        paneles[8] = new PanelFondo("colaEjecutor.png");
+        paneles[9] = new PanelFondo("salida.png");
+        paneles[10] = new PanelFondo("fondo.png");
         Imagenes.setLayout(new BorderLayout());
 
-        for(int j = 0; j < flechas.length; j++){
-           Imagenes.add(flechas[j]);
-           flechas[j].setOpaque(false);
-           flechas[j].setLocation(0,0);
-           flechas[j].setVisible(false);
+        for (PanelFondo flecha : flechas) {//limpia las flechas al inicializarlas
+            flecha.setOpaque(false);
+            flecha.setLocation(0, 0);
+            flecha.setVisible(false);
+            Imagenes.add(flecha);
         }
 
         int tam = paneles.length-1;
-        for(int i = 0; i < tam; i++){  
+        for(int i = 0; i < tam; i++){   
            Imagenes.add(paneles[i]);
            paneles[i].setOpaque(false);
            paneles[i].setLocation(0,0);
@@ -159,21 +173,27 @@ public class Menu extends javax.swing.JFrame {
 
     }
     
+    /**
+     * ActionListener encargado de llevar control de los cambiosInterfaz siendo hechos, toma el primero de la lista y le hace el llamado necesario.
+     */
     ActionListener listener = new ActionListener(){
         @Override
         public void actionPerformed(ActionEvent e) {
             if(cambiosInterfaz.isEmpty()){
-            System.out.println("no hay nada para cargar");
+                System.out.println("no hay nada para cargar");
                 terminarSimulacion();
             }
             else{
             limpiarFlechas();
-            actual = cambiosInterfaz.remove(0);
-            relojLabel.setText(Double.toString(actual.cargarLabel()));
+                actual = cambiosInterfaz.remove(0);
+                relojLabel.setText(Double.toString(actual.cargarLabel()));
             }
         }
     };
     
+    /**
+     * Método encargado de poner el boton de simulación activo y la flag de simulando en falso para poder volver a utilizar el programa.
+     */
     public void terminarSimulacion(){
         displayTimer.stop();
         EmprezarBtn.setText("Simular");
@@ -181,46 +201,69 @@ public class Menu extends javax.swing.JFrame {
         simulando = false;
     }
     
+    /**
+     * Método utilizado para saber si la simulación esta corriendo en modo lento
+     * @return devuelve un booleano true si corre en modo lento, falso si no 
+     */
     public boolean isLento(){
         return lento;
     }
     
-    void retrasar(JLabel label,BackgroundPanel panel,BackgroundPanel flecha, int val, double relojP){
+    //método encargado de añadir a la cola de cambiosInterfaz el proximo cambio, el cual contiene un int por valor de label
+    private void retrasar(JLabel label,PanelFondo panel,PanelFondo flecha, int val, double relojP){
         CambioInterfaz c =  new CambioInterfaz(label,panel,flecha,val,relojP);
         cambiosInterfaz.add(c);
     }
     
-    void retrasar(JLabel label,BackgroundPanel panel,BackgroundPanel flecha, double val, double relojP){
+    //método encargado de añadir a la cola de cambiosInterfaz el proximo cambio, el cual contiene un double por valor de label
+    private void retrasar(JLabel label,PanelFondo panel,PanelFondo flecha, double val, double relojP){
         CambioInterfaz c =  new CambioInterfaz(label,panel,flecha,val,relojP);
         cambiosInterfaz.add(c);
     }
     
-    void retrasar(JLabel label,BackgroundPanel panel,BackgroundPanel flecha, String val, double relojP){
+    //método encargado de añadir a la cola de cambiosInterfaz el proximo cambio, el cual contiene un string por valor de label
+    private void retrasar(JLabel label,PanelFondo panel,PanelFondo flecha, String val, double relojP){
         CambioInterfaz c =  new CambioInterfaz(label,panel,flecha,val,relojP);
         cambiosInterfaz.add(c);
     }
     
-    
-    
-    void limpiarFlechas(){
-        for (BackgroundPanel flecha : flechas) {
+    /**
+     * Método encargado de limpiar las flechas que fueron utilizadas en el ultimo llamada, para ejecutar la siguiente.
+     */
+    public void limpiarFlechas(){
+        for (PanelFondo flecha : flechas) {
             flecha.setVisible(false);
         }
     }
     
-    void aplicarInterfazRechazadas(int val, double reloj){
+    /**
+     * Método encargado de añadir a la cola de cambios en interfaz la acción de un nuevo rechazo de red
+     * @param val cantidad de conexiones rechazadas hasta el momento
+     * @param reloj variable representando el reloj actual.
+     */
+    public void aplicarInterfazRechazadas(int val, double reloj){
         if(lento){
             retrasar(rechazadasLabel,null,flechas[0],val,reloj);
         }
     }
     
-    void aplicarInterfazClientes(int val, double reloj){
+    /**
+     * Método encargado de añadir a la cola de cambios en interfaz la acción de una nueva entrada de cliente en red
+     * @param val cantidad de conexiones logradas hasta el momento
+     * @param reloj variable representando el reloj actual.
+     */
+    public void aplicarInterfazClientes(int val, double reloj){
         if(lento){
             retrasar(kLabel,paneles[0],flechas[1],val,reloj);
         }
     }
     
-    void aplicarInterfazNuevoHilo(boolean ocupado, double reloj){
+    /**
+     * Método encargado de añadir a la cola de cambios en interfaz la acción de una nueva entrada al hilo de conexión
+     * @param ocupado flag para saber en que estado esta el procesador de hilos en este momento
+     * @param reloj variable representando el reloj actual.
+     */
+    public void aplicarInterfazNuevoHilo(boolean ocupado, double reloj){
         
         
         if(lento){
@@ -233,7 +276,12 @@ public class Menu extends javax.swing.JFrame {
         }
     }
     
-    void aplicarInterfazColaHilo(int val, double reloj){
+    /**
+     * Método encargado de añadir a la cola de cambios en interfaz la acción de una nueva entrada a la cola de hilos
+     * @param val cantidad de conexiones en cola en este momento.
+     * @param reloj variable representando el reloj actual.
+     */
+    public void aplicarInterfazColaHilo(int val, double reloj){
        
         if(lento){
             if(val > Integer.parseInt(colaHiloLabel.getText())){
@@ -246,13 +294,23 @@ public class Menu extends javax.swing.JFrame {
         }
     }
        
-    void aplicarInterfazProcesarConsulta(int val,double reloj){
+    /**
+     * Método encargado de añadir a la cola de cambios en interfaz la acción de una nueva entrada de procesamiento de consulta
+     * @param val cantidad de prcesos en el servidor
+     * @param reloj variable representando el reloj actual.
+     */
+    public void aplicarInterfazProcesarConsulta(int val,double reloj){
         if(lento){
             retrasar(nLabel,paneles[3],flechas[4],val,reloj);
         } 
     }
     
-    void aplicarInterfazColaProcesador(int val, double reloj){
+    /**
+     * Método encargado de añadir a la cola de cambios en interfaz la acción de una nueva entrada a la cola de procesador
+     * @param val cantidad de conexiones en cola en este momento.
+     * @param reloj variable representando el reloj actual.
+     */
+    public void aplicarInterfazColaProcesador(int val, double reloj){
         if(lento){
             if(val > Integer.parseInt(colaHiloLabel.getText())){
                 retrasar(colaProcesadorLabel,paneles[4],flechas[5],val,reloj); 
@@ -264,14 +322,23 @@ public class Menu extends javax.swing.JFrame {
         }
     }
    
-    
-    void aplicarInterfazProcesarTransacciones(int val, double reloj){
+    /**
+     * Método encargado de añadir a la cola de cambios en interfaz la acción de una nueva transacción de consulta
+     * @param val cantidad de prcesos en el servidor
+     * @param reloj variable representando el reloj actual.
+     */
+    public void aplicarInterfazProcesarTransacciones(int val, double reloj){
         if(lento){
             retrasar(pLabel,paneles[5],flechas[6],val,reloj);
         }
     }
 
-    void aplicarInterfazColaTransacciones(int val, double reloj){
+    /**
+     * Método encargado de añadir a la cola de cambios en interfaz la acción de una nueva entrada a la cola de transacciónes
+     * @param val cantidad de conexiones en cola en este momento.
+     * @param reloj variable representando el reloj actual.
+     */
+    public void aplicarInterfazColaTransacciones(int val, double reloj){
         
         if(lento){
             if(val > Integer.parseInt(colaTransaccionesLabel.getText())){
@@ -284,13 +351,23 @@ public class Menu extends javax.swing.JFrame {
         }
     }
     
-    void aplicarInterfazProcesarEjecutor(int val, double reloj){
+    /**
+     * Método encargado de añadir a la cola de cambios en interfaz la acción de una nueva entrada de ejecución de consulta
+     * @param val cantidad de prcesos en el servidor
+     * @param reloj variable representando el reloj actual.
+     */
+    public void aplicarInterfazProcesarEjecutor(int val, double reloj){
         if(lento){
             retrasar(mLabel,paneles[7],flechas[8],val,reloj);
         }
     }
     
-    void aplicarInterfazColaEjecutor(int val, double reloj){
+    /**
+     * Método encargado de añadir a la cola de cambios en interfaz la acción de una nueva entrada a la cola de ejecución
+     * @param val cantidad de conexiones en cola en este momento.
+     * @param reloj variable representando el reloj actual.
+     */
+    public void aplicarInterfazColaEjecutor(int val, double reloj){
         
         if(lento){
             if(val > Integer.parseInt(colaEjecutorLabel.getText())){
@@ -302,19 +379,45 @@ public class Menu extends javax.swing.JFrame {
         }
     }
         
-        void aplicarInterfazProcesarCierreConexion(int val, double reloj){
+    /**
+     * Método encargado de añadir a la cola de cambios en interfaz la acción de un cierre de conexión en la simulación
+     * @param val cantidad de conexiones en el servidor en este momento.
+     * @param reloj variable representando el reloj actual.
+     */
+    public void aplicarInterfazProcesarCierreConexion(int val, double reloj){
         if(lento){
             retrasar(cierreLabel,paneles[9],flechas[13],val,reloj);
         }
     }
         
-        void aplicarInterfazBorradasTimeOut(int val,double reloj){
+    /**
+     * Método encargado de añadir a la cola de cambios en interfaz la acción de añadir una al contador de conexiones elminadas por timeout
+     * @param val cantidad de conexiones elminadas por tiemout hasta el momento
+     * @param reloj variable representando el reloj actual.
+     */
+    public void aplicarInterfazBorradasTimeOut(int val,double reloj){
             if(lento){
                 retrasar(borradasTimeoutLabel,null,null,val,reloj);
             }
         }
         
-        void ModoRapido(int k, int rechazadas, boolean hilo, int colaHilo, int n, int colaProcesador, int p, int colaTransacciones, int m, int colaEjecutor, int cierre, double reloj, int borradas){
+    /**
+     * Método encargado de modificar toda la interfaz de un solo en el caso de haber sido ejecutada la simulación de modo rapido.
+     * @param k variable de número de conexiones concurrentes al final de la simulacion
+     * @param rechazadas variable de número de conexiones rechazadas al final de la simulacion
+     * @param hilo variable tipo flag de si el hilo de procesamiento está ocupado  al final de la simulacion
+     * @param colaHilo variable de número de conexiones en cola de hilo al final de la simulacion
+     * @param n variable de número de consultas al final de la simulacion
+     * @param colaProcesador variable de número de conexiones en cola de procesador al final de la simulacion
+     * @param p variable de número de transacciónes al final de la simulacion
+     * @param colaTransacciónes variable de número de conexiones en cola de transacciónes al final de la simulacion
+     * @param m variable de número de procesos en servidor al final de la simulacion
+     * @param colaEjecutor variable de número de conexiones en cola de ejecución al final de la simulacion
+     * @param cierre variable de número de conexiones terminadas al final de la simulacion
+     * @param reloj variable de tiempo de reloj en que la simulación terminó
+     * @param borradas variable de número de conexiones borradas por tiemout
+     */
+    public void ModoRapido(int k, int rechazadas, boolean hilo, int colaHilo, int n, int colaProcesador, int p, int colaTransacciónes, int m, int colaEjecutor, int cierre, double reloj, int borradas){
         
             kLabel.setText(Integer.toString(k));
             rechazadasLabel.setText(Integer.toString(rechazadas));
@@ -327,7 +430,7 @@ public class Menu extends javax.swing.JFrame {
             colaHiloLabel.setText(Integer.toString(colaHilo));
             nLabel.setText(Integer.toString(n));
             colaProcesadorLabel.setText(Integer.toString(colaProcesador));
-            colaTransaccionesLabel.setText(Integer.toString(colaTransacciones));
+            colaTransaccionesLabel.setText(Integer.toString(colaTransacciónes));
             mLabel.setText(Integer.toString(m));
             colaEjecutorLabel.setText(Integer.toString(colaEjecutor));
             cierreLabel.setText(Integer.toString(cierre));
@@ -774,7 +877,6 @@ public class Menu extends javax.swing.JFrame {
        if(!simulando){
         EmprezarBtn.setBackground(Color.red);
         EmprezarBtn.setText("corriendo");
-        //EmprezarBtn.setForeground(Color.red);
         getEntradas(); //se cargan los datos y se empieza la simulacion  
        } 
     }//GEN-LAST:event_EmprezarBtnActionPerformed
@@ -791,9 +893,14 @@ public class Menu extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_tmInputActionPerformed
 
+    /**
+     *
+     * @param args
+     */
     public static void main(String args[]) {
         
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
               
                 Menu menu = new Menu();

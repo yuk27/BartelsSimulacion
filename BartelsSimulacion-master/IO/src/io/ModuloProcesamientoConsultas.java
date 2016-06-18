@@ -180,10 +180,12 @@ public class ModuloProcesamientoConsultas {
     
     public void procesarSalidaEjecutor(Conexion c,PriorityQueue<Evento> eventos, double reloj){
         int posLibre = eliminarConexionEjecutor(c);
-        if(!ejecutor.isEmpty()){
-            ejecutorConsultas[posLibre] = ejecutor.get(0).getNumServidor();
-            Evento siguienteConsultaProcesada = new Evento(calcularTiempoAlgoritmoEjecucion(ejecutor.get(0).getNumBloques(), ejecutor.get(0)) + reloj, ejecutor.remove(0), TipoEvento.EJECUTO_CONSULTA);
-            eventos.add(siguienteConsultaProcesada);
+        if(posLibre != -1){
+            if(!ejecutor.isEmpty()){
+                ejecutorConsultas[posLibre] = ejecutor.get(0).getNumServidor();
+                Evento siguienteConsultaProcesada = new Evento(calcularTiempoAlgoritmoEjecucion(ejecutor.get(0).getNumBloques(), ejecutor.get(0)) + reloj, ejecutor.remove(0), TipoEvento.EJECUTO_CONSULTA);
+                eventos.add(siguienteConsultaProcesada);
+            }
         }
         
         menu.aplicarInterfazProcesarEjecutor(getOcupadosEjecutor(),reloj);

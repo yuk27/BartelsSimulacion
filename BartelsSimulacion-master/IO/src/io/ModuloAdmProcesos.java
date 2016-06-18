@@ -28,7 +28,7 @@ public class ModuloAdmProcesos {
      }
      
      public void crearHilo(Conexion c,double reloj, PriorityQueue<Evento> eventos){
-
+         
          if(!servidorOcupado){
              if(conexiones.isEmpty()){
                 servidorOcupado = true;
