@@ -102,7 +102,7 @@ public class ModuloAdmProcesos {
      }
      
     public void siguienteHilo(Conexion c,double reloj,PriorityQueue<Evento> eventos){
-        Evento siguienteHilo= new Evento(generarTiempoSalida() + reloj,c,TipoEvento.SALE_DE_HILO); //se genera el evento de Procesado de consulta de la siguiente conexion 
+        Evento siguienteHilo = new Evento(generarTiempoSalida() + reloj,c,TipoEvento.SALE_DE_HILO); //se genera el evento de Procesado de consulta de la siguiente conexion 
         eventos.add(siguienteHilo); 
         menu.aplicarInterfazNuevoHilo(true,reloj);
         menu.aplicarInterfazColaHilo(conexiones.size(),reloj);
