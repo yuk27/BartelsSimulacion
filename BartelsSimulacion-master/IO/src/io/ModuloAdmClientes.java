@@ -3,6 +3,7 @@ package io;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.Vector;
 
 /**
  * Calse que representa el modulo de administración de clientes, la parte de creación de las conexiones a la base de datos simulada
@@ -12,6 +13,12 @@ public class ModuloAdmClientes {
     private List<Conexion> conexiones;
     private boolean[] servidores; //array que representa los servidores utilizables por nuevos clientes
     private double timeOutGlobal;
+    private Vector<Integer> colaClientes; 
+    
+    private Vector<Double> tiempoSelect;
+    private Vector<Double> tiempoUpdate;
+    private Vector<Double> tiempoJoin;
+    private Vector<Double> tiempoDDL;
     
     /**
      *Contructor de la clase que tiene por proposito inicializar las variables del objeto 
@@ -20,10 +27,19 @@ public class ModuloAdmClientes {
      * @param menu //variable que conecta al modulo con el menu para poder hacer la llamadas necesarias para actualizar la interfaz.
      */
     public ModuloAdmClientes(int k, double timeOutGlobal,Menu menu){
-        servidores = new boolean[k];
-        conexiones = new ArrayList<>();
+        this.servidores = new boolean[k];
+        this.conexiones = new ArrayList<>();
         this.timeOutGlobal = timeOutGlobal;
+        this.colaClientes =  new Vector<>();
+        this.tiempoSelect  = new Vector<>();    
+        this.tiempoUpdate   = new Vector<>();    
+        this.tiempoJoin   = new Vector<>();    
+        this.tiempoDDL  = new Vector<>();    
         this.menu = menu;
+    }
+    
+    public Vector<Integer> getCola(){
+        return this.colaClientes;
     }
     
     /**
@@ -32,7 +48,6 @@ public class ModuloAdmClientes {
      * @return devuelve un true en el caso que pudiera meter una nueva conexión.
      */
     public boolean crearConexion(double tiempoActual){
-        
         if(hayServidor()){//si hay servidores desocupados
                 for(int i = 0; i < servidores.length; i++){  //se crea la conexion y se pone la posicion del servidor en ocupado
                     if(!servidores[i]){
@@ -41,10 +56,12 @@ public class ModuloAdmClientes {
                          nuevaConexion.generarTimeout(timeOutGlobal);
                          nuevaConexion.generarTipo();
                          conexiones.add(nuevaConexion);
+                         this.colaClientes.add(this.getOcupados());
                          return true;
                     }
                 }
         }
+       this.colaClientes.add(this.getOcupados());
        return false;
     }
     
@@ -54,7 +71,6 @@ public class ModuloAdmClientes {
      */
     public int getOcupados(){
         int aux = 0;
-        
         for(int i = 0; i < servidores.length; i++){ 
             if(servidores[i]){
                 aux++; 

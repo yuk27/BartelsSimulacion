@@ -8,11 +8,11 @@ public class Conexion {
     private int numServidor = 0;
     private double  tiempoEntrada;
     private int numBloques = 0;
+    private double tiempoEntradaModulo = 0.0;
     private Random r = new Random();
  
     
     public Conexion(double tiempoEntrada,double timeoutGlobal, int numServidor){
-        
        this.tiempoEntrada = tiempoEntrada;
        this.numServidor = numServidor;
        generarTimeout(timeoutGlobal);
@@ -74,4 +74,12 @@ public class Conexion {
         this.numBloques = numBloques;
     }
 
+    public void setTiempoEntradaModulo(double reloj){
+        this.tiempoEntradaModulo = reloj;
+    }
+    
+    public double getTiempoEntradaModulo(){
+        return this.tiempoEntradaModulo;
+    }
+    
 }

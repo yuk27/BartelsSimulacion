@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Random;
+import java.util.Vector;
 
 public class ModuloProcesamientoConsultas {
     private Menu menu;
@@ -14,12 +15,25 @@ public class ModuloProcesamientoConsultas {
     private List<Conexion> ejecutor;
     private Random r = new Random();
     
+    private Vector<Integer> colaProcesamientoConsultas;
+    private Vector<Integer> colaEjecutor;
+    private Vector<Double> tiempoSelect;
+    private Vector<Double> tiempoUpdate;
+    private Vector<Double> tiempoJoin;
+    private Vector<Double> tiempoDDL;
+    
     public ModuloProcesamientoConsultas(int p, int m, Menu menu){
-        servidoresConsultas = new int [p];
-        tiempoProcesamiento = new double [p];
-        ejecutorConsultas = new int[m];
-        consultas = new ArrayList<>();
-        ejecutor = new ArrayList<>();
+        this.servidoresConsultas = new int [p];
+        this.tiempoProcesamiento = new double [p];
+        this.ejecutorConsultas = new int[m];
+        this.consultas = new ArrayList<>();
+        this.ejecutor = new ArrayList<>();
+        this.colaProcesamientoConsultas  = new Vector<>();
+        this.colaEjecutor = new Vector<>();
+        this.tiempoSelect  = new Vector<>();    
+        this.tiempoUpdate   = new Vector<>();    
+        this.tiempoJoin   = new Vector<>();    
+        this.tiempoDDL  = new Vector<>();    
         this.menu = menu;
     }
     
@@ -27,16 +41,18 @@ public class ModuloProcesamientoConsultas {
                 int i = 0;
                 while(i < servidoresConsultas.length){
                     if(servidoresConsultas[i] == -1){
-                        servidoresConsultas[i] = c.getNumServidor();
+                        this.servidoresConsultas[i] = c.getNumServidor();
                         Evento siguienteConsultaProcesada = new Evento(calcularTiempoTotal(c) + reloj, c, TipoEvento.PROCESO_CONSULTA);
                         eventos.add(siguienteConsultaProcesada);
+                        this.colaProcesamientoConsultas.add(this.consultas.size());
                         menu.aplicarInterfazProcesarConsulta(getOcupados(),reloj);
                         menu.aplicarInterfazColaProcesador(consultas.size(), reloj);
                         return;
                     }
                     i++;
                 }
-                consultas.add(c);  
+                this.consultas.add(c);  
+                this.colaProcesamientoConsultas.add(this.consultas.size());
                 menu.aplicarInterfazProcesarConsulta(getOcupados(),reloj);
                 menu.aplicarInterfazColaProcesador(consultas.size(), reloj);
     }
@@ -58,45 +74,38 @@ public class ModuloProcesamientoConsultas {
     public int getOcupados(){
     
         int aux = 0;
-        
-        for(int i = 0; i < servidoresConsultas.length; i++){
-        
+        for(int i = 0; i < servidoresConsultas.length; i++){  
              if(servidoresConsultas[i] != -1){
                  aux++;
-             }
-        
+             }       
         }
         return aux;  
     }
     
     public int getConsultasNum(){
-        return consultas.size();
+        return this.consultas.size();
     }
         
         public int getOcupadosEjecutor(){
-    
         int aux = 0;
-        
         for(int i = 0; i < ejecutorConsultas.length; i++){
-        
              if(ejecutorConsultas[i] != -1){
                  aux++;
              }
-        
         }
         return aux;  
     }
         
     public int getEjecutorNum(){
-        return ejecutor.size();
+        return this.ejecutor.size();
     }
     
     public void inicializarVectores(){    
         for(int i = 0; i < servidoresConsultas.length; i++){
-            servidoresConsultas[i] = -1; 
+            this.servidoresConsultas[i] = -1; 
         }
         for(int i = 0; i < ejecutorConsultas.length; i++){
-            ejecutorConsultas[i] = -1; 
+            this.ejecutorConsultas[i] = -1; 
         }   
     }
         
@@ -138,15 +147,17 @@ public class ModuloProcesamientoConsultas {
         
         while(i < ejecutorConsultas.length){
             if(ejecutorConsultas[i] == -1){
-                ejecutorConsultas[i] = c.getNumServidor();
+                this.ejecutorConsultas[i] = c.getNumServidor();
                 Evento siguienteEjecucion = new Evento(calcularTiempoAlgoritmoEjecucion(c.getNumBloques(), c) + reloj, c, TipoEvento.EJECUTO_CONSULTA);
                 eventos.add(siguienteEjecucion);
+                this.colaEjecutor.add(this.ejecutor.size());
                 menu.aplicarInterfazProcesarEjecutor(getOcupadosEjecutor(),reloj);
                 return;
             }
             i++;
         }
-        ejecutor.add(c);
+        this.ejecutor.add(c);
+        this.colaEjecutor.add(this.ejecutor.size());
         menu.aplicarInterfazProcesarEjecutor(getOcupadosEjecutor(),reloj);
         menu.aplicarInterfazColaEjecutor(ejecutor.size(), reloj);
     }
@@ -182,7 +193,7 @@ public class ModuloProcesamientoConsultas {
         int posLibre = eliminarConexionEjecutor(c);
         if(posLibre != -1){
             if(!ejecutor.isEmpty()){
-                ejecutorConsultas[posLibre] = ejecutor.get(0).getNumServidor();
+                this.ejecutorConsultas[posLibre] = ejecutor.get(0).getNumServidor();
                 Evento siguienteConsultaProcesada = new Evento(calcularTiempoAlgoritmoEjecucion(ejecutor.get(0).getNumBloques(), ejecutor.get(0)) + reloj, ejecutor.remove(0), TipoEvento.EJECUTO_CONSULTA);
                 eventos.add(siguienteConsultaProcesada);
             }
@@ -198,7 +209,7 @@ public class ModuloProcesamientoConsultas {
         int posLibre = eliminarConexionServidor(c);
         if(posLibre != -1){
             if(!consultas.isEmpty()){
-                servidoresConsultas[posLibre] = consultas.get(0).getNumServidor(); //asigno la primera conexion de la lista al servidor que acabo de liberar  
+                this.servidoresConsultas[posLibre] = consultas.get(0).getNumServidor(); //asigno la primera conexion de la lista al servidor que acabo de liberar  
                 Evento siguienteConsultaProcesada = new Evento(calcularTiempoTotal(consultas.get(0)) + reloj, consultas.remove(0), TipoEvento.PROCESO_CONSULTA);
                 eventos.add(siguienteConsultaProcesada);
             }
@@ -212,7 +223,7 @@ public class ModuloProcesamientoConsultas {
         int posLibre = -1;
         for(int i = 0; i < ejecutorConsultas.length; i++){
             if(ejecutorConsultas[i] == c.getNumServidor()){
-                ejecutorConsultas[i] = -1;
+                this.ejecutorConsultas[i] = -1;
                 posLibre = 0;
             }
         }
@@ -223,18 +234,25 @@ public class ModuloProcesamientoConsultas {
         this.eliminarConexionServidor(c);
         for(int i = 0; i < consultas.size(); i++){
              if(consultas.get(i) == c){
-                 consultas.remove(i);
+                 this.consultas.remove(i);
                  break;
              }
          }
         this.eliminarConexionEjecutor(c);
         for(int i = 0; i < ejecutor.size(); i++){
              if(ejecutor.get(i) == c){
-                 ejecutor.remove(i);
+                 this.ejecutor.remove(i);
                  return;
              }
         }
     }
     
+    public Vector<Integer> getColaConsultas(){
+        return this.colaProcesamientoConsultas;
+    }
+    
+    public Vector<Integer> getColaEjecutor(){
+        return this.colaEjecutor;
+    }
     
 }

@@ -3,6 +3,7 @@ package io;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.Vector;
 
 public class ModuloTransacciones {
     private Menu menu;
@@ -10,24 +11,39 @@ public class ModuloTransacciones {
     private int[] servidores;
     private List<Conexion> conexionesConPrioridad;
     
+    private Vector<Integer> colaTransacciones;
+    private Vector<Double> tiempoSelect;
+    private Vector<Double> tiempoUpdate;
+    private Vector<Double> tiempoJoin;
+    private Vector<Double> tiempoDDL;
+    
     private double mayorTiempoEjecucion;
     
     public ModuloTransacciones(int p,Menu menu){
-        servidores = new int[p];
-        conexionesConPrioridad = new ArrayList<>();
-        mayorTiempoEjecucion = 0;
-        hayDDL = false;
+        this.servidores = new int[p];
+        this.conexionesConPrioridad = new ArrayList<>();
+        this.mayorTiempoEjecucion = 0;
+        this.hayDDL = false;
+        this.colaTransacciones = new Vector<>();
+        this.tiempoSelect  = new Vector<>();    
+        this.tiempoUpdate  = new Vector<>();    
+        this.tiempoJoin   = new Vector<>();    
+        this.tiempoDDL  = new Vector<>();    
         this.menu = menu;
     }
     
     public void inicializarVector(){
         for(int i = 0; i < servidores.length; i++){
-            servidores[i] = -1; 
+            this.servidores[i] = -1; 
         }
+    }
+    
+    public Vector<Integer> getCola(){
+        return this.colaTransacciones;
     }
       
     public double calcularTiempoTransaccion(){
-        return servidores.length *0.03;
+        return this.servidores.length *0.03;
     }
     
        public double randomConRango(int min, int max){ 
@@ -40,39 +56,37 @@ public class ModuloTransacciones {
         while(i < servidores.length && !hayDDL){
             if(servidores[i] == -1){
                 if(c.getTipo() == 3){
-                    hayDDL = true;
-                menu.aplicarInterfazProcesarTransacciones(getOcupados(),reloj);
+                    this.hayDDL = true;
+                    menu.aplicarInterfazProcesarTransacciones(getOcupados(),reloj);
                 }
-                servidores[i] = c.getNumServidor();
-                calcularTiempoTransaccion(c,eventos, reloj);
+                this.servidores[i] = c.getNumServidor();
+                this.calcularTiempoTransaccion(c,eventos, reloj);
+                this.colaTransacciones.add(this.conexionesConPrioridad.size());
                 menu.aplicarInterfazProcesarTransacciones(getOcupados(),reloj);
                 return true;
             }
             i++;
         }
         
-        conexionesConPrioridad.add(c);
+        this.conexionesConPrioridad.add(c);
+        this.colaTransacciones.add(this.conexionesConPrioridad.size());
         menu.aplicarInterfazProcesarTransacciones(getOcupados(),reloj);
         menu.aplicarInterfazColaTransacciones(conexionesConPrioridad.size(), reloj);
         return false;
     }
     
         public int getOcupados(){
-    
-        int aux = 0;
-        
+        int aux = 0;     
         for(int i = 0; i < servidores.length; i++){
-        
              if(servidores[i] != -1){
                  aux++;
-             }
-        
+             }      
         }
         return aux;  
     }
         
     public int getConexionNum(){
-       return conexionesConPrioridad.size();
+       return this.conexionesConPrioridad.size();
     }
     
     private Conexion getConexionDePrioridad(){        
@@ -81,11 +95,11 @@ public class ModuloTransacciones {
         
         for(int i = 0; i < conexionesConPrioridad.size(); i++){     
             if(conexionesConPrioridad.get(i).getTipo() > priorMax){
-                priorMax = conexionesConPrioridad.get(i).getTipo();
+                priorMax = this.conexionesConPrioridad.get(i).getTipo();
                 index = i;
             }
         }   
-        return conexionesConPrioridad.get(index);      
+        return this.conexionesConPrioridad.get(index);      
     }
     
         private void calcularTiempoTransaccion(Conexion c,PriorityQueue<Evento> eventos, double reloj){        
@@ -93,26 +107,26 @@ public class ModuloTransacciones {
 
                  switch(c.getTipo()){
                      case 0:        //SELECT
-                         tiempo = calcularTiempoTransaccion() + 1/10 + reloj;
+                         tiempo = this.calcularTiempoTransaccion() + 1/10 + reloj;
                          c.setNumBloques(1);
                          break;
                      case 2:        //JOIN
                          c.setNumBloques((int)randomConRango(1, 64));
-                         tiempo = calcularTiempoTransaccion() + (c.getNumBloques() * 1/10) + reloj; //se calcula el tiempo del join
+                         tiempo = this.calcularTiempoTransaccion() + (c.getNumBloques() * 1/10) + reloj; //se calcula el tiempo del join
                          break;
                      case 3:        //DDL
-                         tiempo = calcularTiempoTransaccion() + getMayorTiempoEjecucion();
+                         tiempo = this.calcularTiempoTransaccion() + this.getMayorTiempoEjecucion();
                          setDDL();
                          break;
                      default:       //UPDATE
-                         tiempo = calcularTiempoTransaccion() + reloj;  
+                         tiempo = this.calcularTiempoTransaccion() + reloj;  
                          break;
                  }
 
                 Evento siguienteTransaccion = new Evento(tiempo,c,TipoEvento.SALE_DE_TRANSACCIONES);
 
                 if(c.getTipo() != 3 && siguienteTransaccion.getTiempo() > getMayorTiempoEjecucion()){
-                  setMayorTiempoEjecucion(siguienteTransaccion.getTiempo());
+                  this.setMayorTiempoEjecucion(siguienteTransaccion.getTiempo());
                 }
                 eventos.add(siguienteTransaccion);
     }
@@ -120,11 +134,11 @@ public class ModuloTransacciones {
     public int eliminarConexion(Conexion c){
        int posLibre = -1;
         if(c.getTipo() == 3){
-            hayDDL = false;
+            this.hayDDL = false;
         }
         for(int i = 0; i < servidores.length; i++){
             if(servidores[i] == c.getNumServidor()){
-                servidores[i] = -1;
+                this.servidores[i] = -1;
                 posLibre = i;
             }
         }
@@ -136,7 +150,7 @@ public class ModuloTransacciones {
         if(posLibre != -1){
             if(!conexionesConPrioridad.isEmpty()){
                 Conexion nuevaConexion = getConexionDePrioridad();
-                servidores[posLibre] = nuevaConexion.getNumServidor();
+                this.servidores[posLibre] = nuevaConexion.getNumServidor();
                 calcularTiempoTransaccion(nuevaConexion, eventos, reloj);
             }
         }
@@ -148,18 +162,18 @@ public class ModuloTransacciones {
         this.eliminarConexion(c);
         for(int i = 0; i < conexionesConPrioridad.size(); i++){
              if(conexionesConPrioridad.get(i) == c){
-                 conexionesConPrioridad.remove(i);
+                 this.conexionesConPrioridad.remove(i);
                  return;
              }
         }
     }
     
     public void setDDL(){
-        hayDDL = true;
+        this.hayDDL = true;
     }
     
     public double getMayorTiempoEjecucion(){
-        return mayorTiempoEjecucion;
+        return this.mayorTiempoEjecucion;
     } 
     
     public void setMayorTiempoEjecucion(double mayorTiempoEjecucion){

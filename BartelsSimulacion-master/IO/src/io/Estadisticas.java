@@ -3,17 +3,18 @@ package io;
 import java.util.Vector;
 
 public class Estadisticas {
-    public double tiempoPromedioGeneral;
-    public double tiempoPromedioSelect;
-    public double tiempoPromedioUpdate;
-    public double tiempoPromedioJoin;
-    public double tiempoPromedioDDL;
-    public double conexionesDescartadas;
+    private double tiempoPromedioGeneral;
+    private double tiempoPromedioSelect;
+    private double tiempoPromedioUpdate;
+    private double tiempoPromedioJoin;
+    private double tiempoPromedioDDL;
+    private double conexionesDescartadas;
     
-    public int colaClientes;
-    public int colaProcesos;
-    public int colaProcesamientoConsultas;
-    public int colaTransacciones;
+    private int colaClientes;
+    private int colaProcesos;
+    private int colaProcesamientoConsultas;
+    private int colaEjecutor;
+    private int colaTransacciones;
     
 
     //calcula el tiempo promedio de las conexiones en el sistema  en el sistema
@@ -62,6 +63,9 @@ public class Estadisticas {
                     break;
                 case 3:
                     this.colaTransacciones = temp/queue.size();
+                    break;
+                 case 4:
+                    this.colaEjecutor = temp/queue.size();
                     break;
             }
         }

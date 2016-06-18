@@ -6,7 +6,7 @@ public class Simulacion {
 
     private Comparador comparador = new Comparador();
     public PriorityQueue<Evento> eventos = new PriorityQueue<>(13,comparador);
-    Estadisticas estadistica = new Estadisticas();
+    //Estadisticas estadistica = new Estadisticas();
     
     private double reloj = 0; //variable que cuenta el tiempo actual en el cual nos encontramos dentro del sistema
     private Menu menu;
@@ -23,29 +23,20 @@ public class Simulacion {
     //lista que tiene las estadisticas de cada corrida de la simulacion
     private ArrayList estadisticas = new ArrayList();
     
-    //vectores que llevan cuenta de los tamanos de la cola generados por cada corrida
-    private Vector<Integer> colaClientes = new Vector<>();
-    private Vector<Integer> colaProcesos = new Vector<>();
-    private Vector<Integer> colaProcesamientoConsutlas = new Vector<>();
-    private Vector<Integer> colaTransacciones = new Vector<>();
-    
     //Vectores que llevan cuenta de los tiempos de cada conexion en los diferentes modulos 
     private Vector<Double> tiempoPromedio = new Vector<>();
-    private Vector<Double> tiempoSelect = new Vector<>();    
-    private Vector<Double> tiempoUpdate = new Vector<>(); 
-    private Vector<Double> tiempoJoin = new Vector<>();
-    private Vector<Double> tiempoDDL = new Vector<>();
 
+    
     private void crearConexion(){
         if(admC.crearConexion(reloj)){ 
-          crearHiloConexion(admC.getSiguienteConexion());
-          menu.aplicarInterfazClientes(admC.getUsedConexiones(),reloj);//pruebas de interfaz
+            crearHiloConexion(admC.getSiguienteConexion());
+            menu.aplicarInterfazClientes(admC.getUsedConexiones(),reloj);//pruebas de interfaz
         }
         else{
-          conexionesRechazadas++;  //sino se puede guardar se agrega al contador de rechazadas
-          menu.aplicarInterfazRechazadas(conexionesRechazadas,reloj);
+             conexionesRechazadas++;  //sino se puede guardar se agrega al contador de rechazadas
+            menu.aplicarInterfazRechazadas(conexionesRechazadas,reloj);
         }
-        admC.crearArribo(reloj,r.nextDouble(),eventos);
+            admC.crearArribo(reloj,r.nextDouble(),eventos);
         }
  
     private void crearHiloConexion(Conexion c){  
@@ -53,7 +44,6 @@ public class Simulacion {
         admP.crearHilo(c,reloj, eventos); //se guarda la conexion entrante ya sea en el servidor si no hay cola, o se agrega a la cola
         if(admP.getServidor()){
             if(c.getTimeout() < reloj){
-                
                 admC.eliminarConexion(c.getNumServidor(),reloj);         //elimnamos la conexion en timeout
                 admP.procesarSalida(reloj,eventos);   
              }
@@ -70,7 +60,7 @@ public class Simulacion {
             admC.eliminarConexion(c.getNumServidor(),reloj);
        }
        else{           
-        pc.asignarConsultaAServidor(c, reloj,eventos); //se asigna el servidor y se calcula el tiempo de reloj en donde terminara de procesarse       
+            pc.asignarConsultaAServidor(c, reloj,eventos); //se asigna el servidor y se calcula el tiempo de reloj en donde terminara de procesarse       
        }  
     }
 
@@ -102,7 +92,8 @@ public class Simulacion {
     
     private void terminarConexion(Conexion c){
         admC.eliminarConexion(c.getNumServidor(),reloj);
-        conexionesTerminadas++;
+        this.conexionesTerminadas++;
+        this.tiempoPromedio.add(reloj - c.getTiempoEntrada());
         menu.aplicarInterfazProcesarCierreConexion(conexionesTerminadas,reloj);
     }
     
@@ -115,6 +106,20 @@ public class Simulacion {
         menu.aplicarInterfazBorradasTimeOut(conexionesBorradasTimeOut,reloj);
     }
     
+    private void calcularEstadisticas(){
+        Estadisticas estadistica = new Estadisticas();
+        
+    //calcula tamanos promedios de las colas
+        estadistica.calcularPromedioInt(admC.getCola(), 0);
+        estadistica.calcularPromedioInt(admP.getCola(), 1);
+        estadistica.calcularPromedioInt(pc.getColaConsultas(), 2);
+        estadistica.calcularPromedioInt(transacciones.getCola(), 3);
+        estadistica.calcularPromedioInt(pc.getColaEjecutor(), 4);
+        
+    //calcula tiempos promedios
+        //estadistica.calcularPromedioDouble();
+    }
+    
     public void iniciarSimulación(int numC, double tiempoMax,int k,int n, int p, int m,double t,Menu menu){    
         System.out.println(numC+"-"+tiempoMax+" - "+k+ " - " + n+ " - " + p+" - "+m +" - " +t);
         this.timeOutGlobal = t;
@@ -124,6 +129,7 @@ public class Simulacion {
         pc.inicializarVectores();
         transacciones = new ModuloTransacciones(p,menu);
         transacciones.inicializarVector();
+        
         this.menu = menu;
         this.correrSimulacion(numC,tiempoMax);
     }
@@ -160,6 +166,8 @@ public class Simulacion {
                         break;
                 }
             }
+            
+            this.calcularEstadisticas();
             
             System.out.println("Termino: " + i);
         }
