@@ -67,25 +67,28 @@ public class ModuloProcesamientoConsultas {
      */
     public void asignarConsultaAServidor(Conexion c, double reloj,PriorityQueue<Evento> eventos, ModuloAdmProcesos admP){
                 int i = 0;
-                while(i < servidoresConsultas.length){
+                while(i < servidoresConsultas.length){ //busca el primer espacio en servidor
                     if(servidoresConsultas[i] == -1){
-                        this.servidoresConsultas[i] = c.getNumServidor();
-                        Evento siguienteConsultaProcesada = new Evento(calcularTiempoTotal(c) + reloj, c, TipoEvento.PROCESO_CONSULTA);
+                        this.servidoresConsultas[i] = c.getNumServidor(); //inserta el servidor
+                        Evento siguienteConsultaProcesada = new Evento(calcularTiempoTotal(c) + reloj, c, TipoEvento.PROCESO_CONSULTA); //crea el siguiente evento
                         eventos.add(siguienteConsultaProcesada);
-                        this.colaProcesamientoConsultas.add(this.consultas.size());
+                        this.colaProcesamientoConsultas.add(this.consultas.size()); //lo agrega a la lista para generar estadisticas
                         this.setTiempoModuloProcesos(c, admP, reloj);
-                        menu.aplicarInterfazProcesarConsulta(getOcupados(),reloj);
+                        menu.aplicarInterfazProcesarConsulta(getOcupados(),reloj); //refresca interfaz
                         menu.aplicarInterfazColaProcesador(consultas.size(), reloj);
                         return;
                     }
                     i++;
                 }
+                
+                //De no poder meterlo al servidor se meterá a la cola de consultas
                 this.consultas.add(c);  
-                this.colaProcesamientoConsultas.add(this.consultas.size());
-                this.setTiempoModuloProcesos(c, admP, reloj);
-                menu.aplicarInterfazProcesarConsulta(getOcupados(),reloj);
+                this.colaProcesamientoConsultas.add(this.consultas.size());//actualiza listas de estadisticas 
+                this.setTiempoModuloProcesos(c, admP, reloj); 
+                menu.aplicarInterfazProcesarConsulta(getOcupados(),reloj); //refresca interfaz
                 menu.aplicarInterfazColaProcesador(consultas.size(), reloj);
     }
+      
         
     /**
      * Metodo encargado de enviar estadisticas al modulo de clientes 
@@ -293,8 +296,8 @@ public class ModuloProcesamientoConsultas {
     }
     
     /**
-     *
-     * @return
+     * Metodo encargado de calcular el tiempo de comprobación sintáctica
+     * @return devuelve un double representando el tiempo de duración del proceso
      */
     public double calcularTiempoSintactico(){
         //resultado de la integral despejada
@@ -303,8 +306,8 @@ public class ModuloProcesamientoConsultas {
     }
     
     /**
-     *
-     * @return
+     * Metodo encargado de calcular el tiempo de comprobación semantica
+     * @return devuelve un double representando el tiempo de duración del proceso
      */
     public double calcularTiempoSemantico(){
         //resultado de la integral despejada
@@ -313,17 +316,16 @@ public class ModuloProcesamientoConsultas {
     }
     
     /**
-     *
-     * @return
+     * Metodo encargado de calcular el tiempo de petición de permisos
+     * @return devuelve un double representando el tiempo de duración del proceso
      */
     public double calcularTiempoPermisos(){
         return (-(Math.log(1 - r.nextDouble()))/0.07);
     }
             
     /**
-     *
-     * @param c
-     * @return
+     * Metodo encargado de calcular el tiempo de optimización dependiendo de su tipo (read only o no)
+     * @return devuelve un double representando el tiempo de duración del proceso
      */
     public double calcularTiempoOptimizacion(Conexion c){
         if(c.isReadOnly()){
@@ -335,39 +337,41 @@ public class ModuloProcesamientoConsultas {
     }
     
     /**
-     *
-     * @param c
-     * @param eventos
-     * @param reloj
-     * @param transacciones
+     * Metodo encargado de insertar una conexión al servidor de consultas, genera el evento de llamada a transaccion, y en el caso de estar todos los espacios ocupados lo inserta en la cola de consultas
+     * @param c conexión entrante
+     * @param reloj tiempo de reloj en el momento de la llamada
+     * @param eventos //lista de eventos en donde se meterá el nuevo evento de ejecuto_consulta
+     * @param transacciones  //variable que conecta al modulo con modulo de transacciones, para sacar estadisticas
      */
     public void asignarConsultaAEjecutor(Conexion c,PriorityQueue<Evento> eventos, double reloj, ModuloTransacciones transacciones){
         int i = 0;
         
-        while(i < ejecutorConsultas.length){
+        while(i < ejecutorConsultas.length){ //busca el primer espacio en servidor
             if(ejecutorConsultas[i] == -1){
-                this.ejecutorConsultas[i] = c.getNumServidor();
-                Evento siguienteEjecucion = new Evento(calcularTiempoAlgoritmoEjecucion(c.getNumBloques(), c) + reloj, c, TipoEvento.EJECUTO_CONSULTA);
+                this.ejecutorConsultas[i] = c.getNumServidor();//inserta el servidor
+                Evento siguienteEjecucion = new Evento(calcularTiempoAlgoritmoEjecucion(c.getNumBloques(), c) + reloj, c, TipoEvento.EJECUTO_CONSULTA); //crea el siguiente evento
                 eventos.add(siguienteEjecucion);
-                this.colaEjecutor.add(this.ejecutor.size());
+                this.colaEjecutor.add(this.ejecutor.size()); //lo agrega a la lista para generar estadisticas
                 this.setTiempoModuloTransacciones(c, transacciones, reloj);
-                menu.aplicarInterfazProcesarEjecutor(getOcupadosEjecutor(),reloj);
+                menu.aplicarInterfazProcesarEjecutor(getOcupadosEjecutor(),reloj); //refresca interfaz
                 return;
             }
             i++;
         }
+        
+        //De no poder meterlo al servidor se meterá a la cola de consultas
         this.ejecutor.add(c);
-        this.colaEjecutor.add(this.ejecutor.size());
+        this.colaEjecutor.add(this.ejecutor.size()); //actualiza listas de estadisticas 
         this.setTiempoModuloTransacciones(c, transacciones, reloj);
-        menu.aplicarInterfazProcesarEjecutor(getOcupadosEjecutor(),reloj);
+        menu.aplicarInterfazProcesarEjecutor(getOcupadosEjecutor(),reloj);  //refresca interfaz
         menu.aplicarInterfazColaEjecutor(ejecutor.size(), reloj);
     }
     
     /**
-     *
-     * @param cantidadDeBloques
-     * @param c
-     * @return
+     * Metodo encargado de calcular el tiempo de duración de la ejecución de la consulta y el uso de bloques de memori
+     * @param cantidadDeBloques cantidad de bloques que utilizará la consulta dependeindo de su tipo.
+     * @param c conexion entrante
+     * @return devuelve un double representando el tiempo que debe durar
      */
     public double calcularTiempoAlgoritmoEjecucion(int cantidadDeBloques, Conexion c){
         double tiempoDeEjecucionSegundos = Math.pow(cantidadDeBloques, 2.0) / 1000;
@@ -382,18 +386,18 @@ public class ModuloProcesamientoConsultas {
     }
     
     /**
-     *
-     * @param cantidadDeBloques
-     * @return
+     *Metodo encargado de calcular el tiempo por cantidad de bloques
+     * @param cantidadDeBloques numero de bloques que se utilizarán
+     * @return tiempo que durará en procesar la respuesta por su tamaño en disco
      */
     public double calcularTamanoRespuesta(int cantidadDeBloques){
         return cantidadDeBloques/64;
     }
     
     /**
-     *
-     * @param c
-     * @return
+     * Metodo encargado de eliminar una conexion especifica del sistema
+     * @param c conexion entrante 
+     * @return devuelve la posición donde fue borrado o un -1 de no haber sido encontrado.
      */
     public int eliminarConexionServidor(Conexion c){
         int posLibre = -1;
@@ -407,10 +411,10 @@ public class ModuloProcesamientoConsultas {
     }
     
     /**
-     *
-     * @param c
-     * @param eventos
-     * @param reloj
+     * Metodo encargado de sacar la conexion del servidor de ejecución y generar el evento de poner en red
+     * @param c conexion entrante 
+     * @param eventos lista de eventos donde se agregará el evento
+     * @param reloj tiempo de reloj en el momento de la llamada 
      */
     public void procesarSalidaEjecutor(Conexion c,PriorityQueue<Evento> eventos, double reloj){
         int posLibre = eliminarConexionEjecutor(c);
@@ -428,10 +432,10 @@ public class ModuloProcesamientoConsultas {
     }
     
     /**
-     *
-     * @param c
-     * @param eventos
-     * @param reloj
+     * Metodo encargado de tomar el siguiente evento en salir del servidor de consulta y generar el evento de entrada a transacción
+     * @param c conexion que saldra 
+     * @param eventos lista de eventos donde se agregará el nuevp evento
+     * @param reloj tiempo de reloj en el tiempo de la llamada 
      */
     public void procesarSalidaConsulta(Conexion c,PriorityQueue<Evento> eventos, double reloj){             
         
@@ -449,9 +453,9 @@ public class ModuloProcesamientoConsultas {
     }
     
     /**
-     *
-     * @param c
-     * @return
+     * Metodo encargado de eliminar en elemento del servidor de ejecución
+     * @param c conexion entrante 
+     * @return devuelve la posición donde fue borrado o un -1 de no haber sido encontrado.
      */
     public int eliminarConexionEjecutor(Conexion c){
         int posLibre = -1;
@@ -465,8 +469,8 @@ public class ModuloProcesamientoConsultas {
     }
     
     /**
-     *
-     * @param c
+     * Metodo encargado de buscar una conexión en ambos servidores y de ser encontrado borralo
+     * @param c conexion que desea ser borrada.
      */
     public void eliminarConexion(Conexion c){
         this.eliminarConexionServidor(c);
@@ -486,16 +490,18 @@ public class ModuloProcesamientoConsultas {
     }
     
     /**
-     *
-     * @return
+     * Metodo que devuelve la cola de estadisticas de consultas
+     * @return devuelve una lista de integers representando el numero de consulta 
+     * hechas a lo largo de la simulación 
      */
     public Vector<Integer> getColaConsultas(){
-        return this.colaProcesamientoConsultas;
+        return this.colaProcesamientoConsultas; 
     }
     
     /**
-     *
-     * @return
+     * Metodo que devuelve la cola de estadisticas de ejecucion
+     * @return devuelve una lista de integers representando el numero de ejecuciones
+     * hechas a lo largo de la simulación 
      */
     public Vector<Integer> getColaEjecutor(){
         return this.colaEjecutor;
