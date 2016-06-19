@@ -10,6 +10,7 @@ public class Simulacion {
 
     private Comparador comparador = new Comparador(); //comparador utilizado para ordenar los eventos por tiempos de reloj 
     public PriorityQueue<Evento> eventos = new PriorityQueue<>(13,comparador); //lista de eventos
+    public Estadisticas estadisticaFinal = new Estadisticas();
     
     private double reloj = 0; //variable que cuenta el tiempo actual en el cual nos encontramos dentro del sistema
     private Menu menu;
@@ -24,7 +25,7 @@ public class Simulacion {
     private ModuloTransacciones transacciones;
     
     //lista que tiene las estadisticas de cada corrida de la simulacion
-    private ArrayList estadisticas = new ArrayList();
+    private ArrayList<Estadisticas> estadisticas = new ArrayList();
     
     //Vectores que llevan cuenta de los tiempos de cada conexion en los diferentes modulos 
     private Vector<Double> tiempoPromedio = new Vector<>();
@@ -190,7 +191,50 @@ public class Simulacion {
         estadistica.calcularTiempoPromedioEjecutor(pc.getTiempoJoinEjecutor(), 1);
         estadistica.calcularTiempoPromedioEjecutor(pc.getTiempoUpdateEjecutor(), 3);        
         
+        estadistica.calcularTiempoPromedio(this.tiempoPromedio);
+        estadistica.setConexionesDescartadas(conexionesRechazadas);
+        
         estadisticas.add(estadistica);
+    }
+    
+    private void calcularEstadisticasFinales(){
+        for(int i = 0; i < estadisticas.size(); i++){
+            estadisticaFinal.setConexionesDescartadas(estadisticas.get(i).getConexionesDescartadas());
+            estadisticaFinal.setTiempoPromedioGeneral(estadisticas.get(i).getTiempoPromedio());
+            
+        //Colas
+            estadisticaFinal.setColaClientes(estadisticas.get(i).getColaClientes());
+            estadisticaFinal.setColaProcesos(estadisticas.get(i).getColaProcesos());
+            estadisticaFinal.setColaProcesamientoConsultas(estadisticas.get(i).getColaProcesamientoConsultas());
+            estadisticaFinal.setColaTransacciones(estadisticas.get(i).getColaTransacciones());
+            estadisticaFinal.setColaEjecutor(estadisticas.get(i).getColaEjecutor());
+        
+        //admP
+            estadisticaFinal.setTiempoPromedioSelectP(estadisticas.get(i).getTiempoPromedioSelectP());
+            estadisticaFinal.setTiempoPromedioJoinP(estadisticas.get(i).getTiempoPromedioJoinP());
+            estadisticaFinal.setTiempoPromedioUpdateP(estadisticas.get(i).getTiempoPromedioUpdateP());
+            estadisticaFinal.setTiempoPromedioDDLP(estadisticas.get(i).getTiempoPromedioDDLP());
+            
+        //consultas
+            estadisticaFinal.setTiempoPromedioSelectC(estadisticas.get(i).getTiempoPromedioSelectC());
+            estadisticaFinal.setTiempoPromedioJoinC(estadisticas.get(i).getTiempoPromedioJoinC());
+            estadisticaFinal.setTiempoPromedioUpdateC(estadisticas.get(i).getTiempoPromedioUpdateC());
+            estadisticaFinal.setTiempoPromedioDDLC(estadisticas.get(i).getTiempoPromedioDDLC());
+            
+        //transacciones
+            estadisticaFinal.setTiempoPromedioSelectT(estadisticas.get(i).getTiempoPromedioSelectT());
+            estadisticaFinal.setTiempoPromedioJoinT(estadisticas.get(i).getTiempoPromedioJoinT());
+            estadisticaFinal.setTiempoPromedioUpdateT(estadisticas.get(i).getTiempoPromedioUpdateT());
+            estadisticaFinal.setTiempoPromedioDDLT(estadisticas.get(i).getTiempoPromedioDDLT());
+            
+        //Ejecutor
+            estadisticaFinal.setTiempoPromedioSelectE(estadisticas.get(i).getTiempoPromedioSelectE());
+            estadisticaFinal.setTiempoPromedioJoinE(estadisticas.get(i).getTiempoPromedioJoinE());
+            estadisticaFinal.setTiempoPromedioUpdateE(estadisticas.get(i).getTiempoPromedioUpdateE());
+            estadisticaFinal.setTiempoPromedioDDLE(estadisticas.get(i).getTiempoPromedioDDLE());
+        }
+        
+        estadisticaFinal.calcularPromedioFinal(estadisticas.size());
     }
   
     /**
@@ -268,6 +312,8 @@ public class Simulacion {
             
             System.out.println("Termino: " + i);
         }
+        
+            //caluclar estadisticas totales 
         if(!menu.isLento()){ //si la simulación esta funcionando en modo rapido, se llama el método que refresca la interfaz
         
             menu.ModoRapido(admC.getOcupados(), conexionesRechazadas, admP.getServidor(), admP.getConexionesNum(),pc.getOcupados(),pc.getConsultasNum(), transacciones.getOcupados(), transacciones.getConexionNum(), pc.getOcupadosEjecutor(), pc.getEjecutorNum(), conexionesTerminadas, reloj, conexionesBorradasTimeOut);
