@@ -26,7 +26,7 @@ public class ModuloAdmProcesos {
          this.tiempoSelect  = new Vector<>();    
          this.tiempoUpdate   = new Vector<>();    
          this.tiempoJoin   = new Vector<>();    
-         this.tiempoDDL  = new Vector<>();    
+         this.tiempoDDL  = new Vector<>();   
          this.menu = menu;
      }
      

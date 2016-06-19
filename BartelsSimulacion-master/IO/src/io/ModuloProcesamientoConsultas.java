@@ -40,6 +40,10 @@ public class ModuloProcesamientoConsultas {
         this.tiempoUpdate   = new Vector<>();    
         this.tiempoJoin   = new Vector<>();    
         this.tiempoDDL  = new Vector<>();    
+        this.tiempoDDLEjecutor = new Vector<>();  
+        this.tiempoJoinEjecutor = new Vector<>();  
+        this.tiempoSelectEjecutor = new Vector<>();  
+        this.tiempoUpdateEjecutor = new Vector<>();  
         this.menu = menu;
     }
     

@@ -187,9 +187,9 @@ public class Simulacion {
         estadistica.calcularTiempoPromedioEjecutor(pc.getTiempoSelectEjecutor(), 0);
         estadistica.calcularTiempoPromedioEjecutor(pc.getTiempoUpdateEjecutor(), 2);
         estadistica.calcularTiempoPromedioEjecutor(pc.getTiempoJoinEjecutor(), 1);
-        estadistica.calcularTiempoPromedioEjecutor(pc.getTiempoUpdateEjecutor(), 3);
+        estadistica.calcularTiempoPromedioEjecutor(pc.getTiempoUpdateEjecutor(), 3);        
         
-        
+        estadisticas.add(estadistica);
     }
   
     /**

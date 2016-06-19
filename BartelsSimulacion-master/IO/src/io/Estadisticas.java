@@ -42,7 +42,7 @@ public class Estadisticas {
     //calcula el tiempo promedio de las conexiones en el sistema  en el sistema
     public void calcularTiempoPromedioProcesos(Vector<Double> conexiones, int type){
         double temp = 0.0;
-        for(int i = 0; i < conexiones.size(); i++){
+        for(int i = 0; i < conexiones.size()-1; i++){
             temp += conexiones.get(i);
         }
         if(!conexiones.isEmpty()){
@@ -65,7 +65,7 @@ public class Estadisticas {
     
     public void calcularTiempoPromedioConsultas(Vector<Double> conexiones, int type){
             double temp = 0.0;
-            for(int i = 0; i < conexiones.size(); i++){
+            for(int i = 0; i < conexiones.size()-1; i++){
                 temp += conexiones.get(i);
             }
             if(!conexiones.isEmpty()){
@@ -88,7 +88,7 @@ public class Estadisticas {
     
     public void calcularTiempoPromedioTransacciones(Vector<Double> conexiones, int type){
         double temp = 0.0;
-        for(int i = 0; i < conexiones.size(); i++){
+        for(int i = 0; i < conexiones.size()-1; i++){
             temp += conexiones.get(i);
         }
         if(!conexiones.isEmpty()){
@@ -111,7 +111,7 @@ public class Estadisticas {
     
     public void calcularTiempoPromedioEjecutor(Vector<Double> conexiones, int type){
         double temp = 0.0;
-        for(int i = 0; i < conexiones.size(); i++){
+        for(int i = 0; i < conexiones.size()-1; i++){
             temp += conexiones.get(i);
         }
         if(!conexiones.isEmpty()){
@@ -134,7 +134,7 @@ public class Estadisticas {
     
         public void calcularTiempoPromedio(Vector<Double> conexiones, int type){
         double temp = 0.0;
-        for(int i = 0; i < conexiones.size(); i++){
+        for(int i = 0; i < conexiones.size()-1; i++){
             temp += conexiones.get(i);
         }
         if(!conexiones.isEmpty()){
@@ -145,7 +145,7 @@ public class Estadisticas {
     //calcula el tamano promedio de la colas de los modulos 
     public void calcularPromedioInt(Vector<Integer> queue, int type){
         int temp = 0;
-        for(int i = 0; i < queue.size(); i++){
+        for(int i = 0; i < queue.size()-1; i++){
             temp += queue.get(i);
         }
         if(!queue.isEmpty()){
