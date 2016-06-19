@@ -56,13 +56,8 @@ public class Simulacion {
     
     private void crearHiloConexion(Conexion c){      
         admP.crearHilo(c,reloj, eventos); //se pone la conexion entrante ya sea en el servidor si no hay cola, o se agrega a la cola
-        if(admP.getServidor()){
-            if(c.getTimeout() < reloj){
-                admC.eliminarConexion(c.getNumServidor(),reloj);         //elimnamos la conexion en timeout
-                admP.procesarSalida(reloj,eventos);   
-           
-            if(c.getTimeout() < reloj){ //si la conexión esta en tiemout
-                
+        if(admP.getServidor()){           
+            if(c.getTimeout() < reloj){ //si la conexión esta en tiemout                
                 admC.eliminarConexion(c.getNumServidor(),reloj); //eliminamos la conexion en timeout
                 admP.procesarSalida(reloj,eventos); //y si hay conexiones en cola se trae la siguiente para ser procesada  
              }
@@ -70,8 +65,7 @@ public class Simulacion {
                 admP.siguienteHilo(c,reloj,eventos); //se genera el evento salida del procesamiento del hilo y paso al servidor de procesos.
             }
             admP.setServidor();  //se limpia el servidor 
-            }
-       }
+        }
     }
     
     /**
@@ -81,12 +75,12 @@ public class Simulacion {
     * @param c conexión perteneciente al evento siendo ejecutado
     */
     private void procesarConsultas(Conexion c){ 
-        admP.procesarSalida(reloj,eventos); //ordena el servidor del hilo de procesamiento con respecto a la conexion que sale. 
+        admP.procesarSalida(reloj,eventos); //ordena el servidor del hilo de procesamiento con respecto a la conexion que sale.        
         if(c.getTimeout() < reloj){ 
             admC.eliminarConexion(c.getNumServidor(),reloj);
        }
        else{           
-            pc.asignarConsultaAServidor(c, reloj,eventos); //se asigna el servidor y se calcula el tiempo de reloj en donde terminara de procesarse       
+            pc.asignarConsultaAServidor(c, reloj,eventos, admP); //se asigna el servidor y se calcula el tiempo de reloj en donde terminara de procesarse       
        }  
     }
 
@@ -102,7 +96,7 @@ public class Simulacion {
             admC.eliminarConexion(c.getNumServidor(),reloj);
        }
        else{
-            transacciones.asignarConexion(c,eventos,reloj);//se agrega la conexion al servidor de transaciones o a la cola
+            transacciones.asignarConexion(c,eventos,reloj, pc);//se agrega la conexion al servidor de transaciones o a la cola
         }     
     }
    
@@ -171,8 +165,18 @@ public class Simulacion {
         estadistica.calcularPromedioInt(transacciones.getCola(), 3);
         estadistica.calcularPromedioInt(pc.getColaEjecutor(), 4);
         
-    //calcula tiempos promedios
-        //estadistica.calcularPromedioDouble();
+    //calcula tiempos promedios en el modulo de procesos
+        estadistica.calcularTiempoPromedioProcesos(admP.getTiempoSelect(), 0);
+        estadistica.calcularTiempoPromedioProcesos(admP.getTiempoUpdate(), 2);
+        estadistica.calcularTiempoPromedioProcesos(admP.getTiempoJoin(), 1);
+        estadistica.calcularTiempoPromedioProcesos(admP.getTiempoUpdate(), 3);
+        
+    //calcula tiempos promedios en el modulo de procesamiento de consultas
+        estadistica.calcularTiempoPromedioProcesos(admP.getTiempoSelect(), 0);
+        estadistica.calcularTiempoPromedioProcesos(admP.getTiempoUpdate(), 2);
+        estadistica.calcularTiempoPromedioProcesos(admP.getTiempoJoin(), 1);
+        estadistica.calcularTiempoPromedioProcesos(admP.getTiempoUpdate(), 3);
+        
     }
   
     /**

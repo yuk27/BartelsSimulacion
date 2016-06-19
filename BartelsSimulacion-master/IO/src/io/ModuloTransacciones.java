@@ -51,7 +51,7 @@ public class ModuloTransacciones {
             return (Math.random()*range) + min; 
     }
     
-    public boolean asignarConexion(Conexion c,PriorityQueue<Evento> eventos,double reloj){
+    public boolean asignarConexion(Conexion c,PriorityQueue<Evento> eventos,double reloj, ModuloProcesamientoConsultas pc){
         int i = 0; 
         while(i < servidores.length && !hayDDL){
             if(servidores[i] == -1){
@@ -62,6 +62,7 @@ public class ModuloTransacciones {
                 this.servidores[i] = c.getNumServidor();
                 this.calcularTiempoTransaccion(c,eventos, reloj);
                 this.colaTransacciones.add(this.conexionesConPrioridad.size());
+                this.setTiempoModulo(c, pc, reloj);
                 menu.aplicarInterfazProcesarTransacciones(getOcupados(),reloj);
                 return true;
             }
@@ -70,11 +71,46 @@ public class ModuloTransacciones {
         
         this.conexionesConPrioridad.add(c);
         this.colaTransacciones.add(this.conexionesConPrioridad.size());
+        this.setTiempoModulo(c, pc, reloj);
         menu.aplicarInterfazProcesarTransacciones(getOcupados(),reloj);
         menu.aplicarInterfazColaTransacciones(conexionesConPrioridad.size(), reloj);
         return false;
     }
     
+        public void setTiempoModulo(Conexion c, ModuloProcesamientoConsultas pc, double reloj){
+            switch(c.getTipo()){
+                case 0:
+                    pc.getTiempoSelect().add(reloj - c.getTiempoEntradaModulo());
+                    break;
+                case 1:
+                    pc.getTiempoUpdate().add(reloj - c.getTiempoEntradaModulo());
+                    break;
+                case 2:
+                    pc.getTiempoJoin().add(reloj - c.getTiempoEntradaModulo());
+                    break;
+                case 3:
+                   pc.getTiempoDDL().add(reloj - c.getTiempoEntradaModulo());
+                    break;
+            }
+            c.setTiempoEntradaModulo(reloj);
+        }
+    
+    public Vector<Double> getTiempoSelect(){
+        return this.tiempoSelect;
+    }
+    
+    public Vector<Double> getTiempoJoin(){
+        return this.tiempoJoin;
+    }
+        
+    public Vector<Double> getTiempoUpdate(){
+        return this.tiempoUpdate;
+    }
+            
+    public Vector<Double> getTiempoDDL(){
+        return this.tiempoDDL;
+    }
+        
         public int getOcupados(){
         int aux = 0;     
         for(int i = 0; i < servidores.length; i++){

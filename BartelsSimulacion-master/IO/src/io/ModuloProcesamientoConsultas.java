@@ -37,7 +37,7 @@ public class ModuloProcesamientoConsultas {
         this.menu = menu;
     }
     
-        public void asignarConsultaAServidor(Conexion c, double reloj,PriorityQueue<Evento> eventos){
+        public void asignarConsultaAServidor(Conexion c, double reloj,PriorityQueue<Evento> eventos, ModuloAdmProcesos admP){
                 int i = 0;
                 while(i < servidoresConsultas.length){
                     if(servidoresConsultas[i] == -1){
@@ -45,6 +45,7 @@ public class ModuloProcesamientoConsultas {
                         Evento siguienteConsultaProcesada = new Evento(calcularTiempoTotal(c) + reloj, c, TipoEvento.PROCESO_CONSULTA);
                         eventos.add(siguienteConsultaProcesada);
                         this.colaProcesamientoConsultas.add(this.consultas.size());
+                        this.setTiempoModulo(c, admP, reloj);
                         menu.aplicarInterfazProcesarConsulta(getOcupados(),reloj);
                         menu.aplicarInterfazColaProcesador(consultas.size(), reloj);
                         return;
@@ -53,8 +54,43 @@ public class ModuloProcesamientoConsultas {
                 }
                 this.consultas.add(c);  
                 this.colaProcesamientoConsultas.add(this.consultas.size());
+                this.setTiempoModulo(c, admP, reloj);
                 menu.aplicarInterfazProcesarConsulta(getOcupados(),reloj);
                 menu.aplicarInterfazColaProcesador(consultas.size(), reloj);
+    }
+        
+        public void setTiempoModulo(Conexion c, ModuloAdmProcesos admP, double reloj){
+            switch(c.getTipo()){
+                case 0:
+                    admP.getTiempoSelect().add(reloj - c.getTiempoEntrada());
+                    break;
+                case 1:
+                    admP.getTiempoUpdate().add(reloj - c.getTiempoEntrada());
+                    break;
+                case 2:
+                    admP.getTiempoJoin().add(reloj - c.getTiempoEntrada());
+                    break;
+                case 3:
+                   admP.getTiempoDDL().add(reloj - c.getTiempoEntrada());
+                    break;
+            }
+            c.setTiempoEntradaModulo(reloj);
+        }
+        
+    public Vector<Double> getTiempoSelect(){
+        return this.tiempoSelect;
+    }
+    
+    public Vector<Double> getTiempoJoin(){
+        return this.tiempoJoin;
+    }
+        
+    public Vector<Double> getTiempoUpdate(){
+        return this.tiempoUpdate;
+    }
+            
+    public Vector<Double> getTiempoDDL(){
+        return this.tiempoDDL;
     }
         
     public int getSiguienteProcesado(double reloj){ 

@@ -90,21 +90,6 @@ public class ModuloAdmProcesos {
                     
                     Evento siguienteHilo= new Evento(generarTiempoSalida() + reloj, siguienteConexion(), TipoEvento.SALE_DE_HILO);             //se genera el evento de Procesado de consulta de la siguiente conexion 
                     eventos.add(siguienteHilo); 
-                    switch(siguienteConexion().getTipo()){
-                        case 0:
-                            tiempoSelect.add(reloj - siguienteConexion().getTiempoEntrada());
-                            break;
-                        case 1:
-                            tiempoUpdate.add(reloj - siguienteConexion().getTiempoEntrada());
-                            break;
-                        case 2:
-                            tiempoJoin.add(reloj - siguienteConexion().getTiempoEntrada());
-                            break;
-                        case 3:
-                            tiempoDDL.add(reloj - siguienteConexion().getTiempoEntrada());
-                            break;
-                    }
-                    siguienteConexion().setTiempoEntradaModulo(reloj);
                 }
         menu.aplicarInterfazColaHilo(conexiones.size(),reloj);
         menu.aplicarInterfazNuevoHilo(servidorOcupado,reloj);
@@ -136,24 +121,25 @@ public class ModuloAdmProcesos {
     public void siguienteHilo(Conexion c,double reloj,PriorityQueue<Evento> eventos){
         Evento siguienteHilo = new Evento(generarTiempoSalida() + reloj,c,TipoEvento.SALE_DE_HILO); //se genera el evento de Procesado de consulta de la siguiente conexion 
         eventos.add(siguienteHilo); 
-        switch(siguienteConexion().getTipo()){
-            case 0:
-                tiempoSelect.add(reloj - siguienteConexion().getTiempoEntrada());
-                break;
-            case 1:
-                tiempoUpdate.add(reloj - siguienteConexion().getTiempoEntrada());
-                break;
-            case 2:
-                tiempoJoin.add(reloj - siguienteConexion().getTiempoEntrada());
-                break;
-            case 3:
-                tiempoDDL.add(reloj - siguienteConexion().getTiempoEntrada());
-                break;
-        }
-        siguienteConexion().setTiempoEntradaModulo(reloj);
         menu.aplicarInterfazNuevoHilo(true,reloj);
         menu.aplicarInterfazColaHilo(conexiones.size(),reloj);
         System.out.println("evento anadido de salida de hilo");
+    }
+    
+    public Vector<Double> getTiempoSelect(){
+        return this.tiempoSelect;
+    }
+    
+    public Vector<Double> getTiempoJoin(){
+        return this.tiempoJoin;
+    }
+        
+    public Vector<Double> getTiempoUpdate(){
+        return this.tiempoUpdate;
+    }
+            
+    public Vector<Double> getTiempoDDL(){
+        return this.tiempoDDL;
     }
     
 }
