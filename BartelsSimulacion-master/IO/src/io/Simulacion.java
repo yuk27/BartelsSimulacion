@@ -157,6 +157,9 @@ public class Simulacion {
         menu.aplicarInterfazBorradasTimeOut(conexionesBorradasTimeOut,reloj);
     }
     
+    /**
+     * Calcula las estadisticas para una sola corrida y las guarda en una lista
+     */
     private void calcularEstadisticas(){
         Estadisticas estadistica = new Estadisticas();
         
@@ -197,6 +200,9 @@ public class Simulacion {
         estadisticas.add(estadistica);
     }
     
+    /**
+     * Calcula las estadisticas finales para todas las corridas en conjunto
+     */
     private void calcularEstadisticasFinales(){
         for(int i = 0; i < estadisticas.size(); i++){
             estadisticaFinal.setConexionesDescartadas(estadisticas.get(i).getConexionesDescartadas());

@@ -29,6 +29,10 @@ public class ModuloAdmClientes {
         this.menu = menu;
     }
     
+    /**
+     * Devuelve el tamaño de la cola de clientes
+     * @return tamaño de la cola de clientes
+     */
     public Vector<Integer> getCola(){
         return this.colaClientes;
     }
@@ -130,6 +134,12 @@ public class ModuloAdmClientes {
         this.setTiempoModulo(c, pc, reloj);
     }
     
+    /**
+     * Calcula y guarda el tiempo que estuvo una conexion en el modulo ejecutor
+     * @param c conexion que sale del modulo ejecutor
+     * @param pc instancia del modulo de procesamiento de consultas 
+     * @param reloj reloj del sistema
+     */
     public void setTiempoModulo(Conexion c, ModuloProcesamientoConsultas pc, double reloj){
             switch(c.getTipo()){
                 case 0:
