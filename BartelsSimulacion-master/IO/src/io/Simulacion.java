@@ -316,7 +316,7 @@ public class Simulacion {
             
             this.calcularEstadisticas();
             //menu.estadisticasCorrida(i,int tamPromCHilo,int tamPromCConsultas,int tamPromCTrans,int tamPromCEjecucion,double PromVida, double tiempoSelect,double tiempoJoin,double tiempoUpdate,double tiempoDDL, reloj);
-            menu.estadisticasCorrida(i,3,4,5,6,1.0,2.0,3.0,4.0,5.0, reloj);
+            menu.estadisticasCorrida(i,6,7,8,9,11.0,22.0,33.0,44.00,55.00,66.00,77.00,88.00,99.00,12.0,13.0,14.0,15.4,16.4,1.68,1.25,1.4,reloj);
             System.out.println("Termino: " + i); //se limpia el reloj y los objetos para correr la siguiente corrida
             reloj = 0;
             admC = new ModuloAdmClientes(k,timeOutGlobal,menu);
@@ -329,7 +329,7 @@ public class Simulacion {
         
             //caluclar estadisticas totales 
            // menu.estadisticasTotales(int tamPromCHilo,int tamPromCConsultas,int tamPromCTrans,int tamPromCEjecucion,double PromVida, double tiempoSelect,double tiempoJoin,double tiempoUpdate,double tiempoDDL);
-            menu.estadisticasTotales(6,7,8,9,22.0,33.0,44.0,44.0,99.0);
+            menu.estadisticasTotales(6,7,8,9,11.0,22.0,33.0,44.00,55.00,66.00,77.00,88.00,99.00,12.0,13.0,14.0,15.4,16.4,1.68,1.25,1.4);
         if(!menu.isLento()){ //si la simulación esta funcionando en modo rapido, se llama el método que refresca la interfaz
         
             menu.ModoRapido(admC.getOcupados(), conexionesRechazadas, admP.getServidor(), admP.getConexionesNum(),pc.getOcupados(),pc.getConsultasNum(), transacciones.getOcupados(), transacciones.getConexionNum(), pc.getOcupadosEjecutor(), pc.getEjecutorNum(), conexionesTerminadas, reloj, conexionesBorradasTimeOut);
