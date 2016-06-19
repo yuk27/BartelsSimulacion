@@ -319,7 +319,7 @@ public class ModuloProcesamientoConsultas {
      * @return devuelve un double representando el tiempo de duración del proceso
      */
     public double calcularTiempoPermisos(){
-        return (-(Math.log(1 - r.nextDouble()))/0.07);
+        return (-(Math.log(1 - r.nextDouble()))/0.7);
     }
             
     /**
