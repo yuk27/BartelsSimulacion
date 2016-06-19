@@ -1,13 +1,7 @@
 package io;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- *
+ * Clase encargada de guardar los resultados de las estadisticas en cada corrida y mostrarlas en interfaz
  */
 public class InterfazEstadisticas {
     int numCorrida,tamPromCHilo, tamPromCConsultas, tamPromCTrans,tamPromCEjecucion;

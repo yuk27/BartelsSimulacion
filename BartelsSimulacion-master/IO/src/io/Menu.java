@@ -25,7 +25,7 @@ public class Menu extends javax.swing.JFrame {
     Timer displayTimer; //timer que hace la funcion del delay en la corrida lenta
     boolean simulando = false; //flag para saber cuando el sistema esta corriendo y no correrlo dos veces simultaneas
     
-    int tamPromCHilot, tamPromCConsultast, tamPromCTranst,tamPromCEjecuciont;
+    int tamPromCHilot, tamPromCConsultast, tamPromCTranst,tamPromCEjecuciont; //variables que guardan las estadisticas finales
     double PromVidat, tiempoSelectt, tiempoJoint, tiempoUpdatet,tiempoDDLt;
     
     boolean pausado = false;
@@ -91,7 +91,7 @@ public class Menu extends javax.swing.JFrame {
           s.iniciarSimulación(nc, tm, k, n, p, m, t, this);
           
           if(lento){ //si esta en modo lento genera el hilo de interfaz y el tiempo de espera.
-            displayTimer = new Timer(100, listener);
+            displayTimer = new Timer(10, listener);
             displayTimer.start(); 
           }
         }
@@ -103,19 +103,20 @@ public class Menu extends javax.swing.JFrame {
         }
 
     }
-    
-    private void playInterfaz(){
-        displayTimer.start();
-        pausado = false;
-        EmprezarBtn.setBackground(Color.red);
-        EmprezarBtn.setText("corriendo");
-    }
-    
+    //metodo que pausa la interfaz para mostrar las estadisticas de corrida
     private void pauseInterfaz(){
         displayTimer.stop();
         pausado = true;
         EmprezarBtn.setBackground(Color.green);
         EmprezarBtn.setText("seguir");
+    }
+    
+    //metodo que vuelve a poner a correr la interfaz luego de mostrar las estadisticas de corrida
+    private void playInterfaz(){
+        displayTimer.start();
+        pausado = false;
+        EmprezarBtn.setBackground(Color.red);
+        EmprezarBtn.setText("corriendo");
     }
     
         
@@ -132,9 +133,9 @@ public class Menu extends javax.swing.JFrame {
             else{
             limpiarFlechas();
                 actual = cambiosInterfaz.remove(0);
-                if(actual.getVal() == -3){
-                    InterfazEstadisticas estadistica = cambiosEstadisticas.remove(0);
-                    EventoEstadisticas(estadistica);
+                if(actual.getVal() == -3){ //si el siguiente evento es una estadistica
+                    InterfazEstadisticas estadistica = cambiosEstadisticas.remove(0); //lo saca de lista
+                    EventoEstadisticas(estadistica); //e imprime
                     limpiarLabels();
                 }
                 else{
@@ -431,6 +432,20 @@ public class Menu extends javax.swing.JFrame {
             }
         }
     
+    /**
+     * Metodo encargado de guardar las estadisticas de la corrida recien terminada
+     * @param numCorrida numero de corrida en la que nos encontramos
+     * @param tamPromCHilo tamaño promedio de la cola de hilo
+     * @param tamPromCConsultas tamaño promedio de la cola de consultas
+     * @param tamPromCTrans  tamaño promedio de la cola de transacciones
+     * @param tamPromCEjecucion  tamaño promedio de la cola de ejecucion
+     * @param PromVida  tiempo promedio de la vida de una conexion
+     * @param tiempoSelect  tiempo promedio pasado por select
+     * @param tiempoJoin tiempo promedio pasado por join
+     * @param tiempoUpdate tiempo promedio pasado por update
+     * @param tiempoDDL tiempo promedio pasado por DDL
+     * @param reloj tiempo de reloj en el momento especifico que se llamo al metodo
+     */
     public void estadisticasCorrida(int numCorrida,int tamPromCHilo,int tamPromCConsultas,int tamPromCTrans,int tamPromCEjecucion,double PromVida, double tiempoSelect,double tiempoJoin,double tiempoUpdate,double tiempoDDL, double reloj){
         int id = -3;
         retrasar(null,null,null,id,reloj);
@@ -438,6 +453,10 @@ public class Menu extends javax.swing.JFrame {
         cambiosEstadisticas.add(e);
     }
     
+    /**
+     * Metodo encargado de poner en interfaz los resultados de estadisticas de la ultima corrid
+     * @param e le entra las estadisticas de la corrida actual
+     */
     public void EventoEstadisticas(InterfazEstadisticas e){
         int[] ints = e.returnInts();
         double[] doubles = e.returnDoubles();
@@ -456,7 +475,19 @@ public class Menu extends javax.swing.JFrame {
         pauseInterfaz();
     }
     
-        public void estadisticasTotales(int tamPromCHilo,int tamPromCConsultas,int tamPromCTrans,int tamPromCEjecucion,double PromVida, double tiempoSelect,double tiempoJoin,double tiempoUpdate,double tiempoDDL){
+    /**
+     * Metodo encargado de guardar las estadisticas totales
+     * @param tamPromCHilo tamaño promedio de la cola de hilo
+     * @param tamPromCConsultas tamaño promedio de la cola de consultas
+     * @param tamPromCTrans  tamaño promedio de la cola de transacciones
+     * @param tamPromCEjecucion  tamaño promedio de la cola de ejecucion
+     * @param PromVida  tiempo promedio de la vida de una conexion
+     * @param tiempoSelect  tiempo promedio pasado por select
+     * @param tiempoJoin tiempo promedio pasado por join
+     * @param tiempoUpdate tiempo promedio pasado por update
+     * @param tiempoDDL tiempo promedio pasado por DDL
+     */
+    public void estadisticasTotales(int tamPromCHilo,int tamPromCConsultas,int tamPromCTrans,int tamPromCEjecucion,double PromVida, double tiempoSelect,double tiempoJoin,double tiempoUpdate,double tiempoDDL){
 
         this.tamPromCHilot = tamPromCHilo;
         this.tamPromCConsultast = tamPromCConsultas;
@@ -470,7 +501,10 @@ public class Menu extends javax.swing.JFrame {
         
     }
         
-        public void ImprimirEstadisticasTotales(){
+    /**
+     * Metodo encargado de imprimir en pantalla las estadisticas finales
+     */
+    public void ImprimirEstadisticasTotales(){
             
         cth.setText(Integer.toString(tamPromCHilot));
         ctc.setText(Integer.toString(tamPromCConsultast));
@@ -1349,7 +1383,7 @@ public class Menu extends javax.swing.JFrame {
         getEntradas(); //se cargan los datos y se empieza la simulacion  
        }
        
-       else{
+       else{ //si se esta mostrando las estadisticas oprimalo para seguir simulando
            if(pausado){
                playInterfaz();
            }
