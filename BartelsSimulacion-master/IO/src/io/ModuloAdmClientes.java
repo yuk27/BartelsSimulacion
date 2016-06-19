@@ -79,7 +79,7 @@ public class ModuloAdmClientes {
     public void eliminarConexion(int pos,double reloj){
         servidores[pos] = false;  //se pone el servidor en limpio 
         for(int i = 0; i < conexiones.size(); i++){ //se busca la conexión en la cola de servicioes y se elimina.
-            if(conexiones.get(i).getServidor() == pos){
+            if(conexiones.get(i).getNumServidor() == pos){
                 conexiones.remove(i);
                 menu.aplicarInterfazClientes(conexiones.size(),reloj); //se actualiza la interfaz
             }    

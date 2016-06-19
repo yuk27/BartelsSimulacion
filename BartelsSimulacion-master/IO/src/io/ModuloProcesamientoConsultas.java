@@ -7,27 +7,26 @@ import java.util.Random;
 import java.util.Vector;
 
 /**
- * Clase que represenenta el modulo de procesamiento de consultas,
+ * Clase que representa el modulo de procesamiento de consultas,
  * el cual se encarga tanto de procesar las consultas, 
  * como de enviarlas a transacciones y ejecutarlas
  */
 public class ModuloProcesamientoConsultas {
-    private Menu menu;
-    private int[] servidoresConsultas;
-    private int[] ejecutorConsultas;
-    private double[] tiempoProcesamiento; 
-    private List<Conexion> consultas;
-    private List<Conexion> ejecutor;
+   private Menu menu;
+    private int[] servidoresConsultas; //array que representa los servidores utilizables por el servidor de consultas
+    private int[] ejecutorConsultas; //array que representa los servidores utilizables por el servidor de ejecución
+    private double[] tiempoProcesamiento; //array que guarda el tiempo en donde se procesará cada consulta y para llevar contro del DLL
+    private List<Conexion> consultas; //cola de consultas
+    private List<Conexion> ejecutor; //cola de ejecutor
     private Random r = new Random();
     
-    private Vector<Integer> colaProcesamientoConsultas;
-    private Vector<Integer> colaEjecutor;
-    
-    private Vector<Double> tiempoSelect;
+    private Vector<Integer> colaProcesamientoConsultas; //colas utilizadas para 
+    private Vector<Integer> colaEjecutor;               //llevar control de los valores de las partes del modulo
+    private Vector<Double> tiempoSelect;                //en cada momento y poder utilizar los resultados para sacar estadisticas
     private Vector<Double> tiempoUpdate;
     private Vector<Double> tiempoJoin;
     private Vector<Double> tiempoDDL;
-    
+
     private Vector<Double> tiempoSelectEjecutor;
     private Vector<Double> tiempoUpdateEjecutor;
     private Vector<Double> tiempoJoinEjecutor;
