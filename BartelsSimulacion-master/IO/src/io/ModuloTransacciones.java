@@ -5,6 +5,10 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Vector;
 
+/**
+ * Clase que se encarga de toda la logica involucrada dentro de la transaccion de una conexion en el sistema
+ * @author Ulises
+ */
 public class ModuloTransacciones {
     private Menu menu;
     private boolean hayDDL;
@@ -19,6 +23,11 @@ public class ModuloTransacciones {
     
     private double mayorTiempoEjecucion;
     
+    /**
+     * Contructor de la clase. Inicializa variables.
+     * @param p tamaño de los servidores 
+     * @param menu interfaz del sistema
+     */
     public ModuloTransacciones(int p,Menu menu){
         this.servidores = new int[p];
         this.conexionesConPrioridad = new ArrayList<>();
@@ -32,25 +41,50 @@ public class ModuloTransacciones {
         this.menu = menu;
     }
     
+    /**
+     * Inicializa los servidores en -1. Los pone en desocupados.
+     */
     public void inicializarVector(){
         for(int i = 0; i < servidores.length; i++){
             this.servidores[i] = -1; 
         }
     }
     
+    /**
+     * Devuelve el tamaño de la cola de transacciones. Conexiones en espera
+     * @return tamaño de la cola de transacciones.
+     */
     public Vector<Integer> getCola(){
         return this.colaTransacciones;
     }
-      
+
+    /**
+     * Calcula el tiempo que dura el sistema procesando una transaccion
+     * @return tiempo que dura procesándose una transacción. 
+     */
     public double calcularTiempoTransaccion(){
         return this.servidores.length *0.03;
     }
     
+    /**
+     * Genera un número aleatorio dentro del rango especificado en los parámetros
+     * @param min límite inferior para generación de número aleatorio
+     * @param max límita superar para generación de número aleatorio
+     * @return número aleatorio que se encuentra entre los número indicados
+     */
        public double randomConRango(int min, int max){ 
             int range = (max - min) + 1; 
             return (Math.random()*range) + min; 
     }
     
+       /**
+        * Asigna una conexión entrante al servidor del módulo o lo pone en la cola de espera
+        * @param c conexión entrante
+        * @param eventos cola de prioridad de eventos
+        * @param reloj  tiempo actual del sistema
+        * @param pc instancia del módulo de procesamiento de consultas
+        * @return booleano que indica si la conexión logró entrar al servidor o fue añadida a la cola de espera
+        */
     public boolean asignarConexion(Conexion c,PriorityQueue<Evento> eventos,double reloj, ModuloProcesamientoConsultas pc){
         int i = 0; 
         while(i < servidores.length && !hayDDL){
@@ -77,6 +111,12 @@ public class ModuloTransacciones {
         return false;
     }
     
+    /**
+     * Calcula y guarda el tiempo que una conexión estuvo en el módulo de procesamiento de consultas
+     * @param c conexión entrarnte
+     * @param pc instancia del módulo de procesamiento de consultas
+     * @param reloj tiempo actual del sistema
+     */
         public void setTiempoModulo(Conexion c, ModuloProcesamientoConsultas pc, double reloj){
             switch(c.getTipo()){
                 case 0:
@@ -95,23 +135,43 @@ public class ModuloTransacciones {
             c.setTiempoEntradaModulo(reloj);
         }
     
+    /**
+     * Devuelve el tiempo que una conexión de tipo select duró el en módulo.
+     * @return tiempo de duración del tipo de conexión en el módulo
+     */
     public Vector<Double> getTiempoSelect(){
         return this.tiempoSelect;
     }
     
+    /**
+     * Devuelve el tiempo que una conexión de tipo join duró el en módulo.
+     * @return tiempo de duración del tipo de conexión en el módulo
+     */
     public Vector<Double> getTiempoJoin(){
         return this.tiempoJoin;
     }
         
+    /**
+     * Devuelve el tiempo que una conexión de tipo update duró el en módulo.
+     * @return tiempo de duración del tipo de conexión en el módulo
+     */
     public Vector<Double> getTiempoUpdate(){
         return this.tiempoUpdate;
     }
-            
+    
+    /**
+     * Devuelve el tiempo que una conexión de tipo DDL duró el en módulo.
+     * @return tiempo de duración del tipo de conexión en el módulo
+     */        
     public Vector<Double> getTiempoDDL(){
         return this.tiempoDDL;
     }
         
-        public int getOcupados(){
+   /**
+    * Cuenta cuántos servidores están ocupados dentro del módulo
+    * @return cantidad de servidores ocupados
+    */ 
+    public int getOcupados(){
         int aux = 0;     
         for(int i = 0; i < servidores.length; i++){
              if(servidores[i] != -1){
@@ -120,11 +180,19 @@ public class ModuloTransacciones {
         }
         return aux;  
     }
-        
+       
+    /**
+     * Calcula el tamaño de la cola del módulo
+     * @return tamaño de la cola de prioridades
+     */
     public int getConexionNum(){
        return this.conexionesConPrioridad.size();
     }
     
+    /**
+     * Determina la próxima conexión a procesar de acuerdo a su prioridad en la cola
+     * @return siguiente conexión de prioridad para procesar
+     */
     private Conexion getConexionDePrioridad(){        
         int priorMax = 0;
         int index = 0;
@@ -138,6 +206,12 @@ public class ModuloTransacciones {
         return this.conexionesConPrioridad.get(index);      
     }
     
+    /**
+     * Calcula el tiempo de salida de una conexión en este módulo de acuerdo a su tipo
+     * @param c conexión entrante 
+     * @param eventos cola de prioridad de eventos
+     * @param reloj tiempo actual del sistema
+     */
         private void calcularTiempoTransaccion(Conexion c,PriorityQueue<Evento> eventos, double reloj){        
                 double tiempo;
 
@@ -167,6 +241,11 @@ public class ModuloTransacciones {
                 eventos.add(siguienteTransaccion);
     }
     
+        /**
+         * Elimina la conexión del servidor
+         * @param c conexión a eliminar
+         * @return posición del servidor que acaba de ser liberada
+         */
     public int eliminarConexion(Conexion c){
        int posLibre = -1;
         if(c.getTipo() == 3){
@@ -181,6 +260,12 @@ public class ModuloTransacciones {
         return posLibre;
     }
     
+    /**
+     * Maneja la salida de la conexión del módulo y acomoda las conexiones que se encuentran en cola para ponerlas en servicio
+     * @param c conexión que sale
+     * @param eventos cola de prioridad de eventos
+     * @param reloj tiempo actual del sistema
+     */
     public void procesarSalida(Conexion c,PriorityQueue<Evento> eventos, double reloj){
         int posLibre = eliminarConexion(c);
         if(posLibre != -1){
@@ -194,6 +279,10 @@ public class ModuloTransacciones {
         menu.aplicarInterfazColaTransacciones(conexionesConPrioridad.size(), reloj);
     }
     
+    /**
+     * Elimina la conexión de la cola de espera ya que se le acabó el tiempo
+     * @param c conexión a eliminar
+     */
     public void eliminarConexionTimeout(Conexion c){
         this.eliminarConexion(c);
         for(int i = 0; i < conexionesConPrioridad.size(); i++){
@@ -204,14 +293,25 @@ public class ModuloTransacciones {
         }
     }
     
+    /**
+     * Setea la variable hayDDL a true
+     */
     public void setDDL(){
         this.hayDDL = true;
     }
     
+    /**
+     * Devuelve el tiempo de ejecución mayor de las conexiones en servicio
+     * @return tiempo mayor de ejecución de las conexiones en servicio
+     */
     public double getMayorTiempoEjecucion(){
         return this.mayorTiempoEjecucion;
     } 
     
+    /**
+     * Setea mayorTiempoEjecucución al valor especificado
+     * @param mayorTiempoEjecucion valor por cambiar la variable
+     */
     public void setMayorTiempoEjecucion(double mayorTiempoEjecucion){
         this.mayorTiempoEjecucion = mayorTiempoEjecucion;
     }
