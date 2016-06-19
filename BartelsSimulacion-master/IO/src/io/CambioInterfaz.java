@@ -74,6 +74,10 @@ public class CambioInterfaz {
         return Integer.toString(val);
     }
     
+    public int getVal(){
+        return val;
+    }
+    
     /**
      * Metodo encargado de devolver el Jlabel especifico de este objeto
      * @return JLabel perteneciente al objeto especifico.

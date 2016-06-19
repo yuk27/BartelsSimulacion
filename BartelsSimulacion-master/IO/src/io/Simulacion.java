@@ -262,7 +262,7 @@ public class Simulacion {
         transacciones.inicializarVector();
         
         this.menu = menu;
-        this.correrSimulacion(numC,tiempoMax);
+        this.correrSimulacion(numC,tiempoMax,k,n,p, m);
     }
     
     
@@ -273,7 +273,7 @@ public class Simulacion {
     * @param numC número de corridas que se hará en la simulación
     * @param tiempoMax tiempo max que puede durar cada corrida
     */
-    private void correrSimulacion(int numC, double tiempoMax){
+    private void correrSimulacion(int numC, double tiempoMax,int k,int n,int p, int m){
         this.crearConexion(); //se genera la primera conexión para empezar la simulación
         
         for(int i = 0; i < numC; i++){ //se corre la simulación el número de veces indicadas por el usuario
@@ -309,11 +309,21 @@ public class Simulacion {
             }
             
             this.calcularEstadisticas();
-            
-            System.out.println("Termino: " + i);
+            //menu.estadisticasCorrida(i,int tamPromCHilo,int tamPromCConsultas,int tamPromCTrans,int tamPromCEjecucion,double PromVida, double tiempoSelect,double tiempoJoin,double tiempoUpdate,double tiempoDDL, reloj);
+            menu.estadisticasCorrida(i,3,4,5,6,1.0,2.0,3.0,4.0,5.0, reloj);
+            System.out.println("Termino: " + i); //se limpia el reloj y los objetos para correr la siguiente corrida
+            reloj = 0;
+            admC = new ModuloAdmClientes(k,timeOutGlobal,menu);
+            admP = new ModuloAdmProcesos(menu);
+            pc = new ModuloProcesamientoConsultas(n,m,menu);
+            pc.inicializarVectores();
+            transacciones = new ModuloTransacciones(p,menu);
+            transacciones.inicializarVector();
         }
         
             //caluclar estadisticas totales 
+           // menu.estadisticasTotales(int tamPromCHilo,int tamPromCConsultas,int tamPromCTrans,int tamPromCEjecucion,double PromVida, double tiempoSelect,double tiempoJoin,double tiempoUpdate,double tiempoDDL);
+            menu.estadisticasTotales(6,7,8,9,22.0,33.0,44.0,44.0,99.0);
         if(!menu.isLento()){ //si la simulación esta funcionando en modo rapido, se llama el método que refresca la interfaz
         
             menu.ModoRapido(admC.getOcupados(), conexionesRechazadas, admP.getServidor(), admP.getConexionesNum(),pc.getOcupados(),pc.getConsultasNum(), transacciones.getOcupados(), transacciones.getConexionNum(), pc.getOcupadosEjecutor(), pc.getEjecutorNum(), conexionesTerminadas, reloj, conexionesBorradasTimeOut);
