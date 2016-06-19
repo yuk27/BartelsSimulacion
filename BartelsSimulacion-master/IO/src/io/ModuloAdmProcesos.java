@@ -92,7 +92,7 @@ public class ModuloAdmProcesos {
                     eventos.add(siguienteHilo); 
                 }
         menu.aplicarInterfazColaHilo(conexiones.size(),reloj);
-        menu.aplicarInterfazNuevoHilo(servidorOcupado,reloj);
+        menu.aplicarInterfazNuevoHilo(true,reloj);
         return this.servidorOcupado;
      }
      

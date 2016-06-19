@@ -619,7 +619,7 @@ public class Menu extends javax.swing.JFrame {
         jLabel10.setFont(new java.awt.Font("Tahoma", 0, 13)); // NOI18N
         jLabel10.setText("Timeout(t)");
 
-        tInput.setText("10");
+        tInput.setText("1000");
         tInput.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 tInputActionPerformed(evt);
