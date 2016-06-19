@@ -17,10 +17,16 @@ public class ModuloProcesamientoConsultas {
     
     private Vector<Integer> colaProcesamientoConsultas;
     private Vector<Integer> colaEjecutor;
+    
     private Vector<Double> tiempoSelect;
     private Vector<Double> tiempoUpdate;
     private Vector<Double> tiempoJoin;
     private Vector<Double> tiempoDDL;
+    
+    private Vector<Double> tiempoSelectEjecutor;
+    private Vector<Double> tiempoUpdateEjecutor;
+    private Vector<Double> tiempoJoinEjecutor;
+    private Vector<Double> tiempoDDLEjecutor;
     
     public ModuloProcesamientoConsultas(int p, int m, Menu menu){
         this.servidoresConsultas = new int [p];
@@ -45,7 +51,7 @@ public class ModuloProcesamientoConsultas {
                         Evento siguienteConsultaProcesada = new Evento(calcularTiempoTotal(c) + reloj, c, TipoEvento.PROCESO_CONSULTA);
                         eventos.add(siguienteConsultaProcesada);
                         this.colaProcesamientoConsultas.add(this.consultas.size());
-                        this.setTiempoModulo(c, admP, reloj);
+                        this.setTiempoModuloProcesos(c, admP, reloj);
                         menu.aplicarInterfazProcesarConsulta(getOcupados(),reloj);
                         menu.aplicarInterfazColaProcesador(consultas.size(), reloj);
                         return;
@@ -54,12 +60,12 @@ public class ModuloProcesamientoConsultas {
                 }
                 this.consultas.add(c);  
                 this.colaProcesamientoConsultas.add(this.consultas.size());
-                this.setTiempoModulo(c, admP, reloj);
+                this.setTiempoModuloProcesos(c, admP, reloj);
                 menu.aplicarInterfazProcesarConsulta(getOcupados(),reloj);
                 menu.aplicarInterfazColaProcesador(consultas.size(), reloj);
     }
         
-        public void setTiempoModulo(Conexion c, ModuloAdmProcesos admP, double reloj){
+        public void setTiempoModuloProcesos(Conexion c, ModuloAdmProcesos admP, double reloj){
             switch(c.getTipo()){
                 case 0:
                     admP.getTiempoSelect().add(reloj - c.getTiempoEntrada());
@@ -72,6 +78,24 @@ public class ModuloProcesamientoConsultas {
                     break;
                 case 3:
                    admP.getTiempoDDL().add(reloj - c.getTiempoEntrada());
+                    break;
+            }
+            c.setTiempoEntradaModulo(reloj);
+        }
+        
+        public void setTiempoModuloTransacciones(Conexion c, ModuloTransacciones transacciones, double reloj){
+            switch(c.getTipo()){
+                case 0:
+                    transacciones.getTiempoSelect().add(reloj - c.getTiempoEntradaModulo());
+                    break;
+                case 1:
+                    transacciones.getTiempoUpdate().add(reloj - c.getTiempoEntradaModulo());
+                    break;
+                case 2:
+                    transacciones.getTiempoJoin().add(reloj - c.getTiempoEntradaModulo());
+                    break;
+                case 3:
+                   transacciones.getTiempoDDL().add(reloj - c.getTiempoEntradaModulo());
                     break;
             }
             c.setTiempoEntradaModulo(reloj);
@@ -91,6 +115,22 @@ public class ModuloProcesamientoConsultas {
             
     public Vector<Double> getTiempoDDL(){
         return this.tiempoDDL;
+    }
+    
+    public Vector<Double> getTiempoSelectEjecutor(){
+        return this.tiempoSelectEjecutor;
+    }
+    
+    public Vector<Double> getTiempoJoinEjecutor(){
+        return this.tiempoJoinEjecutor;
+    }
+        
+    public Vector<Double> getTiempoUpdateEjecutor(){
+        return this.tiempoUpdateEjecutor;
+    }
+            
+    public Vector<Double> getTiempoDDLEjecutor(){
+        return this.tiempoDDLEjecutor;
     }
         
     public int getSiguienteProcesado(double reloj){ 
@@ -178,7 +218,7 @@ public class ModuloProcesamientoConsultas {
         }
     }
     
-    public void asignarConsultaAEjecutor(Conexion c,PriorityQueue<Evento> eventos, double reloj){
+    public void asignarConsultaAEjecutor(Conexion c,PriorityQueue<Evento> eventos, double reloj, ModuloTransacciones transacciones){
         int i = 0;
         
         while(i < ejecutorConsultas.length){
@@ -187,6 +227,7 @@ public class ModuloProcesamientoConsultas {
                 Evento siguienteEjecucion = new Evento(calcularTiempoAlgoritmoEjecucion(c.getNumBloques(), c) + reloj, c, TipoEvento.EJECUTO_CONSULTA);
                 eventos.add(siguienteEjecucion);
                 this.colaEjecutor.add(this.ejecutor.size());
+                this.setTiempoModuloTransacciones(c, transacciones, reloj);
                 menu.aplicarInterfazProcesarEjecutor(getOcupadosEjecutor(),reloj);
                 return;
             }
@@ -194,6 +235,7 @@ public class ModuloProcesamientoConsultas {
         }
         this.ejecutor.add(c);
         this.colaEjecutor.add(this.ejecutor.size());
+        this.setTiempoModuloTransacciones(c, transacciones, reloj);
         menu.aplicarInterfazProcesarEjecutor(getOcupadosEjecutor(),reloj);
         menu.aplicarInterfazColaEjecutor(ejecutor.size(), reloj);
     }

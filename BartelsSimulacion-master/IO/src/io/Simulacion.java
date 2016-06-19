@@ -112,7 +112,7 @@ public class Simulacion {
             admC.eliminarConexion(c.getNumServidor(),reloj);
        }
        else{
-            pc.asignarConsultaAEjecutor(c,eventos, reloj);
+            pc.asignarConsultaAEjecutor(c,eventos, reloj, transacciones);
        }    
     }
     
@@ -123,7 +123,7 @@ public class Simulacion {
     */
     private void ponerResultadoEnRed(Conexion c){
         pc.procesarSalidaEjecutor(c,eventos, reloj);
-        admC.sacarDelSistema(c,pc.calcularTamanoRespuesta(c.getNumBloques()) + reloj, eventos);
+        admC.sacarDelSistema(c,pc.calcularTamanoRespuesta(c.getNumBloques()) + reloj, eventos, pc, reloj);
     }
     
     
@@ -172,10 +172,23 @@ public class Simulacion {
         estadistica.calcularTiempoPromedioProcesos(admP.getTiempoUpdate(), 3);
         
     //calcula tiempos promedios en el modulo de procesamiento de consultas
-        estadistica.calcularTiempoPromedioProcesos(admP.getTiempoSelect(), 0);
-        estadistica.calcularTiempoPromedioProcesos(admP.getTiempoUpdate(), 2);
-        estadistica.calcularTiempoPromedioProcesos(admP.getTiempoJoin(), 1);
-        estadistica.calcularTiempoPromedioProcesos(admP.getTiempoUpdate(), 3);
+        estadistica.calcularTiempoPromedioConsultas(pc.getTiempoSelect(), 0);
+        estadistica.calcularTiempoPromedioConsultas(pc.getTiempoUpdate(), 2);
+        estadistica.calcularTiempoPromedioConsultas(pc.getTiempoJoin(), 1);
+        estadistica.calcularTiempoPromedioConsultas(pc.getTiempoUpdate(), 3);
+        
+    //calcula tiempos promedios en el modulo de transacciones
+        estadistica.calcularTiempoPromedioTransacciones(transacciones.getTiempoSelect(), 0);
+        estadistica.calcularTiempoPromedioTransacciones(transacciones.getTiempoUpdate(), 2);
+        estadistica.calcularTiempoPromedioTransacciones(transacciones.getTiempoJoin(), 1);
+        estadistica.calcularTiempoPromedioTransacciones(transacciones.getTiempoUpdate(), 3);
+        
+    //calcula tiempos promedios en el modulo ejecutor
+        estadistica.calcularTiempoPromedioEjecutor(pc.getTiempoSelectEjecutor(), 0);
+        estadistica.calcularTiempoPromedioEjecutor(pc.getTiempoUpdateEjecutor(), 2);
+        estadistica.calcularTiempoPromedioEjecutor(pc.getTiempoJoinEjecutor(), 1);
+        estadistica.calcularTiempoPromedioEjecutor(pc.getTiempoUpdateEjecutor(), 3);
+        
         
     }
   

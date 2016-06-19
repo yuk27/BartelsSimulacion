@@ -130,10 +130,31 @@ public class ModuloAdmClientes {
      * @param c la conexión que terminó todo su proceso
      * @param tamanoRespuesta doubl que representa el tamaños en disco de la respueta para poder calcular su tiempo de salida
      * @param eventos lista de eventos en donde se agrará el evento creado.
+     * @param pc instancia del mod de consultas para determinar el tiempo que la conexion estuvo en el modulo
+     * @param reloj tiempo actual del sistema
      */
-    public void sacarDelSistema(Conexion c,double tamanoRespuesta,PriorityQueue<Evento> eventos){
+    public void sacarDelSistema(Conexion c,double tamanoRespuesta,PriorityQueue<Evento> eventos, ModuloProcesamientoConsultas pc, double reloj){
         Evento siguienteSalidaDelSistema = new Evento(tamanoRespuesta, c, TipoEvento.TERMINO_CONEXION);
         eventos.add(siguienteSalidaDelSistema);
+        this.setTiempoModulo(c, pc, reloj);
+    }
+    
+    public void setTiempoModulo(Conexion c, ModuloProcesamientoConsultas pc, double reloj){
+            switch(c.getTipo()){
+                case 0:
+                    pc.getTiempoSelectEjecutor().add(reloj - c.getTiempoEntradaModulo());
+                    break;
+                case 1:
+                    pc.getTiempoUpdateEjecutor().add(reloj - c.getTiempoEntradaModulo());
+                    break;
+                case 2:
+                    pc.getTiempoJoinEjecutor().add(reloj - c.getTiempoEntradaModulo());
+                    break;
+                case 3:
+                   pc.getTiempoDDLEjecutor().add(reloj - c.getTiempoEntradaModulo());
+                    break;
+            }
+            c.setTiempoEntradaModulo(reloj);
     }
     
     /**
