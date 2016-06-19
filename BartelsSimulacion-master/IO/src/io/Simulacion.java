@@ -56,6 +56,7 @@ public class Simulacion {
     
     private void crearHiloConexion(Conexion c){      
         admP.crearHilo(c,reloj, eventos); //se pone la conexion entrante ya sea en el servidor si no hay cola, o se agrega a la cola
+        System.out.println("TAMANO DE LA COLA EN PROCESOS " + admP.getConexionesNum());
         if(admP.getServidor()){           
             if(c.getTimeout() < reloj){ //si la conexión esta en tiemout                
                 admC.eliminarConexion(c.getNumServidor(),reloj); //eliminamos la conexion en timeout
