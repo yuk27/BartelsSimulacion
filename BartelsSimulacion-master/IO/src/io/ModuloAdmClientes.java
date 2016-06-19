@@ -15,11 +15,6 @@ public class ModuloAdmClientes {
     private double timeOutGlobal;
     private Vector<Integer> colaClientes; 
     
-    private Vector<Double> tiempoSelect;
-    private Vector<Double> tiempoUpdate;
-    private Vector<Double> tiempoJoin;
-    private Vector<Double> tiempoDDL;
-    
     /**
      *Contructor de la clase que tiene por proposito inicializar las variables del objeto 
      * @param k cantidad maxima de espacios con los que contará el servidor de clientes
@@ -31,10 +26,6 @@ public class ModuloAdmClientes {
         this.conexiones = new ArrayList<>();
         this.timeOutGlobal = timeOutGlobal;
         this.colaClientes =  new Vector<>();
-        this.tiempoSelect  = new Vector<>();    
-        this.tiempoUpdate   = new Vector<>();    
-        this.tiempoJoin   = new Vector<>();    
-        this.tiempoDDL  = new Vector<>();    
         this.menu = menu;
     }
     
