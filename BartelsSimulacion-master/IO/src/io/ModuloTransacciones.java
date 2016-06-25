@@ -247,7 +247,6 @@ public class ModuloTransacciones {
          * @return posición del servidor que acaba de ser liberada
          */
     public int eliminarConexion(Conexion c){
-        System.out.println("julio es un idiota");
        int posLibre = -1;
         if(c.getTipo() == 3){
             this.hayDDL = false;
@@ -268,7 +267,6 @@ public class ModuloTransacciones {
      * @param reloj tiempo actual del sistema
      */
     public void procesarSalida(Conexion c,PriorityQueue<Evento> eventos, double reloj){
-        System.out.println("julio es un imbecil");
         int posLibre = eliminarConexion(c);
         if(posLibre != -1){
             if(!conexionesConPrioridad.isEmpty()){

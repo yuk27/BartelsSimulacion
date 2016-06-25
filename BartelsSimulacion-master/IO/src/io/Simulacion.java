@@ -316,8 +316,6 @@ public class Simulacion {
             }
             eventos.clear();
             this.calcularEstadisticas();
-            //menu.estadisticasCorrida(i,int tamPromCHilo,int tamPromCConsultas,int tamPromCTrans,int tamPromCEjecucion,double PromVida, double tiempoSelect,double tiempoJoin,double tiempoUpdate,double tiempoDDL, reloj);
-            //menu.estadisticasCorrida(i,6,7,8,9,11.0,22.0,33.0,44.00,55.00,66.00,77.00,88.00,99.00,12.0,13.0,14.0,15.4,16.4,1.68,1.25,1.4,reloj);
             Estadisticas estaditica =  estadisticas.get(i);
             menu.estadisticasCorrida(i,estaditica,reloj);
             System.out.println("Termino: " + i); //se limpia el reloj y los objetos para correr la siguiente corrida
@@ -330,15 +328,14 @@ public class Simulacion {
             transacciones.inicializarVector();
         }
         
-            this.calcularEstadisticasFinales();
-           // menu.estadisticasTotales(int tamPromCHilo,int tamPromCConsultas,int tamPromCTrans,int tamPromCEjecucion,double PromVida, double tiempoSelect,double tiempoJoin,double tiempoUpdate,double tiempoDDL);
-            //menu.estadisticasTotales(6,7,8,9,11.0,22.0,33.0,44.00,55.00,66.00,77.00,88.00,99.00,12.0,13.0,14.0,15.4,16.4,1.68,1.25,1.4);
-            System.out.println(estadisticaFinal.getColaProcesos() + " ulises es un idiota"); 
-            menu.estadisticasTotales(estadisticaFinal);
-        if(!menu.isLento()){ //si la simulación esta funcionando en modo rapido, se llama el método que refresca la interfaz
-        
-            menu.ModoRapido(admC.getOcupados(), conexionesRechazadas, admP.getServidor(), admP.getConexionesNum(),pc.getOcupados(),pc.getConsultasNum(), transacciones.getOcupados(), transacciones.getConexionNum(), pc.getOcupadosEjecutor(), pc.getEjecutorNum(), conexionesTerminadas, reloj, conexionesBorradasTimeOut);
-        
+        this.calcularEstadisticasFinales();
+        System.out.println(estadisticaFinal.getColaProcesos()); 
+        if(menu.isLento()){
+        menu.estadisticasTotales(0,null,estadisticaFinal,reloj); //en caso de ser modo lento se pone en null la estadistica final en null para evitar que se pinta más veces de lo necesario
+        }
+        else{ //si la simulación esta funcionando en modo rapido, se llama el método que refresca la interfaz
+            menu.estadisticasTotales(numC,estadisticas.get(numC-1),estadisticaFinal,reloj);
+            menu.ModoRapido(admC.getOcupados(), conexionesRechazadas, admP.getServidor(), admP.getConexionesNum(),pc.getOcupados(),pc.getConsultasNum(), transacciones.getOcupados(), transacciones.getConexionNum(), pc.getOcupadosEjecutor(), pc.getEjecutorNum(), conexionesTerminadas, reloj, conexionesBorradasTimeOut); 
         }
         System.out.println("Termino todo");
     }

@@ -24,7 +24,7 @@ public class Menu extends javax.swing.JFrame {
     private CambioInterfaz actual; //variable auxiliar para guardar el cambio de interfaz sucediendo en un momento dado
     private Timer displayTimer; //timer que hace la funcion del delay en la corrida lenta
     private boolean simulando = false; //flag para saber cuando el sistema esta corriendo y no correrlo dos veces simultaneas
-    
+    private int velCorrida = 10; //tiempo en milisegundos que se durará por instruccion en simulada modo lento
     private int tamPromCHilot, tamPromCConsultast, tamPromCTranst,tamPromCEjecuciont; //variables que guardan las estadisticas finales
     double tiempoSelectHiloT, tiempoJoinHiloT, tiempoUpdateHiloT,tiempoDDLHiloT;
     double tiempoSelectConsultaT, tiempoJoinConsultaT, tiempoUpdateConsultaT,tiempoDDLConsultaT;
@@ -96,7 +96,7 @@ public class Menu extends javax.swing.JFrame {
           s.iniciarSimulación(nc, tm, k, n, p, m, t, this);
           
           if(lento){ //si esta en modo lento genera el hilo de interfaz y el tiempo de espera.
-            displayTimer = new Timer(10, listener);
+            displayTimer = new Timer(velCorrida, listener);
             displayTimer.start(); 
           }
         }
@@ -110,10 +110,12 @@ public class Menu extends javax.swing.JFrame {
     }
     //metodo que pausa la interfaz para mostrar las estadisticas de corrida
     private void pauseInterfaz(){
+        if(displayTimer != null && displayTimer.isRunning()){
         displayTimer.stop();
         pausado = true;
         EmprezarBtn.setBackground(Color.green);
         EmprezarBtn.setText("seguir");
+        }
     }
     
     //metodo que vuelve a poner a correr la interfaz luego de mostrar las estadisticas de corrida
@@ -124,6 +126,12 @@ public class Menu extends javax.swing.JFrame {
         EmprezarBtn.setText("corriendo");
     }
     
+    /**
+     * Metodo encargado de poner el valor de duración por cada instruccion en modo lento
+     */
+    private void setVel(int val){
+        velCorrida = val;
+    }
         
     /**
      * ActionListener encargado de llevar control de los cambiosInterfaz siendo hechos, toma el primero de la lista y le hace el llamado necesario.
@@ -141,7 +149,10 @@ public class Menu extends javax.swing.JFrame {
                 if(actual.getVal() == -3){ //si el siguiente evento es una estadistica
                     estadistica = cambiosEstadisticas.remove(0); //lo saca de lista
                     EventoEstadisticas(); //e imprime
-                    limpiarLabels();
+                    if(cambiosEstadisticas.isEmpty()){//en el caso de que ya se haya llegado al final de las corridas imprima la interfaz final
+                        System.out.println("no hay nada para cargar");
+                        terminarSimulacion();
+                    }
                 }
                 else{
                 relojLabel.setText(Double.toString(actual.cargarLabel()));
@@ -164,6 +175,27 @@ public class Menu extends javax.swing.JFrame {
         colaTransaccionesLabel.setText("0");
         cierreLabel.setText("0");
         borradasTimeoutLabel.setText("0");
+        tts.setText("0.0");
+        ttj.setText("0.0");
+        ttu.setText("0.0");
+        ttd.setText("0.0");
+        tts.setText("0.0");
+        ttj.setText("0.0");
+        ttu.setText("0.0");
+        ttd.setText("0.0");
+        tts.setText("0.0");
+        ttj.setText("0.0");
+        ttu.setText("0.0");
+        ttd.setText("0.0");
+        tts.setText("0.0");
+        ttj.setText("0.0");
+        ttu.setText("0.0");
+        ttd.setText("0.0");
+        cth.setText("0");
+        ctc.setText("0");
+        ctt.setText("0");
+        cte.setText("0");
+        tpv.setText("0");
     }
     
     /**
@@ -196,8 +228,8 @@ public class Menu extends javax.swing.JFrame {
         paneles[2] = new PanelFondo("colaHilo.png");
         paneles[3] = new PanelFondo("Procesador.png");
         paneles[4] = new PanelFondo("colaServidor.png");
-        paneles[5] = new PanelFondo("transacciónes.png");
-        paneles[6] = new PanelFondo("colaTransacción.png");
+        paneles[5] = new PanelFondo("Transacciones.png");
+        paneles[6] = new PanelFondo("colaTransaccion.png");
         paneles[7] = new PanelFondo("Ejecutor.png");
         paneles[8] = new PanelFondo("colaEjecutor.png");
         paneles[9] = new PanelFondo("salida.png");
@@ -440,15 +472,7 @@ public class Menu extends javax.swing.JFrame {
     /**
      * Metodo encargado de guardar las estadisticas de la corrida recien terminada
      * @param numCorrida numero de corrida en la que nos encontramos
-     * @param tamPromCHilo tamaño promedio de la cola de hilo
-     * @param tamPromCConsultas tamaño promedio de la cola de consultas
-     * @param tamPromCTrans  tamaño promedio de la cola de transacciones
-     * @param tamPromCEjecucion  tamaño promedio de la cola de ejecucion
-     * @param PromVida  tiempo promedio de la vida de una conexion
-     * @param tiempoSelect  tiempo promedio pasado por select
-     * @param tiempoJoin tiempo promedio pasado por join
-     * @param tiempoUpdate tiempo promedio pasado por update
-     * @param tiempoDDL tiempo promedio pasado por DDL
+     * @param estadistica entrada del objeto estadistica que contiene todos los valores de estadisticas
      * @param reloj tiempo de reloj en el momento especifico que se llamo al metodo
      */
     public void estadisticasCorrida(int numCorrida,Estadisticas estadistica,double reloj){
@@ -460,7 +484,6 @@ public class Menu extends javax.swing.JFrame {
     
     /**
      * Metodo encargado de poner en interfaz los resultados de estadisticas de la ultima corrid
-     * @param e le entra las estadisticas de la corrida actual
      */
     public void EventoEstadisticas(){
         
@@ -516,45 +539,45 @@ public class Menu extends javax.swing.JFrame {
     
     /**
      * Metodo encargado de guardar las estadisticas totales
-     * @param tamPromCHilo tamaño promedio de la cola de hilo
-     * @param tamPromCConsultas tamaño promedio de la cola de consultas
-     * @param tamPromCTrans  tamaño promedio de la cola de transacciones
-     * @param tamPromCEjecucion  tamaño promedio de la cola de ejecucion
-     * @param PromVida  tiempo promedio de la vida de una conexion
-     * @param tiempoSelect  tiempo promedio pasado por select
-     * @param tiempoJoin tiempo promedio pasado por join
-     * @param tiempoUpdate tiempo promedio pasado por update
-     * @param tiempoDDL tiempo promedio pasado por DDL
+     * @param numEstadisticas entrada de que numero de estadistica fue la ultima en ser corrida
+     * @param estadisticaF objeto estadisticas que contiene las estadisticas de la ultima corrida finales
+     * @param reloj tiempo de reloj en que termina la simulacion
+     * @param estadisticaT objeto estadisticas que contiene las estadisticas promediadas y terminadas
      */
-    public void estadisticasTotales(Estadisticas estadistica){
-
-        this.tamPromCHilot = estadistica.getColaProcesos();
-        this.tamPromCConsultast = estadistica.getColaProcesamientoConsultas();
-        this.tamPromCTranst = estadistica.getColaTransacciones();
-        this.tamPromCEjecuciont = estadistica.getColaEjecutor();
-        this.PromVidat = estadistica.getTiempoPromedio();
-        this.tiempoSelectHiloT = estadistica.getTiempoPromedioSelectP();
-        this.tiempoJoinHiloT = estadistica.getTiempoPromedioJoinP();
-        this.tiempoUpdateHiloT = estadistica.getTiempoPromedioUpdateP();
-        this.tiempoDDLHiloT = estadistica.getTiempoPromedioDDLP();
-        this.tiempoSelectConsultaT = estadistica.getTiempoPromedioSelectC();
-        this.tiempoJoinConsultaT = estadistica.getTiempoPromedioJoinC();
-        this.tiempoUpdateConsultaT = estadistica.getTiempoPromedioUpdateC();
-        this.tiempoDDLConsultaT = estadistica.getTiempoPromedioDDLC();
-        this.tiempoSelectTransaccionesT = estadistica.getTiempoPromedioSelectT();
-        this.tiempoJoinTransaccionesT = estadistica.getTiempoPromedioJoinT();
-        this.tiempoUpdateTransaccionesT = estadistica.getTiempoPromedioUpdateT();
-        this.tiempoDDLTransaccionesT = estadistica.getTiempoPromedioDDLT();
-        this.tiempoSelectEjecucionT = estadistica.getTiempoPromedioSelectE();
-        this.tiempoJoinEjecucionT = estadistica.getTiempoPromedioJoinE();
-        this.tiempoUpdateEjecucionT = estadistica.getTiempoPromedioUpdateE();
-        this.tiempoDDLEjecucionT = estadistica.getTiempoPromedioDDLE();
+    public void estadisticasTotales(int numEstadisticas,Estadisticas estadisticaF ,Estadisticas estadisticaT,double reloj){
+        if(estadisticaF !=null){
+            InterfazEstadisticas interfazUltimaCorrida = new InterfazEstadisticas(numEstadisticas, estadisticaF,reloj); //se carga la estadistica de la ultima corrida
+            this.estadistica =  interfazUltimaCorrida; //se crea el objeto
+            EventoEstadisticas(); //y imprimir los valores en interfaz
+        }
+        this.tamPromCHilot = estadisticaT.getColaProcesos();
+        this.tamPromCConsultast = estadisticaT.getColaProcesamientoConsultas();
+        this.tamPromCTranst = estadisticaT.getColaTransacciones();
+        this.tamPromCEjecuciont = estadisticaT.getColaEjecutor();
+        this.PromVidat = estadisticaT.getTiempoPromedio();
+        this.tiempoSelectHiloT = estadisticaT.getTiempoPromedioSelectP();
+        this.tiempoJoinHiloT = estadisticaT.getTiempoPromedioJoinP();
+        this.tiempoUpdateHiloT = estadisticaT.getTiempoPromedioUpdateP();
+        this.tiempoDDLHiloT = estadisticaT.getTiempoPromedioDDLP();
+        this.tiempoSelectConsultaT = estadisticaT.getTiempoPromedioSelectC();
+        this.tiempoJoinConsultaT = estadisticaT.getTiempoPromedioJoinC();
+        this.tiempoUpdateConsultaT = estadisticaT.getTiempoPromedioUpdateC();
+        this.tiempoDDLConsultaT = estadisticaT.getTiempoPromedioDDLC();
+        this.tiempoSelectTransaccionesT =estadisticaT.getTiempoPromedioSelectT();
+        this.tiempoJoinTransaccionesT = estadisticaT.getTiempoPromedioJoinT();
+        this.tiempoUpdateTransaccionesT =estadisticaT.getTiempoPromedioUpdateT();
+        this.tiempoDDLTransaccionesT = estadisticaT.getTiempoPromedioDDLT();
+        this.tiempoSelectEjecucionT = estadisticaT.getTiempoPromedioSelectE();
+        this.tiempoJoinEjecucionT = estadisticaT.getTiempoPromedioJoinE();
+        this.tiempoUpdateEjecucionT = estadisticaT.getTiempoPromedioUpdateE();
+        this.tiempoDDLEjecucionT = estadisticaT.getTiempoPromedioDDLE();
         
     }
         
     /**
      * Metodo encargado de imprimir en pantalla las estadisticas finales
-     */
+     * @param tipo dependiendo del tipo que se quiera (PROCESO CONSULTA TRANSACCION EJECUCION) se imprime esos resultados en pantalla
+     */ 
     public void ImprimirEstadisticasTotales(int tipo){
         
             switch(tipo){
@@ -612,6 +635,8 @@ public class Menu extends javax.swing.JFrame {
      */
     public void ModoRapido(int k, int rechazadas, boolean hilo, int colaHilo, int n, int colaProcesador, int p, int colaTransacciónes, int m, int colaEjecutor, int cierre, double reloj, int borradas){
         
+            
+        
             kLabel.setText(Integer.toString(k));
             rechazadasLabel.setText(Integer.toString(rechazadas));
             if(hilo){
@@ -641,6 +666,7 @@ public class Menu extends javax.swing.JFrame {
     private void initComponents() {
 
         ModuloGroup = new javax.swing.ButtonGroup();
+        VelGroup = new javax.swing.ButtonGroup();
         jPanel2 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
@@ -736,6 +762,10 @@ public class Menu extends javax.swing.JFrame {
         radioEjecucionT = new javax.swing.JRadioButton();
         radioTransaccionesT = new javax.swing.JRadioButton();
         jButton3 = new javax.swing.JButton();
+        jLabel19 = new javax.swing.JLabel();
+        velUno = new javax.swing.JRadioButton();
+        velMedio = new javax.swing.JRadioButton();
+        velDiezMs = new javax.swing.JRadioButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -1165,6 +1195,10 @@ public class Menu extends javax.swing.JFrame {
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jButton2)
+                .addGap(74, 74, 74))
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1187,11 +1221,8 @@ public class Menu extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(ce))
                             .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(pv, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addComponent(jLabel14)
-                                .addGap(0, 127, Short.MAX_VALUE)))
+                                .addGap(0, 0, Short.MAX_VALUE)))
                         .addContainerGap())
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
@@ -1218,11 +1249,10 @@ public class Menu extends javax.swing.JFrame {
                                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(radioEjecucion)
                                     .addComponent(radioConsultas))))
+                        .addContainerGap())
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(pv)
                         .addContainerGap())))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton2)
-                .addGap(74, 74, 74))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1369,10 +1399,6 @@ public class Menu extends javax.swing.JFrame {
         jPanel25.setLayout(jPanel25Layout);
         jPanel25Layout.setHorizontalGroup(
             jPanel25Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel25Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(tituloTiempoPromT)
-                .addGap(88, 88, 88))
             .addGroup(jPanel25Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel25Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1395,9 +1421,6 @@ public class Menu extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(cte))
                             .addGroup(jPanel25Layout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(tpv, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel25Layout.createSequentialGroup()
                                 .addComponent(jLabel285, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(tts))
@@ -1417,27 +1440,34 @@ public class Menu extends javax.swing.JFrame {
                                 .addComponent(jLabel278)
                                 .addGap(0, 0, Short.MAX_VALUE)))
                         .addContainerGap())
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel25Layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jLabel277)
-                        .addGap(87, 87, 87))
                     .addGroup(jPanel25Layout.createSequentialGroup()
                         .addComponent(jLabel284)
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(jPanel25Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel25Layout.createSequentialGroup()
-                            .addComponent(jLabel26)
-                            .addContainerGap(45, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel25Layout.createSequentialGroup()
-                            .addGroup(jPanel25Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(radioHiloT)
-                                .addComponent(radioTransaccionesT))
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addGroup(jPanel25Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(radioEjecucionT)
-                                .addComponent(radioConsultasT))))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel25Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(jPanel25Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(radioHiloT)
+                            .addComponent(radioTransaccionesT))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(jPanel25Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(radioEjecucionT)
+                            .addComponent(radioConsultasT)))))
+            .addGroup(jPanel25Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(tpv)
+                .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel25Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel25Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel25Layout.createSequentialGroup()
+                        .addComponent(tituloTiempoPromT)
+                        .addGap(88, 88, 88))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel25Layout.createSequentialGroup()
+                        .addComponent(jLabel277)
+                        .addGap(87, 87, 87))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel25Layout.createSequentialGroup()
+                        .addComponent(jLabel26)
+                        .addContainerGap(45, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel25Layout.createSequentialGroup()
                         .addComponent(jButton3)
                         .addGap(74, 74, 74))))
         );
@@ -1501,6 +1531,28 @@ public class Menu extends javax.swing.JFrame {
                 .addGap(25, 25, 25))
         );
 
+        jLabel19.setText("Velocidad de simulacion (modo lento)");
+
+        VelGroup.add(velUno);
+        velUno.setText("1 seg por instrucción");
+        velUno.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                velUnoActionPerformed(evt);
+            }
+        });
+
+        VelGroup.add(velMedio);
+        velMedio.setText("1/2 seg por instrucción");
+        velMedio.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                velMedioActionPerformed(evt);
+            }
+        });
+
+        VelGroup.add(velDiezMs);
+        velDiezMs.setSelected(true);
+        velDiezMs.setText("10 ms por instrucción");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -1523,7 +1575,13 @@ public class Menu extends javax.swing.JFrame {
                                 .addComponent(tmInput, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(32, 32, 32)
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 132, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(velUno)
+                            .addComponent(jLabel19)
+                            .addComponent(velMedio)
+                            .addComponent(velDiezMs))
+                        .addGap(66, 66, 66)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addComponent(lentoInput)
@@ -1544,23 +1602,19 @@ public class Menu extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel12)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                            .addComponent(borradasTimeoutLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addGroup(layout.createSequentialGroup()
-                                                .addGap(35, 35, 35)
-                                                .addComponent(jLabel11)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(relojLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 116, Short.MAX_VALUE)))
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 50, Short.MAX_VALUE))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
-                                .addComponent(jPanel25, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                    .addComponent(borradasTimeoutLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                        .addGap(35, 35, 35)
+                                        .addComponent(jLabel11)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(relojLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jPanel25, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel12)
+                                .addGap(0, 0, Short.MAX_VALUE)))))
                 .addContainerGap())
             .addGroup(layout.createSequentialGroup()
                 .addGap(333, 333, 333)
@@ -1577,44 +1631,57 @@ public class Menu extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(ncInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel3)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(tmInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel10)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(tInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(9, 9, 9)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lentoInput)
-                            .addComponent(jLabel6))))
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(ncInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel3)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(tmInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel10)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(tInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(9, 9, 9)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(lentoInput)
+                                    .addComponent(jLabel6))))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(6, 6, 6)
+                                .addComponent(EmprezarBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(Imagenes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(37, 37, 37)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel11)
+                                    .addComponent(relojLabel))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel12)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(borradasTimeoutLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(jPanel25, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addGap(0, 12, Short.MAX_VALUE))))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addComponent(EmprezarBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(Imagenes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(37, 37, 37)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel11)
-                            .addComponent(relojLabel))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel19)
+                                .addGap(26, 26, 26))
+                            .addComponent(velUno))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel12)
+                        .addComponent(velMedio)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(borradasTimeoutLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jPanel25, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(velDiezMs)
                         .addGap(0, 0, Short.MAX_VALUE))))
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(layout.createSequentialGroup()
@@ -1636,6 +1703,18 @@ public class Menu extends javax.swing.JFrame {
 
     private void EmprezarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EmprezarBtnActionPerformed
        if(!simulando){
+           
+        if(velUno.isSelected()){          
+            setVel(1000);       
+        }else{
+                if(velUno.isSelected()){
+                    setVel(500);
+                }
+                else{
+                    setVel(10);
+            }
+        }
+        
         EmprezarBtn.setBackground(Color.red);
         EmprezarBtn.setText("corriendo");
         getEntradas(); //se cargan los datos y se empieza la simulacion  
@@ -1643,6 +1722,7 @@ public class Menu extends javax.swing.JFrame {
        
        else{ //si se esta mostrando las estadisticas oprimalo para seguir simulando
            if(pausado){
+               limpiarLabels();
                playInterfaz();
            }
        
@@ -1760,6 +1840,14 @@ public class Menu extends javax.swing.JFrame {
         
     }//GEN-LAST:event_jButton3ActionPerformed
 
+    private void velUnoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_velUnoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_velUnoActionPerformed
+
+    private void velMedioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_velMedioActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_velMedioActionPerformed
+
     /**
      *
      * @param args
@@ -1782,6 +1870,7 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JPanel Imagenes;
     private javax.swing.ButtonGroup ModuloGroup;
     private javax.swing.JPanel PanelHilo;
+    private javax.swing.ButtonGroup VelGroup;
     private javax.swing.JLabel borradasTimeoutLabel;
     private javax.swing.JTextField cc;
     private javax.swing.JTextField ce;
@@ -1809,6 +1898,7 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel18;
+    private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
@@ -1874,5 +1964,8 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JTextField tts;
     private javax.swing.JTextField ttu;
     private javax.swing.JTextField tu;
+    private javax.swing.JRadioButton velDiezMs;
+    private javax.swing.JRadioButton velMedio;
+    private javax.swing.JRadioButton velUno;
     // End of variables declaration//GEN-END:variables
 }
