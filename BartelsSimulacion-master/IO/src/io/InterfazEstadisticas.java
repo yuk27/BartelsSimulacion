@@ -13,26 +13,29 @@ public class InterfazEstadisticas {
     int[] ints = new int[5];
     double[] doubles = new double[6];
     
-public InterfazEstadisticas(int numCorrida,int tamPromCHilo,int tamPromCConsultas,int tamPromCTrans,int tamPromCEjecucion,double PromVida, double tiempoSelectH,double tiempoJoinH,double tiempoUpdateH,double tiempoDDLH, double tiempoSelectC,double tiempoJoinC,double tiempoUpdateC,double tiempoDDLC, double tiempoSelectT,double tiempoJoinT,double tiempoUpdateT,double tiempoDDLT, double tiempoSelectE,double tiempoJoinE,double tiempoUpdateE,double tiempoDDLE, double reloj){
+public InterfazEstadisticas(int numCorrida,Estadisticas estadistica, double reloj){
         ints[0] = numCorrida;
-        ints[1] = tamPromCHilo;
-        ints[2] = tamPromCConsultas;
-        ints[3] = tamPromCTrans;
-        ints[4] = tamPromCEjecucion;
-        doubles[0] = PromVida;
-        doubles[5] = reloj;
-        tiempoSelectHilo = tiempoSelectH;
-        tiempoJoinHilo = tiempoJoinH;
-        tiempoUpdateHilo = tiempoUpdateH;
-        tiempoDDLHilo = tiempoDDLH;
-        tiempoSelectTransacciones = tiempoSelectT;
-        tiempoJoinTransacciones = tiempoJoinT;
-        tiempoUpdateTransacciones = tiempoUpdateT;
-        tiempoDDLTransacciones = tiempoDDLT;
-        tiempoSelectEjecucion = tiempoSelectE;
-        tiempoJoinEjecucion = tiempoJoinE;
-        tiempoUpdateEjecucion = tiempoUpdateE;
-        tiempoDDLEjecucion= tiempoDDLE;
+        ints[1] = estadistica.getColaProcesos();
+        ints[2] = estadistica.getColaProcesamientoConsultas();
+        ints[3] = estadistica.getColaTransacciones();
+        ints[4] = estadistica.getColaEjecutor();
+        doubles[0] = estadistica.getTiempoPromedio();
+        tiempoSelectHilo = estadistica.getTiempoPromedioSelectP();
+        tiempoJoinHilo = estadistica.getTiempoPromedioJoinP();
+        tiempoUpdateHilo = estadistica.getTiempoPromedioUpdateP();
+        tiempoDDLHilo = estadistica.getTiempoPromedioDDLP();
+        tiempoSelectTransacciones = estadistica.getTiempoPromedioSelectT();
+        tiempoJoinTransacciones = estadistica.getTiempoPromedioJoinT();
+        tiempoUpdateTransacciones = estadistica.getTiempoPromedioUpdateT();
+        tiempoDDLTransacciones = estadistica.getTiempoPromedioDDLT();
+        tiempoSelectEjecucion = estadistica.getTiempoPromedioSelectE();
+        tiempoJoinEjecucion = estadistica.getTiempoPromedioJoinE();
+        tiempoUpdateEjecucion = estadistica.getTiempoPromedioUpdateE();
+        tiempoDDLEjecucion= estadistica.getTiempoPromedioDDLE();
+        tiempoSelectConsulta = estadistica.getTiempoPromedioSelectC();
+        tiempoJoinConsulta = estadistica.getTiempoPromedioJoinC();
+        tiempoUpdateConsulta = estadistica.getTiempoPromedioUpdateC();
+        tiempoDDLConsulta = estadistica.getTiempoPromedioDDLC();
 }   
 
 public int[] returnInts(){

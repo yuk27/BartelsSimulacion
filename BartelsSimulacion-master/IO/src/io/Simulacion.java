@@ -280,9 +280,10 @@ public class Simulacion {
     * @param tiempoMax tiempo max que puede durar cada corrida
     */
     private void correrSimulacion(int numC, double tiempoMax,int k,int n,int p, int m){
-        this.crearConexion(); //se genera la primera conexión para empezar la simulación
+        
         
         for(int i = 0; i < numC; i++){ //se corre la simulación el número de veces indicadas por el usuario
+            this.crearConexion(); //se genera la primera conexión para empezar la simulación
             while(reloj < tiempoMax){ //mientras el tiempo de reloj sea menor al tiempo maximo de corrida
                 
                 Evento siguienteEvento = eventos.poll(); //se saca el siguiente evento
@@ -313,10 +314,12 @@ public class Simulacion {
                         break;
                 }
             }
-            
+            eventos.clear();
             this.calcularEstadisticas();
             //menu.estadisticasCorrida(i,int tamPromCHilo,int tamPromCConsultas,int tamPromCTrans,int tamPromCEjecucion,double PromVida, double tiempoSelect,double tiempoJoin,double tiempoUpdate,double tiempoDDL, reloj);
-            menu.estadisticasCorrida(i,6,7,8,9,11.0,22.0,33.0,44.00,55.00,66.00,77.00,88.00,99.00,12.0,13.0,14.0,15.4,16.4,1.68,1.25,1.4,reloj);
+            //menu.estadisticasCorrida(i,6,7,8,9,11.0,22.0,33.0,44.00,55.00,66.00,77.00,88.00,99.00,12.0,13.0,14.0,15.4,16.4,1.68,1.25,1.4,reloj);
+            Estadisticas estaditica =  estadisticas.get(i);
+            menu.estadisticasCorrida(i,estaditica,reloj);
             System.out.println("Termino: " + i); //se limpia el reloj y los objetos para correr la siguiente corrida
             reloj = 0;
             admC = new ModuloAdmClientes(k,timeOutGlobal,menu);
@@ -327,9 +330,11 @@ public class Simulacion {
             transacciones.inicializarVector();
         }
         
-            //caluclar estadisticas totales 
+            this.calcularEstadisticasFinales();
            // menu.estadisticasTotales(int tamPromCHilo,int tamPromCConsultas,int tamPromCTrans,int tamPromCEjecucion,double PromVida, double tiempoSelect,double tiempoJoin,double tiempoUpdate,double tiempoDDL);
-            menu.estadisticasTotales(6,7,8,9,11.0,22.0,33.0,44.00,55.00,66.00,77.00,88.00,99.00,12.0,13.0,14.0,15.4,16.4,1.68,1.25,1.4);
+            //menu.estadisticasTotales(6,7,8,9,11.0,22.0,33.0,44.00,55.00,66.00,77.00,88.00,99.00,12.0,13.0,14.0,15.4,16.4,1.68,1.25,1.4);
+            System.out.println(estadisticaFinal.getColaProcesos() + " ulises es un idiota"); 
+            menu.estadisticasTotales(estadisticaFinal);
         if(!menu.isLento()){ //si la simulación esta funcionando en modo rapido, se llama el método que refresca la interfaz
         
             menu.ModoRapido(admC.getOcupados(), conexionesRechazadas, admP.getServidor(), admP.getConexionesNum(),pc.getOcupados(),pc.getConsultasNum(), transacciones.getOcupados(), transacciones.getConexionNum(), pc.getOcupadosEjecutor(), pc.getEjecutorNum(), conexionesTerminadas, reloj, conexionesBorradasTimeOut);

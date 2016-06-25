@@ -214,7 +214,7 @@ public class ModuloTransacciones {
      */
         private void calcularTiempoTransaccion(Conexion c,PriorityQueue<Evento> eventos, double reloj){        
                 double tiempo;
-
+                System.out.println("jiji " + c.getTipo() + " " + reloj);
                  switch(c.getTipo()){
                      case 0:        //SELECT
                          tiempo = this.calcularTiempoTransaccion() + 1/10 + reloj;
@@ -225,7 +225,7 @@ public class ModuloTransacciones {
                          tiempo = this.calcularTiempoTransaccion() + (c.getNumBloques() * 1/10) + reloj; //se calcula el tiempo del join
                          break;
                      case 3:        //DDL
-                         tiempo = this.calcularTiempoTransaccion() + this.getMayorTiempoEjecucion();
+                         tiempo = this.calcularTiempoTransaccion() + this.getMayorTiempoEjecucion() + reloj;
                          setDDL();
                          break;
                      default:       //UPDATE
@@ -247,6 +247,7 @@ public class ModuloTransacciones {
          * @return posición del servidor que acaba de ser liberada
          */
     public int eliminarConexion(Conexion c){
+        System.out.println("julio es un idiota");
        int posLibre = -1;
         if(c.getTipo() == 3){
             this.hayDDL = false;
@@ -267,6 +268,7 @@ public class ModuloTransacciones {
      * @param reloj tiempo actual del sistema
      */
     public void procesarSalida(Conexion c,PriorityQueue<Evento> eventos, double reloj){
+        System.out.println("julio es un imbecil");
         int posLibre = eliminarConexion(c);
         if(posLibre != -1){
             if(!conexionesConPrioridad.isEmpty()){

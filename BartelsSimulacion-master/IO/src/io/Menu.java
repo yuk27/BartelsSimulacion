@@ -451,10 +451,10 @@ public class Menu extends javax.swing.JFrame {
      * @param tiempoDDL tiempo promedio pasado por DDL
      * @param reloj tiempo de reloj en el momento especifico que se llamo al metodo
      */
-    public void estadisticasCorrida(int numCorrida,int tamPromCHilo,int tamPromCConsultas,int tamPromCTrans,int tamPromCEjecucion,double PromVida, double tiempoSelectH,double tiempoJoinH,double tiempoUpdateH,double tiempoDDLH, double tiempoSelectC,double tiempoJoinC,double tiempoUpdateC,double tiempoDDLC, double tiempoSelectT,double tiempoJoinT,double tiempoUpdateT,double tiempoDDLT, double tiempoSelectE,double tiempoJoinE,double tiempoUpdateE,double tiempoDDLE, double reloj){
+    public void estadisticasCorrida(int numCorrida,Estadisticas estadistica,double reloj){
         int id = -3;
         retrasar(null,null,null,id,reloj);
-        InterfazEstadisticas e =  new InterfazEstadisticas(numCorrida,tamPromCHilo,tamPromCConsultas,tamPromCTrans,tamPromCEjecucion,PromVida, tiempoSelectH,tiempoJoinH,tiempoUpdateH,tiempoDDLH,tiempoSelectC,tiempoJoinC,tiempoUpdateC,tiempoDDLC,  tiempoSelectT,tiempoJoinT,tiempoUpdateT,tiempoDDLT,tiempoSelectE,tiempoJoinE, tiempoUpdateE,tiempoDDLE,reloj);
+        InterfazEstadisticas e =  new InterfazEstadisticas(numCorrida,estadistica,reloj);
         cambiosEstadisticas.add(e);
     }
     
@@ -526,29 +526,29 @@ public class Menu extends javax.swing.JFrame {
      * @param tiempoUpdate tiempo promedio pasado por update
      * @param tiempoDDL tiempo promedio pasado por DDL
      */
-    public void estadisticasTotales(int tamPromCHilo,int tamPromCConsultas,int tamPromCTrans,int tamPromCEjecucion,double PromVida, double tiempoSelectH,double tiempoJoinH,double tiempoUpdateH,double tiempoDDLH, double tiempoSelectC,double tiempoJoinC,double tiempoUpdateC,double tiempoDDLC, double tiempoSelectT,double tiempoJoinT,double tiempoUpdateT,double tiempoDDLT, double tiempoSelectE,double tiempoJoinE,double tiempoUpdateE,double tiempoDDLE){
+    public void estadisticasTotales(Estadisticas estadistica){
 
-        this.tamPromCHilot = tamPromCHilo;
-        this.tamPromCConsultast = tamPromCConsultas;
-        this.tamPromCTranst = tamPromCTrans;
-        this.tamPromCEjecuciont = tamPromCEjecucion;
-        this.PromVidat = PromVida;
-        this.tiempoSelectHiloT = tiempoSelectH;
-        this.tiempoJoinHiloT = tiempoJoinH;
-        this.tiempoUpdateHiloT = tiempoUpdateH;
-        this.tiempoDDLHiloT = tiempoDDLH; 
-        this.tiempoSelectConsultaT = tiempoSelectC;
-        this.tiempoJoinConsultaT = tiempoJoinC;
-        this.tiempoUpdateConsultaT = tiempoUpdateC;
-        this.tiempoDDLConsultaT = tiempoDDLC; 
-        this.tiempoSelectTransaccionesT = tiempoSelectT;
-        this.tiempoJoinTransaccionesT = tiempoJoinT;
-        this.tiempoUpdateTransaccionesT = tiempoUpdateT;
-        this.tiempoDDLTransaccionesT = tiempoDDLT;
-        this.tiempoSelectEjecucionT = tiempoSelectE;
-        this.tiempoJoinEjecucionT = tiempoJoinE;
-        this.tiempoUpdateEjecucionT = tiempoUpdateE;
-        this.tiempoDDLEjecucionT = tiempoDDLE;
+        this.tamPromCHilot = estadistica.getColaProcesos();
+        this.tamPromCConsultast = estadistica.getColaProcesamientoConsultas();
+        this.tamPromCTranst = estadistica.getColaTransacciones();
+        this.tamPromCEjecuciont = estadistica.getColaEjecutor();
+        this.PromVidat = estadistica.getTiempoPromedio();
+        this.tiempoSelectHiloT = estadistica.getTiempoPromedioSelectP();
+        this.tiempoJoinHiloT = estadistica.getTiempoPromedioJoinP();
+        this.tiempoUpdateHiloT = estadistica.getTiempoPromedioUpdateP();
+        this.tiempoDDLHiloT = estadistica.getTiempoPromedioDDLP();
+        this.tiempoSelectConsultaT = estadistica.getTiempoPromedioSelectC();
+        this.tiempoJoinConsultaT = estadistica.getTiempoPromedioJoinC();
+        this.tiempoUpdateConsultaT = estadistica.getTiempoPromedioUpdateC();
+        this.tiempoDDLConsultaT = estadistica.getTiempoPromedioDDLC();
+        this.tiempoSelectTransaccionesT = estadistica.getTiempoPromedioSelectT();
+        this.tiempoJoinTransaccionesT = estadistica.getTiempoPromedioJoinT();
+        this.tiempoUpdateTransaccionesT = estadistica.getTiempoPromedioUpdateT();
+        this.tiempoDDLTransaccionesT = estadistica.getTiempoPromedioDDLT();
+        this.tiempoSelectEjecucionT = estadistica.getTiempoPromedioSelectE();
+        this.tiempoJoinEjecucionT = estadistica.getTiempoPromedioJoinE();
+        this.tiempoUpdateEjecucionT = estadistica.getTiempoPromedioUpdateE();
+        this.tiempoDDLEjecucionT = estadistica.getTiempoPromedioDDLE();
         
     }
         

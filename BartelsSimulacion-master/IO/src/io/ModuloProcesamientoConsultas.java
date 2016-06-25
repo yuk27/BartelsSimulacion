@@ -299,8 +299,8 @@ public class ModuloProcesamientoConsultas {
      * @return devuelve un double representando el tiempo de duración del proceso
      */
     public double calcularTiempoSintactico(){
-        //resultado de la integral despejada
-        double temp = r.nextDouble();
+        //distrubución uniforme a = 0 b = 1
+        double temp = (r.nextDouble());
         return temp;
     }
     
@@ -309,8 +309,8 @@ public class ModuloProcesamientoConsultas {
      * @return devuelve un double representando el tiempo de duración del proceso
      */
     public double calcularTiempoSemantico(){
-        //resultado de la integral despejada
-        double temp = r.nextDouble();
+        //distrubución uniforme a = 0 b = 2
+        double temp = (r.nextDouble())*2;
         return temp;
     }
     
