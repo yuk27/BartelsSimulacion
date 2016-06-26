@@ -320,6 +320,8 @@ public class Simulacion {
             menu.estadisticasCorrida(i,estaditica,reloj);
             System.out.println("Termino: " + i); //se limpia el reloj y los objetos para correr la siguiente corrida
             reloj = 0;
+            conexionesRechazadas = 0; 
+            conexionesTerminadas = 0;
             admC = new ModuloAdmClientes(k,timeOutGlobal,menu);
             admP = new ModuloAdmProcesos(menu);
             pc = new ModuloProcesamientoConsultas(n,m,menu);
