@@ -214,7 +214,6 @@ public class ModuloTransacciones {
      */
         private void calcularTiempoTransaccion(Conexion c,PriorityQueue<Evento> eventos, double reloj){        
                 double tiempo;
-                System.out.println("jiji " + c.getTipo() + " " + reloj);
                  switch(c.getTipo()){
                      case 0:        //SELECT
                          tiempo = this.calcularTiempoTransaccion() + 1/10 + reloj;
